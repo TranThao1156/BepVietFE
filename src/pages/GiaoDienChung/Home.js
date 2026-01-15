@@ -1,0 +1,196 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const Home = () => {
+  // --- MOCK DATA (Dữ liệu giả lập thay cho Database) ---
+  const monNgonNoiBat = [
+    {
+      id: 1,
+      TenMon: "Phở Bò Gia Truyền Nam Định",
+      HinhAnh: "https://images.unsplash.com/photo-1582878826618-c05326eff935?q=80&w=2070&auto=format&fit=crop",
+      ThoiGianNau: 90,
+      DoKho: "Trung bình",
+      average_rating: 4.9,
+      tacGia: { HoTen: "Bếp cô Minh", AnhDaiDien: "https://randomuser.me/api/portraits/women/44.jpg" }
+    },
+    {
+      id: 2,
+      TenMon: "Cơm Tấm Sườn Bì Chả",
+      HinhAnh: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?q=80&w=1000&auto=format&fit=crop",
+      ThoiGianNau: 45,
+      DoKho: "Dễ",
+      average_rating: 4.7,
+      tacGia: { HoTen: "Chef Tuấn", AnhDaiDien: "https://randomuser.me/api/portraits/men/32.jpg" }
+    },
+    {
+      id: 3,
+      TenMon: "Gỏi Cuốn Tôm Thịt",
+      HinhAnh: "https://images.unsplash.com/photo-1548596638-349c25055b80?q=80&w=1000&auto=format&fit=crop",
+      ThoiGianNau: 30,
+      DoKho: "Rất dễ",
+      average_rating: 5.0,
+      tacGia: { HoTen: "Lan Nhi", AnhDaiDien: "https://randomuser.me/api/portraits/women/65.jpg" }
+    },
+    {
+      id: 4,
+      TenMon: "Bánh Xèo Miền Tây",
+      HinhAnh: "https://images.unsplash.com/photo-1551185627-2b7b3b421274?q=80&w=1000&auto=format&fit=crop",
+      ThoiGianNau: 60,
+      DoKho: "Khó",
+      average_rating: 4.5,
+      tacGia: { HoTen: "Mẹ Gấu", AnhDaiDien: "https://randomuser.me/api/portraits/women/68.jpg" }
+    }
+  ];
+
+  return (
+    <>
+      {/* ================= HERO SECTION ================= */}
+      <section className="hero">
+        <div className="container">
+            <h1>Khám phá hương vị <br />Việt Nam</h1>
+            <p>Hàng ngàn công thức nấu ăn chuẩn vị từ các đầu bếp tại gia.</p>
+            <div className="hero-btns">
+                <Link to="/cong-thuc" className="btn btn-primary">
+                    Xem công thức
+                </Link>
+            </div>
+        </div>
+      </section>
+
+      <main className="container">
+        
+        {/* ================= SECTION 1: MÓN NGON NỔI BẬT ================= */}
+        <div className="section-header">
+            <h2>Món ngon nổi bật</h2>
+            <Link to="/cong-thuc" className="view-all">
+                Xem tất cả <i className="fa-solid fa-arrow-right"></i>
+            </Link>
+        </div>
+
+        <div className="grid-4">
+            {monNgonNoiBat.map((mon) => (
+                <article className="card" key={mon.id}>
+                    {/* Ảnh món ăn */}
+                    <img 
+                        src={mon.HinhAnh} 
+                        alt={mon.TenMon} 
+                        className="card-img" 
+                    />
+
+                    <div className="card-body">
+                        {/* Tên món (Click vào sẽ sang trang chi tiết) */}
+                        <Link to={`/cong-thuc/${mon.id}`} className="card-title">
+                            {mon.TenMon}
+                        </Link>
+
+                        <div className="card-meta">
+                            <i className="fa-regular fa-clock"></i> {mon.ThoiGianNau}p
+                            &nbsp;|&nbsp;
+                            <span>{mon.DoKho}</span>
+                        </div>
+
+                        <div className="card-footer">
+                            <div className="author">
+                                <img 
+                                    src={mon.tacGia.AnhDaiDien} 
+                                    alt={mon.tacGia.HoTen} 
+                                />
+                                <span>{mon.tacGia.HoTen}</span>
+                            </div>
+
+                            <div className="rating">
+                                <i className="fa-solid fa-star"></i> {mon.average_rating}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            ))}
+        </div>
+
+        {/* ================= SECTION 2: KHÁM PHÁ 3 MIỀN ================= */}
+        <div className="section-header" style={{ justifyContent: 'center', marginTop: '60px' }}>
+            <h2>Khám phá Ẩm thực 3 Miền</h2>
+        </div>
+        
+        <div className="grid-3">
+            <div className="region-card">
+                <img src="https://images.unsplash.com/photo-1555921015-5532091f6026?q=80&w=1000&auto=format&fit=crop" alt="Miền Bắc" />
+                <div className="region-overlay">
+                    <div className="region-title">Miền Bắc</div>
+                </div>
+            </div>
+            <div className="region-card">
+                <img src="https://images.unsplash.com/photo-1565060169123-e99d821361c4?q=80&w=1000&auto=format&fit=crop" alt="Miền Trung" />
+                <div className="region-overlay">
+                    <div className="region-title">Miền Trung</div>
+                </div>
+            </div>
+            <div className="region-card">
+                <img src="https://images.unsplash.com/photo-1559592413-7cec4d0ea49b?q=80&w=1000&auto=format&fit=crop" alt="Miền Nam" />
+                <div className="region-overlay">
+                    <div className="region-title">Miền Nam</div>
+                </div>
+            </div>
+        </div>
+
+        {/* ================= SECTION 3: MÓN NGON MỚI ================= */}
+        <div className="section-header">
+            <h2>Món ngon mới</h2>
+            <Link to="/cong-thuc" className="view-all">
+                Xem tất cả <i className="fa-solid fa-arrow-right"></i>
+            </Link>
+        </div>
+
+        {/* Tái sử dụng grid card nhưng có thể map dữ liệu khác nếu muốn */}
+        <div className="grid-4">
+            {monNgonNoiBat.map((mon) => (
+                <article className="card" key={`new-${mon.id}`}>
+                    <img src={mon.HinhAnh} alt={mon.TenMon} className="card-img" />
+                    <div className="card-body">
+                        <Link to={`/cong-thuc/${mon.id}`} className="card-title">
+                            {mon.TenMon}
+                        </Link>
+                        <div className="card-meta">
+                            <i className="fa-regular fa-clock"></i> {mon.ThoiGianNau}p
+                            &nbsp;|&nbsp;
+                            <span>{mon.DoKho}</span>
+                        </div>
+                        <div className="card-footer">
+                            <div className="author">
+                                <img src={mon.tacGia.AnhDaiDien} alt="Avatar" />
+                                <span>{mon.tacGia.HoTen}</span>
+                            </div>
+                            <div className="rating">
+                                <i className="fa-solid fa-star"></i> {mon.average_rating}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            ))}
+        </div>
+
+        {/* ================= SECTION 4: AI BANNER ================= */}
+        <div className="ai-banner">
+            <div className="ai-content">
+                <div className="ai-badge">
+                    <i className="fa-solid fa-robot"></i> Mới: Trợ lý AI
+                </div>
+                <h2>Bạn không biết nấu gì hôm nay?</h2>
+                <p>Chỉ cần nhập nguyên liệu bạn có, AI Chef sẽ gợi ý ngay.</p>
+                <button className="btn btn-white">
+                    <Link to="/ai-chat" style={{ color: 'var(--primary-color)' }}>
+                        Thử ngay miễn phí
+                    </Link>
+                </button>
+            </div>
+            <div className="ai-icon">
+                <i className="fa-solid fa-utensils"></i>
+            </div>
+        </div>
+
+      </main>
+    </>
+  );
+};
+
+export default Home;

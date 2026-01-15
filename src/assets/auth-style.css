@@ -1,0 +1,220 @@
+/* =========================================
+   AUTH STYLE - BẾP VIỆT
+   ========================================= */
+
+/* Reset CSS cơ bản */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+.auth-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;       /* Chiều cao full màn hình */
+    background: #ffffff;
+    
+    /* Cố định để đè lên các layout khác nếu có */
+    position: fixed;         
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+
+/* --- CỘT TRÁI: ẢNH (50%) --- */
+.auth-image {
+    width: 50%;
+    height: 100vh; /* Bắt buộc có chiều cao */
+    background: url('https://images.unsplash.com/photo-1556910103-1c02745a30bf?q=80&w=1000&auto=format&fit=crop') no-repeat center center;
+    background-size: cover; /* Ảnh phủ kín khung */
+    position: relative;
+    display: flex;
+    align-items: flex-end; /* Đẩy chữ xuống đáy */
+}
+
+/* Lớp phủ đen mờ trên ảnh */
+.image-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    width: 100%;
+    padding: 40px;
+    color: white;
+}
+.image-overlay h2 { font-size: 2rem; margin-bottom: 10px; font-weight: 700; }
+.image-overlay p { font-size: 1rem; opacity: 0.9; }
+
+/* --- CỘT PHẢI: FORM (50%) --- */
+.auth-form-container {
+    width: 50%;
+    height: 100vh; /* Bắt buộc có chiều cao */
+    padding: 40px 60px;
+    background: white;
+    
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Cho phép cuộn nếu màn hình thấp */
+}
+
+/* Logo */
+.auth-logo {
+    font-size: 26px;
+    font-weight: 700;
+    color: #FF6B35; /* Màu cam chủ đạo */
+    text-decoration: none;
+    margin-bottom: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* --- TABS CHUYỂN ĐỔI --- */
+.auth-tabs {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f0f0f0;
+    flex-shrink: 0;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: #9CA3AF;
+    padding-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-btn.active {
+    color: #FF6B35;
+}
+
+/* Đường gạch chân màu cam */
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #FF6B35;
+    border-radius: 3px 3px 0 0;
+}
+
+/* --- FORM STYLING --- */
+.auth-form {
+    display: none; /* Ẩn mặc định */
+    animation: fadeIn 0.4s ease-out;
+}
+
+.auth-form.active {
+    display: block; /* Hiện khi có class active */
+}
+
+.form-section-title {
+    font-size: 13px;
+    color: #6B7280;
+    margin: 25px 0 15px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+.form-row .form-group { flex: 1; }
+
+label {
+    display: block;
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+/* Input Styles */
+input, select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px; /* Bo góc mềm mại hơn */
+    font-size: 15px;
+    transition: all 0.2s;
+    background-color: #fff;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: #FF6B35;
+    box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+}
+
+/* Password Eye Icon */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+.password-input-wrapper input { padding-right: 45px; }
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: 0.2s;
+}
+.toggle-password:hover { color: #374151; }
+
+/* Submit Button */
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background-color: #FF6B35;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+}
+
+.btn-submit:hover {
+    background-color: #e04e1d;
+}
+
+/* Thông báo lỗi/thành công */
+.alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+.alert-success { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+.alert-danger { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar Custom */
+.auth-form-container::-webkit-scrollbar { width: 6px; }
+.auth-form-container::-webkit-scrollbar-track { background: #f1f1f1; }
+.auth-form-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+.auth-form-container::-webkit-scrollbar-thumb:hover { background: #999; }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .auth-wrapper { flex-direction: column; overflow-y: auto; position: absolute; }
+    .auth-image { width: 100%; height: 200px; flex-shrink: 0; }
+    .auth-form-container { width: 100%; height: auto; padding: 30px 20px; overflow: visible; }
+    .image-overlay { padding: 20px; }
+    .image-overlay h2 { font-size: 1.5rem; }
+}
