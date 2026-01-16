@@ -12,7 +12,7 @@ const CookBook = () => {
         {/* Lưu ý: Trong Blade cũ bạn để thẻ <a> bên trong <button>, điều này không hợp lệ trong HTML/React.
             Tôi đã gộp lại thành một thẻ <Link> có class button để giữ nguyên giao diện.
         */}
-        <Link to="/nguoidung/taocookbook" className="btn btn-primary">
+        <Link to="/nguoi-dung/cookbook/tao-cookbook" className="btn btn-primary">
           <i className="fa-solid fa-plus"></i> Tạo Cookbook mới
         </Link>
       </div>
@@ -26,7 +26,7 @@ const CookBook = () => {
         {/* Card 1 */}
         <div className="cb-card">
           <div className="cb-img-wrapper">
-            <Link to="/nguoidung/chitietcookbook">
+            <Link to="/nguoi-dung/cookbook/chi-tiet-cookbook">
               <img 
                 src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" 
                 alt="Eat Clean" 
@@ -43,7 +43,7 @@ const CookBook = () => {
               <span className="cb-time">
                 <i className="fa-regular fa-clock"></i> 2 giờ trước
               </span>
-              <Link to="/nguoidung/chitietcookbook" className="cb-link">
+              <Link to="/nguoi-dung/cookbook/chi-tiet-cookbook" className="cb-link">
                 Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
               </Link>
             </div>
@@ -53,7 +53,7 @@ const CookBook = () => {
         {/* Card 2 */}
         <div className="cb-card">
           <div className="cb-img-wrapper">
-            <Link to="/nguoidung/chitietcookbook">
+            <Link to="/nguoi-dung/cookbook/chi-tiet-cookbook">
               <img 
                 src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop" 
                 alt="Món ngon đãi tiệc" 
@@ -70,7 +70,7 @@ const CookBook = () => {
               <span className="cb-time">
                 <i className="fa-regular fa-clock"></i> 1 ngày trước
               </span>
-              <Link to="/nguoidung/chitietcookbook" className="cb-link">
+              <Link to="/nguoidung/cookbook/chitietcookbook" className="cb-link">
                 Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
               </Link>
             </div>
@@ -80,7 +80,7 @@ const CookBook = () => {
         {/* Card 3 */}
         <div className="cb-card">
           <div className="cb-img-wrapper">
-            <Link to="/nguoidung/chitietcookbook">
+            <Link to="/nguoidung/cookbook/chitietcookbook">
               <img 
                 src="https://images.unsplash.com/photo-1496116218417-1a781b1c423c?q=80&w=1000&auto=format&fit=crop" 
                 alt="Bữa sáng" 
@@ -97,7 +97,7 @@ const CookBook = () => {
               <span className="cb-time">
                 <i className="fa-regular fa-clock"></i> 3 ngày trước
               </span>
-              <Link to="/nguoidung/chitietcookbook" className="cb-link">
+              <Link to="/nguoidung/cookbook/chitietcookbook" className="cb-link">
                 Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
               </Link>
             </div>

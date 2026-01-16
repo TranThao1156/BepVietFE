@@ -23,7 +23,7 @@ const QlBlog = () => {
       <div className="blog-manage-grid">
 
         {/* Card Tạo mới - Tôi đã chuyển div thành Link để có thể click được */}
-        <Link to="/nguoidung/taoblog" className="blog-create-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to="/nguoi-dung/ql-blog/tao-blog" className="blog-create-card" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className="create-icon">
             <i className="fa-solid fa-plus"></i>
           </div>
@@ -34,7 +34,7 @@ const QlBlog = () => {
         {/* Blog Card 1 */}
         <div className="blog-manage-card">
           <div className="blog-card-thumb">
-            <Link to="/user/blog/detail/1">
+            <Link to="/nguoi-dung/ql-blog/chi-tiet-blog/1">
               <img 
                 src="https://images.unsplash.com/photo-1626082927389-d3164294050d?q=80&w=1000&auto=format&fit=crop" 
                 alt="Thịt bò" 
@@ -52,7 +52,7 @@ const QlBlog = () => {
             </div>
           </div>
           <div className="blog-actions">
-            <Link to="/nguoidung/suablog" className="btn-icon btn-edit" title="Sửa">
+            <Link to="/nguoi-dung/ql-blog/sua-blog" className="btn-icon btn-edit" title="Sửa">
               <i className="fa-regular fa-pen-to-square"></i>
             </Link>
             <button 
@@ -68,7 +68,7 @@ const QlBlog = () => {
         {/* Blog Card 2 */}
         <div className="blog-manage-card">
           <div className="blog-card-thumb">
-            <Link to="/user/blog/detail/2">
+            <Link to="/nguoi-dung/ql-blog/chi-tiet-blog/2">
               <img 
                 src="https://images.unsplash.com/photo-1555243896-c709bfa0b564?q=80&w=1000&auto=format&fit=crop" 
                 alt="Nhà hàng chay" 
@@ -86,7 +86,7 @@ const QlBlog = () => {
             </div>
           </div>
           <div className="blog-actions">
-            <Link to="/nguoidung/suablog" className="btn-icon btn-edit" title="Sửa">
+            <Link to="/nguoi-dung/ql-blog/sua-blog" className="btn-icon btn-edit" title="Sửa">
               <i className="fa-regular fa-pen-to-square"></i>
             </Link>
             <button 
@@ -102,7 +102,7 @@ const QlBlog = () => {
         {/* Blog Card 3 */}
         <div className="blog-manage-card">
           <div className="blog-card-thumb">
-            <Link to="/nguoidung/suablog">
+            <Link to="/nguoi-dung/ql-blog/sua-blog">
               <img 
                 src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop" 
                 alt="Rau củ" 
@@ -121,7 +121,7 @@ const QlBlog = () => {
           </div>
 
           <div className="blog-actions">
-            <Link to="/nguoidung/suablog" className="btn-icon btn-edit" title="Sửa">
+            <Link to="/nguoi-dung/ql-blog/sua-blog" className="btn-icon btn-edit" title="Sửa">
               <i className="fa-regular fa-pen-to-square"></i>
             </Link>
             <button 

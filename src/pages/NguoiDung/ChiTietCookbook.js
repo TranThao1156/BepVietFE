@@ -22,7 +22,7 @@ const ChiTietCookbook = () => {
       {/* Nút Quay lại */}
       <div style={{ marginBottom: '20px' }}>
         <Link 
-          to="/user/cookbook" 
+          to="/nguoi-dung/cookbook" 
           style={{ 
             textDecoration: 'none', 
             color: 'var(--text-gray)', 
@@ -53,7 +53,7 @@ const ChiTietCookbook = () => {
           
           <div className="hero-actions">
             <Link 
-              to="/user/cookbook/edit/1" // Giả sử ID là 1
+              to="/nguoi-dung/sua-cookbook/1" // Giả sử ID là 1
               className="btn btn-outline-gray" 
               style={{ padding: '8px 20px' }}
             >

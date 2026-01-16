@@ -20,7 +20,7 @@ const QlCongThuc = () => {
         <div className="manage-card-header">
           <h3>Danh sách món ăn</h3>
           {/* Sửa lại nút tạo mới: Thay vì button lồng a, dùng Link trực tiếp */}
-          <Link to="/nguoidung/taocongthuc" className="btn btn-primary btn-sm">
+          <Link to="/nguoi-dung/ql-cong-thuc/tao-cong-thuc" className="btn btn-primary btn-sm">
             <i className="fa-solid fa-plus"></i> Tạo mới
           </Link>
         </div>
@@ -53,7 +53,7 @@ const QlCongThuc = () => {
                 <td className="table-date">20/10/2023</td>
                 <td><span className="badge badge-success">Đã duyệt</span></td>
                 <td className="text-right">
-                  <Link to="/nguoidung/suacongthuc" className="action-btn edit" title="Sửa">
+                  <Link to="/nguoi-dung/ql-cong-thuc/sua-cong-thuc" className="action-btn edit" title="Sửa">
                     <i className="fa-solid fa-pen"></i>
                   </Link>
                   <button 
@@ -82,7 +82,7 @@ const QlCongThuc = () => {
                 <td className="table-date">22/10/2023</td>
                 <td><span className="badge badge-warning">Chờ duyệt</span></td>
                 <td className="text-right">
-                  <Link to="/nguoidung/suacongthuc" className="action-btn edit">
+                  <Link to="/nguoi-dung/ql-cong-thuc/sua-cong-thuc" className="action-btn edit">
                     <i className="fa-solid fa-pen"></i>
                   </Link>
                   <button 
@@ -110,7 +110,7 @@ const QlCongThuc = () => {
                 <td className="table-date">15/10/2023</td>
                 <td><span className="badge badge-danger">Từ chối</span></td>
                 <td className="text-right">
-                  <Link to="/nguoidung/suacongthuc" className="action-btn edit">
+                  <Link to="/nguoi-dung/ql-cong-thuc/sua-cong-thuc" className="action-btn edit">
                     <i className="fa-solid fa-pen"></i>
                   </Link>
                   <button 
@@ -138,7 +138,7 @@ const QlCongThuc = () => {
                 <td className="table-date">12/10/2023</td>
                 <td><span className="badge badge-success">Đã duyệt</span></td>
                 <td className="text-right">
-                  <Link to="/nguoidung/suacongthuc" className="action-btn edit">
+                  <Link to="/nguoi-dung/ql-cong-thuc/sua-cong-thuc" className="action-btn edit">
                     <i className="fa-solid fa-pen"></i>
                   </Link>
                   <button 
@@ -166,7 +166,7 @@ const QlCongThuc = () => {
                 <td className="table-date">28/10/2023</td>
                 <td><span className="badge badge-warning">Chờ duyệt</span></td>
                 <td className="text-right">
-                  <Link to="/nguoidung/suacongthuc" className="action-btn edit">
+                  <Link to="/nguoi-dung/ql-cong-thuc/sua-cong-thuc" className="action-btn edit">
                     <i className="fa-solid fa-pen"></i>
                   </Link>
                   <button 

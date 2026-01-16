@@ -17,21 +17,21 @@ import TaoCookbook from '../pages/NguoiDung/TaoCookbook';
 
 export default function UserRoutes() {
   return (
-    <>
-      <Route path="/nguoidung" element={<LayoutNguoiDung />}>
-        <Route path="thongtincanhan" element={<ThongTinCaNhan />} />
+    <Routes>
+      <Route element={<LayoutNguoiDung />}>
+        <Route path="thong-tin-ca-nhan" element={<ThongTinCaNhan />} />
         <Route path="cookbook" element={<CookBook />} />
-        <Route path="chitietcookbook" element={<ChiTietCookbook />} />
-        <Route path="doimatkhau" element={<DoiMatKhau />} />
-        <Route path="lichsutruycap" element={<LichSuTruyCap />} />
-        <Route path="qlcongthuc" element={<QlCongThuc />} />
-        <Route path="qlblog" element={<QlBlog />} />
-        <Route path="suablog" element={<SuaBlog />} />
-        <Route path="suacongthuc" element={<SuaCongThuc />} />
-        <Route path="taoblog" element={<TaoBlog />} />
-        <Route path="taocongthuc" element={<TaoCongThuc />} />
-        <Route path="taocookbook" element={<TaoCookbook />} />
+        <Route path="cookbook/chi-tiet-cookbook" element={<ChiTietCookbook />} />
+        <Route path="doi-mat-khau" element={<DoiMatKhau />} />
+        <Route path="lich-su-truy-cap" element={<LichSuTruyCap />} />
+        <Route path="ql-cong-thuc" element={<QlCongThuc />} />
+        <Route path="ql-blog" element={<QlBlog />} />
+        <Route path="ql-blog/sua-blog" element={<SuaBlog />} />
+        <Route path="ql-cong-thuc/sua-cong-thuc" element={<SuaCongThuc />} />
+        <Route path="ql-blog/tao-blog" element={<TaoBlog />} />
+        <Route path="ql-cong-thuc/tao-cong-thuc" element={<TaoCongThuc />} />
+        <Route path="cookbook/tao-cookbook" element={<TaoCookbook />} />
       </Route>
-      </>
+      </Routes>
   );
 }

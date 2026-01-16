@@ -53,7 +53,7 @@ const SuaCongThuc = () => {
           <h2>Chỉnh sửa công thức</h2>
           <p>Cập nhật thông tin cho món ăn của bạn.</p>
         </div>
-        <Link to="/nguoidung/qlcongthuc" className="btn-outline-gray">
+        <Link to="/nguoi-dung/ql-cong-thuc" className="btn-outline-gray">
           <i className="fa-solid fa-arrow-left"></i> Quay lại
         </Link>
       </div>

@@ -630,8 +630,8 @@ blockquote p { margin-bottom: 0; }
 
 .sidebar-footer {
     border-top: 1px solid #E5E7EB;
-    padding-top: 15px;
-    margin-top: 10px;
+    padding-top: 5px;
+    margin-top: 5px;
 }
 .user-mini { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.9rem; }
 .user-mini img { width: 32px; height: 32px; border-radius: 50%; }
@@ -705,7 +705,9 @@ blockquote p { margin-bottom: 0; }
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
 }
-
+.mar {
+    margin-top: 20px;
+}
 /* AI Style */
 .message-row.ai .msg-avatar { background: #10A37F; color: white; background: var(--primary-color); }
 .message-row.ai .msg-bubble { background: #F9FAFB; color: var(--text-dark); border-radius: 0 12px 12px 12px; }

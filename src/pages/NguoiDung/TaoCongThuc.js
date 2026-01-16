@@ -250,7 +250,7 @@ const TaoCongThuc = () => {
 
         {/* --- ACTIONS --- */}
         <div className="form-submit-area">
-          <Link to="/nguoidung/qlcongthuc" className="btn-outline-gray" style={{ marginRight: 'auto' }}>
+          <Link to="/nguoi-dung/ql-cong-thuc" className="btn-outline-gray" style={{ marginRight: 'auto' }}>
             <i className="fa-solid fa-arrow-left"></i> Quay lại
           </Link>  
           <button type="submit" className="btn btn-primary btn-large">Đăng công thức</button>

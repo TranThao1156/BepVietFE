@@ -126,7 +126,7 @@ const TaoCookbook = () => {
         </div>
 
         <div className="form-actions" style={{ marginTop: '40px', borderTop: '1px solid #F3F4F6', paddingTop: '20px' }}>
-          <Link to="/nguoidung/cookbook" className="btn-outline-gray" style={{ border: '1px solid #E5E7EB', textDecoration: 'none' }}>
+          <Link to="/nguoi-dung/cookbook" className="btn-outline-gray" style={{ border: '1px solid #E5E7EB', textDecoration: 'none' }}>
             Hủy bỏ
           </Link>
           <button 

@@ -62,7 +62,7 @@ body {
 
 .nav-item i { width: 20px; text-align: center; }
 
-.sidebar-footer { padding-top: 20px; border-top: 1px solid #E5E7EB; }
+
 
 /* --- 2. MAIN CONTENT AREA --- */
 .main-content {
@@ -99,7 +99,7 @@ body {
     margin: 0 auto 20px;
 }
 
-.avatar-circle {
+.avatar-circle2 {
     width: 100%; height: 100%;
     background-color: #FFEDD5; /* Màu cam nhạt */
     color: var(--primary-color);

@@ -1,8 +1,16 @@
-import logo from "./logo.svg";
-import "./App.css";
-import AppRouter from "./routes/AppRouter";
 
-export default function App() {
-  return <AppRouter />;
+import { BrowserRouter } from 'react-router-dom';
+import AppRouter from './routes/AppRouter';
+import ScrollToTop from './components/ScrollToTop'; 
+import './assets/css/style.css';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <AppRouter />
+    </BrowserRouter>
+  );
 }
 
+export default App;

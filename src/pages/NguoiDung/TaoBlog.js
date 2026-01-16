@@ -29,7 +29,7 @@ const TaoBlog = () => {
           <h1>Viết bài chia sẻ</h1>
           <p>Chia sẻ kinh nghiệm và mẹo vặt với cộng đồng.</p>
         </div>
-        <Link to="/nguoidung/qlblog" className="btn btn-outline-gray btn-sm">
+        <Link to="/nguoi-dung/ql-blog" className="btn btn-outline-gray btn-sm">
           <i className="fa-solid fa-arrow-left"></i> Quay lại
         </Link>
       </div>

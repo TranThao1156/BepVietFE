@@ -18,7 +18,7 @@ const SuaBlog = () => {
           <h2>Chỉnh sửa bài viết</h2>
           <p>Cập nhật nội dung chia sẻ của bạn.</p>
         </div>
-        <Link to="/nguoidung/qlblog" className="btn-outline-gray">
+        <Link to="/nguoi-dung/ql-blog" className="btn-outline-gray">
           <i className="fa-solid fa-arrow-left"></i> Quay lại
         </Link>
       </div>
