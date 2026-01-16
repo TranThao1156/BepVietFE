@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 // Đảm bảo bạn đã copy file style.css vào thư mục src/assets/
-import '../assets/style.css'; 
+import '../assets/css/style.css'; 
 
 const LayoutChung = () => {
   const location = useLocation();

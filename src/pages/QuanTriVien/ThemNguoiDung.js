@@ -24,7 +24,7 @@ const ThemNguoiDung = () => {
                 <p className="subtitle">Tạo tài khoản thành viên hoặc quản trị viên mới</p>
             </div>
             <div className="header-actions">
-                <Link to="/admin/quanlynguoidung" className="btn btn-white">
+                <Link to="/quan-tri/quan-ly-nguoi-dung" className="btn btn-white">
                     <i className="fa-solid fa-arrow-left"></i> Quay lại danh sách
                 </Link>
             </div>

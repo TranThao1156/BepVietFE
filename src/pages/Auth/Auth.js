@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 // Import CSS (theo yêu cầu của bạn đã để trong assets)
 // Lưu ý: Đảm bảo file css tên là auth-style.css nằm đúng đường dẫn
-import '../../assets/auth-style.css'; 
+import '../../assets/css/auth-style.css'; 
 
 const Auth = () => {
     // --- STATE QUẢN LÝ ---

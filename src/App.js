@@ -1,7 +1,8 @@
+
 import { BrowserRouter } from 'react-router-dom';
 import AppRouter from './routes/AppRouter';
 import ScrollToTop from './components/ScrollToTop'; 
-import './assets/style.css';
+import './assets/css/style.css';
 
 function App() {
   return (

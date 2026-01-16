@@ -45,7 +45,7 @@ const SuaNguoiDung = () => {
                 <p className="subtitle">Cập nhật thông tin cho tài khoản ID: <strong>{id}</strong></p>
             </div>
             <div className="header-actions">
-                <Link to="/admin/quanlynguoidung" className="btn btn-white">
+                <Link to="/quan-tri/quan-ly-nguoi-dung" className="btn btn-white">
                     <i className="fa-solid fa-arrow-left"></i> Quay lại danh sách
                 </Link>
             </div>
@@ -199,7 +199,7 @@ const SuaNguoiDung = () => {
                     </button>
 
                     <div className="action-right" style={{ display: 'flex', alignItems: 'center' }}>
-                        <Link to="/admin/quanlynguoidung" className="btn-text-gray">Hủy bỏ</Link>
+                        <Link to="/quan-tri/quan-ly-nguoi-dung" className="btn-text-gray">Hủy bỏ</Link>
                         <button type="button" className="btn btn-primary" style={{marginLeft: '15px'}}>
                             <i className="fa-solid fa-save" style={{marginRight: '8px'}}></i> Lưu thay đổi
                         </button>

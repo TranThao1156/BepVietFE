@@ -29,7 +29,7 @@ const QuanLyNguoiDung = () => {
                 </div>
                 <div className="header-actions">
                     {/* Link tới trang Thêm người dùng */}
-                    <Link to="/admin/quanlynguoidung/themnguoidung" className="btn btn-primary">
+                    <Link to="/quan-tri/quan-ly-nguoi-dung/them-nguoi-dung" className="btn btn-primary">
                         <i className="fa-solid fa-user-plus"></i> Thêm người dùng
                     </Link>
                 </div>
@@ -82,7 +82,7 @@ const QuanLyNguoiDung = () => {
                                     </td>
                                     <td className="text-right">
                                         <div className="action-group">
-                                            <Link to={`/admin/quanlynguoidung/suanguoidung/${user.id}`} className="btn-icon">
+                                            <Link to={`/quan-tri/quan-ly-nguoi-dung/sua-nguoi-dung/${user.id}`} className="btn-icon">
                                                 <i className="fa-solid fa-pen-to-square"></i>
                                             </Link>
                                             <button

@@ -12,7 +12,7 @@ const TaoDanhMuc = () => {
                 <p className="subtitle">Tạo danh mục món ăn mới để phân loại công thức</p>
             </div>
             <div className="header-actions">
-                <Link to="/admin/quan-ly-danh-muc" className="btn btn-white">
+                <Link to="/quan-tri/quan-ly-danh-muc" className="btn btn-white">
                     <i className="fa-solid fa-arrow-left"></i> Quay lại danh sách
                 </Link>
             </div>
@@ -67,7 +67,7 @@ const TaoDanhMuc = () => {
                 </div>
 
                 <div className="card-footer" style={{justifyContent: 'flex-end'}}>
-                    <Link to="/admin/categories" className="btn-text-gray" style={{marginRight: '20px'}}>Hủy bỏ</Link>
+                    <Link to="/quan-tri/quan-ly-danh-muc" className="btn-text-gray" style={{marginRight: '20px'}}>Hủy bỏ</Link>
                     <button type="button" className="btn btn-primary">
                         <i className="fa-solid fa-plus" style={{marginRight: '8px'}}></i> Tạo danh mục
                     </button>

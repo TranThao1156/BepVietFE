@@ -35,7 +35,7 @@ const QuanLyDanhMuc = () => {
             </div>
             
             {/* Link tới trang Tạo danh mục (Sẽ làm ở bước sau) */}
-            <Link to="/admin/quanlydanhmuc/taodanhmuc" className="btn btn-primary">
+            <Link to="/quan-tri/quan-ly-danh-muc/tao-danh-muc" className="btn btn-primary">
                 <i className="fas fa-plus-circle" style={{marginRight: '8px'}}></i> Tạo danh mục mới
             </Link>
         </div>
@@ -62,7 +62,7 @@ const QuanLyDanhMuc = () => {
                                     <td>
                                         <div className="action-group">
                                             {/* Link tới trang Sửa (Sẽ làm ở bước sau) */}
-                                            <Link to={`/admin/quanlydanhmuc/suadanhmuc/${cat.id}`} className="btn-icon">
+                                            <Link to={`/quan-tri/quan-ly-danh-muc/sua-danh-muc/${cat.id}`} className="btn-icon">
                                                 <i className="fas fa-pen"></i>
                                             </Link>
                                             

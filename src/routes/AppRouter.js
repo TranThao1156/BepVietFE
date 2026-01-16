@@ -1,23 +1,27 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ClientRoutes from './ClientRoutes';
 import AdminRoutes from './AdminRoutes';
+import UserRoutes from './UserRoutes';
+
 
 const AppRouter = () => {
   return (
     <Routes>
-      {/* QUAN TRỌNG: Dấu sao (*) ở cuối path báo hiệu cho React Router biết
-        là "hãy nhường quyền xử lý phần còn lại cho file con".
-      */}
+      <Route path="/nguoi-dung" element={<Navigate to="/nguoi-dung/thong-tin-ca-nhan" replace />} />
 
-      {/* 1. Nếu đường dẫn là /admin/... thì gọi AdminRoutes */}
-      <Route path="/admin/*" element={<AdminRoutes />} />
+      <Route path="/quan-tri/*" element={<AdminRoutes />} />
 
-      {/* 2. Tất cả đường dẫn còn lại (/*) thì gọi ClientRoutes */}
+      <Route path="/nguoi-dung/*" element={<UserRoutes />} />
+
+
       <Route path="/*" element={<ClientRoutes />} />
       
+      <Route path="*" element={<div>404 Not Found</div>} />
+
     </Routes>
   );
 };
 
 export default AppRouter;
+

@@ -20,15 +20,15 @@ const AdminRoutes = () => {
         <Route index element={<BangDieuKhien />} />
         
         {/* Nội dung */}
-        <Route path="kiemduyet" element={<KiemDuyetNoiDung />} /> 
+        <Route path="kiem-duyet" element={<KiemDuyetNoiDung />} /> 
         {/* Người dùng */}
-        <Route path="quanlynguoidung" element={<QuanLyNguoiDung />} />
-        <Route path="quanlynguoidung/themnguoidung" element={<ThemNguoiDung />} />
-        <Route path="quanlynguoidung/suanguoidung/:id" element={<SuaNguoiDung />} />
+        <Route path="quan-ly-nguoi-dung" element={<QuanLyNguoiDung />} />
+        <Route path="quan-ly-nguoi-dung/them-nguoi-dung" element={<ThemNguoiDung />} />
+        <Route path="quan-ly-nguoi-dung/sua-nguoi-dung/:id" element={<SuaNguoiDung />} />
         {/* Danh mục */}
-        <Route path="quanlydanhmuc" element={<QuanLyDanhMuc />} />
-        <Route path="quanlydanhmuc/taodanhmuc" element={<TaoDanhMuc />} />
-        <Route path="quanlydanhmuc/suadanhmuc/:id" element={<SuaDanhMuc />} />
+        <Route path="quan-ly-danh-muc" element={<QuanLyDanhMuc />} />
+        <Route path="quan-ly-danh-muc/tao-danh-muc" element={<TaoDanhMuc />} />
+        <Route path="quan-ly-danh-muc/sua-danh-muc/:id" element={<SuaDanhMuc />} />
         
 
       </Route>

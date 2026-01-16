@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import '../assets/admin.css'; // Import CSS riêng cho Admin
+import '../assets/css/admin.css'; // Import CSS riêng cho Admin
 
 const AdminLayout = () => {
     return (
@@ -25,22 +25,22 @@ const AdminLayout = () => {
                     <ul>
                         <li>
                             {/* end: Để chỉ active khi đúng chính xác đường dẫn /admin */}
-                            <NavLink to="/admin" end className={({ isActive }) => isActive ? "active" : ""}>
+                            <NavLink to="/quan-tri" end className={({ isActive }) => isActive ? "active" : ""}>
                                 <i className="fas fa-chart-pie"></i> Bảng điều khiển
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/quanlynguoidung" className={({ isActive }) => isActive ? "active" : ""}>
+                            <NavLink to="/quan-tri/quan-ly-nguoi-dung" className={({ isActive }) => isActive ? "active" : ""}>
                                 <i className="fas fa-users"></i> Quản lý Người dùng
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/kiemduyet" className={({ isActive }) => isActive ? "active" : ""}>
+                            <NavLink to="/quan-tri/kiem-duyet" className={({ isActive }) => isActive ? "active" : ""}>
                                 <i className="fas fa-file-alt"></i> Kiểm duyệt nội dung
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/quanlydanhmuc" className={({ isActive }) => isActive ? "active" : ""}>
+                            <NavLink to="/quan-tri/quan-ly-danh-muc" className={({ isActive }) => isActive ? "active" : ""}>
                                 <i className="fas fa-tags"></i> Quản lý Danh mục
                             </NavLink>
                         </li>
