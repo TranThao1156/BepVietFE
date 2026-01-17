@@ -25,9 +25,15 @@ export default function DangNhapDangKy() {
     };
 
     const res = await login(data);
-
+    console.log("👉 DỮ LIỆU SERVER TRẢ VỀ:", res);
     if (res.success) {
+      
       localStorage.setItem("user", JSON.stringify(res.user));
+      if (res.token) {
+            localStorage.setItem("access_token", res.token); 
+        } else if (res.access_token) {
+            localStorage.setItem("access_token", res.access_token);
+        }
         alert("✅ Đăng nhập thành công");
         localStorage.setItem("user", JSON.stringify(res.user));
         navigate("/");
