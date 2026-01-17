@@ -106,7 +106,7 @@ const LayoutChung = () => {
                 </div>
               </div>
             ) : (
-              <Link to="/login" className="btn btn-primary">
+              <Link to="/dang-nhap" className="btn btn-primary">
                 Đăng nhập
               </Link>
             )}

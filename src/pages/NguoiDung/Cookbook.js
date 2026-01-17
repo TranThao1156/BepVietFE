@@ -1,17 +1,52 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CookBook = () => {
+  const [dsCookbook, setDsCookbook] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCookbooks = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        console.log("Token hiện tại:", token);
+        if (!token) { navigate('/dang-nhap'); return; }
+
+        const response = await fetch('http://localhost:8000/api/user/cookbook', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setDsCookbook(data.data);
+        }
+      } catch (error) {
+        console.error("Lỗi:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCookbooks();
+  }, [navigate]);
+
+  const filteredCookbooks = dsCookbook.filter(cb => 
+      cb.TenCookBook.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <main className="main-content">
       <div className="content-header-flex">
         <div className="header-text">
           <h1>Cookbook của tôi</h1>
-          <p>Bộ sưu tập các công thức yêu thích được phân loại theo chủ đề.</p>
+          <p>Bộ sưu tập các công thức yêu thích của bạn.</p>
         </div>
-        {/* Lưu ý: Trong Blade cũ bạn để thẻ <a> bên trong <button>, điều này không hợp lệ trong HTML/React.
-            Tôi đã gộp lại thành một thẻ <Link> có class button để giữ nguyên giao diện.
-        */}
         <Link to="/nguoi-dung/cookbook/tao-cookbook" className="btn btn-primary">
           <i className="fa-solid fa-plus"></i> Tạo Cookbook mới
         </Link>
@@ -19,91 +54,56 @@ const CookBook = () => {
 
       <div className="dashboard-search">
         <i className="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Tìm kiếm bộ sưu tập..." />
+        <input 
+            type="text" 
+            placeholder="Tìm kiếm bộ sưu tập..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       <div className="cookbook-grid">
-        {/* Card 1 */}
-        <div className="cb-card">
-          <div className="cb-img-wrapper">
-            <Link to="/nguoi-dung/cookbook/chi-tiet-cookbook">
-              <img 
-                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" 
-                alt="Eat Clean" 
-              />
-            </Link>
-            <span className="cb-count">
-              <i className="fa-solid fa-book-open"></i> 12 món
-            </span>
-          </div>
-          <div className="cb-body">
-            <h3 className="cb-title">Thực đơn Eat Clean</h3>
-            <p className="cb-desc">Các món ăn ít calo, tốt cho sức khỏe và giữ dáng mỗi ngày.</p>
-            <div className="cb-footer">
-              <span className="cb-time">
-                <i className="fa-regular fa-clock"></i> 2 giờ trước
-              </span>
-              <Link to="/nguoi-dung/cookbook/chi-tiet-cookbook" className="cb-link">
-                Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
-              </Link>
+        {loading ? (
+            <p style={{gridColumn: '1/-1', textAlign: 'center'}}>Đang tải dữ liệu...</p>
+        ) : filteredCookbooks.length === 0 ? (
+            <div style={{gridColumn: '1/-1', textAlign: 'center', color: '#666'}}>
+                <i className="fa-regular fa-folder-open" style={{fontSize: '40px'}}></i>
+                <p>{searchTerm ? 'Không tìm thấy kết quả.' : 'Bạn chưa có bộ sưu tập nào.'}</p>
             </div>
-          </div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="cb-card">
-          <div className="cb-img-wrapper">
-            <Link to="/nguoi-dung/cookbook/chi-tiet-cookbook">
-              <img 
-                src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop" 
-                alt="Món ngon đãi tiệc" 
-              />
-            </Link>
-            <span className="cb-count">
-              <i className="fa-solid fa-book-open"></i> 8 món
-            </span>
-          </div>
-          <div className="cb-body">
-            <h3 className="cb-title">Món ngon đãi tiệc</h3>
-            <p className="cb-desc">Danh sách các món nướng và lẩu phù hợp cho tụ tập bạn bè cuối tuần.</p>
-            <div className="cb-footer">
-              <span className="cb-time">
-                <i className="fa-regular fa-clock"></i> 1 ngày trước
-              </span>
-              <Link to="/nguoidung/cookbook/chitietcookbook" className="cb-link">
-                Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3 */}
-        <div className="cb-card">
-          <div className="cb-img-wrapper">
-            <Link to="/nguoidung/cookbook/chitietcookbook">
-              <img 
-                src="https://images.unsplash.com/photo-1496116218417-1a781b1c423c?q=80&w=1000&auto=format&fit=crop" 
-                alt="Bữa sáng" 
-              />
-            </Link>
-            <span className="cb-count">
-              <i className="fa-solid fa-book-open"></i> 5 món
-            </span>
-          </div>
-          <div className="cb-body">
-            <h3 className="cb-title">Bữa sáng 15 phút</h3>
-            <p className="cb-desc">Nhanh gọn, đầy đủ dinh dưỡng cho buổi sáng bận rộn.</p>
-            <div className="cb-footer">
-              <span className="cb-time">
-                <i className="fa-regular fa-clock"></i> 3 ngày trước
-              </span>
-              <Link to="/nguoidung/cookbook/chitietcookbook" className="cb-link">
-                Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
-              </Link>
-            </div>
-          </div>
-        </div>
-
+        ) : (
+            filteredCookbooks.map((cookbook) => (
+                // Vì Service trả về 'id', nên ở đây dùng cookbook.id là ĐÚNG
+                <div className="cb-card" key={cookbook.id}>
+                    <div className="cb-img-wrapper">
+                        <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}`}>
+                            <img 
+                                src={cookbook.AnhBia} // Service đã tạo link ảnh đầy đủ
+                                alt={cookbook.TenCookBook}
+                                onError={(e) => {e.target.src = 'https://placehold.co/600x400?text=No+Image'}}
+                            />
+                        </Link>
+                        <span className="cb-count">
+                            <i className="fa-solid fa-book-open"></i> {cookbook.SoLuongMon} món
+                        </span>
+                    </div>
+                    
+                    <div className="cb-body">
+                        <h3 className="cb-title">{cookbook.TenCookBook}</h3>
+                        <div className="cb-footer">
+                            <span className="cb-time">
+                                {cookbook.TrangThai === 0 
+                                    ? <i className="fa-solid fa-lock" title="Riêng tư"></i> 
+                                    : <i className="fa-solid fa-globe" title="Công khai"></i>} 
+                                {' ' + cookbook.NgayTao}
+                            </span>
+                            <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}`} className="cb-link">
+                                Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            ))
+        )}
       </div>
     </main>
   );

@@ -25,18 +25,29 @@ export default function DangNhapDangKy() {
     };
 
     const res = await login(data);
-    console.log("👉 DỮ LIỆU SERVER TRẢ VỀ:", res);
+    console.log("👉 API TRẢ VỀ:", res); // Soi kỹ dòng này
+
     if (res.success) {
+      // 1. Xác định chính xác token nằm ở đâu
+      const token = res.token || res.access_token;
       
-      localStorage.setItem("user", JSON.stringify(res.user));
-      if (res.token) {
-            localStorage.setItem("access_token", res.token); 
-        } else if (res.access_token) {
-            localStorage.setItem("access_token", res.access_token);
-        }
-        alert("✅ Đăng nhập thành công");
-        localStorage.setItem("user", JSON.stringify(res.user));
-        navigate("/");
+      if (token) {
+          // Lưu token
+          localStorage.setItem("access_token", token);
+          
+          // Lưu user info
+          localStorage.setItem("user", JSON.stringify(res.user));
+          
+          alert("✅ Đăng nhập thành công");
+
+          // 👇 THAY ĐỔI QUAN TRỌNG:
+          // Dùng window.location.href để load lại trang hoàn toàn. 
+          // Điều này giúp React "quên" sạch trạng thái cũ và load lại Token mới từ đầu.
+          window.location.href = "/"; 
+      } else {
+          alert("❌ Lỗi: Server không trả về Token!");
+      }
+
     } else {
       alert("❌ " + res.message);
     }
