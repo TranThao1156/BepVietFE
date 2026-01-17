@@ -29,7 +29,10 @@ export default function DangNhapDangKy() {
     if (res.success) {
       localStorage.setItem("user", JSON.stringify(res.user));
         alert("✅ Đăng nhập thành công");
-        localStorage.setItem("user", JSON.stringify(res.user));
+        // localStorage.setItem("user", JSON.stringify(res.user));
+
+        // Trâm- thêm Lưu Token (Thay vào chỗ dòng bị trùng)
+        localStorage.setItem("token", res.token);
         navigate("/");
     } else {
       alert("❌ " + res.message);
