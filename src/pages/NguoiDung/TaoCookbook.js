@@ -28,40 +28,58 @@ const TaoCookbook = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Chuẩn bị FormData
-    const formData = new FormData();
-    
-    // Gán các giá trị (Tên key phải khớp với Laravel Controller)
-    formData.append('TenCookBook', tenCookbook);
-    formData.append('Ma_ND', 1); // ID người dùng (tạm thời hardcode là 1)
-    
-    // Chuyển đổi trạng thái: 'public' -> 1, 'private' -> 0
-    formData.append('TrangThai', visibility === 'public' ? 1 : 0);
+    // 1. Lấy Token từ nơi bạn lưu trữ (Ví dụ: localStorage)
+    // Nếu bạn lưu tên khác thì sửa lại 'access_token' cho đúng
+    const token = localStorage.getItem('access_token'); 
+    console.log("Token hiện tại là:", token);
+    if (!token) {
+        alert('Bạn chưa đăng nhập! Vui lòng đăng nhập lại.');
+        navigate('/dang-nhap'); // Chuyển hướng nếu chưa có token
+        return;
+    }
 
-    // Nếu có chọn ảnh thì mới gửi
+    const formData = new FormData();
+    formData.append('TenCookBook', tenCookbook);
+    formData.append('TrangThai', visibility === 'public' ? 1 : 0);
     if (fileAnh) {
         formData.append('AnhBia', fileAnh);
     }
 
     try {
-        // Gọi API Laravel
-        const response = await fetch('http://127.0.0.1:8000/api/cookbook/create', {
+        const response = await fetch('http://127.0.0.1:8000/api/user/cookbook/tao-cookbook', {
             method: 'POST',
-            body: formData, // Tự động nhận diện Multipart form data
+            headers: {
+                // QUAN TRỌNG: Gửi kèm Token để Laravel biết bạn là ai
+                'Authorization': `Bearer ${token}`,
+                
+                // LƯU Ý ĐẶC BIỆT: 
+                // Khi dùng FormData để gửi file, KHÔNG ĐƯỢC thêm 'Content-Type': 'multipart/form-data'
+                // Trình duyệt sẽ tự động thêm header này cùng với boundary chính xác.
+                // Chỉ cần thêm 'Accept': 'application/json' để Laravel trả về JSON khi lỗi
+                'Accept': 'application/json',
+            },
+            body: formData, 
         });
 
         const data = await response.json();
 
+        // Kiểm tra mã lỗi cụ thể
         if (response.ok) {
             alert('Đã tạo Cookbook thành công!');
             navigate('/nguoi-dung/cookbook');
         } else {
-            console.error('Lỗi từ server:', data);
-            alert('Lỗi: ' + JSON.stringify(data.errors || data.message));
+            // Nếu lỗi là 401 thì là do Token hết hạn hoặc sai
+            if (response.status === 401) {
+                alert('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+                navigate('/dang-nhap');
+            } else {
+                console.error('Lỗi từ server:', data);
+                alert('Lỗi: ' + (data.message || JSON.stringify(data)));
+            }
         }
     } catch (error) {
         console.error('Lỗi kết nối:', error);
-        alert('Không thể kết nối đến Server Laravel');
+        alert('Không thể kết nối đến Server. Kiểm tra lại API.');
     }
   };
 
