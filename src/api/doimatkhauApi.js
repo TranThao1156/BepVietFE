@@ -1,8 +1,5 @@
-// src/api/doimatkhauAPI.js
-
 export const changePassword = async (data) => {
     // 1. Lấy token từ bộ nhớ (lúc đăng nhập bạn lưu tên gì thì điền vào đây)
-    // Mình đang giả sử bạn lưu là 'accessToken' hoặc 'token'
     const token = localStorage.getItem('token'); 
 
     // 2. Gọi fetch

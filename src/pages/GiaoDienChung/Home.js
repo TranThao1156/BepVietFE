@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import DsCongThuc from './DsCongThuc'; //Trâm-import 
 const Home = () => {
   // --- MOCK DATA (Dữ liệu giả lập thay cho Database) ---
   const monNgonNoiBat = [
@@ -60,51 +60,9 @@ const Home = () => {
       <main className="container">
         
         {/* ================= SECTION 1: MÓN NGON NỔI BẬT ================= */}
-        <div className="section-header">
-            <h2>Món ngon nổi bật</h2>
-            <Link to="/cong-thuc" className="view-all">
-                Xem tất cả <i className="fa-solid fa-arrow-right"></i>
-            </Link>
-        </div>
-
-        <div className="grid-4">
-            {monNgonNoiBat.map((mon) => (
-                <article className="card" key={mon.id}>
-                    {/* Ảnh món ăn */}
-                    <img 
-                        src={mon.HinhAnh} 
-                        alt={mon.TenMon} 
-                        className="card-img" 
-                    />
-
-                    <div className="card-body">
-                        {/* Tên món (Click vào sẽ sang trang chi tiết) */}
-                        <Link to={`/cong-thuc/${mon.id}`} className="card-title">
-                            {mon.TenMon}
-                        </Link>
-
-                        <div className="card-meta">
-                            <i className="fa-regular fa-clock"></i> {mon.ThoiGianNau}p
-                            &nbsp;|&nbsp;
-                            <span>{mon.DoKho}</span>
-                        </div>
-
-                        <div className="card-footer">
-                            <div className="author">
-                                <img 
-                                    src={mon.tacGia.AnhDaiDien} 
-                                    alt={mon.tacGia.HoTen} 
-                                />
-                                <span>{mon.tacGia.HoTen}</span>
-                            </div>
-
-                            <div className="rating">
-                                <i className="fa-solid fa-star"></i> {mon.average_rating}
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            ))}
+        {/* Trâm - thay thế code cũ bằng Component DsCongThuc */}
+        <div id="danh-sach-mon" style={{ marginTop: '50px', marginBottom: '80px' }}>
+             <DsCongThuc />
         </div>
 
         {/* ================= SECTION 2: KHÁM PHÁ 3 MIỀN ================= */}
@@ -134,40 +92,7 @@ const Home = () => {
         </div>
 
         {/* ================= SECTION 3: MÓN NGON MỚI ================= */}
-        <div className="section-header">
-            <h2>Món ngon mới</h2>
-            <Link to="/cong-thuc" className="view-all">
-                Xem tất cả <i className="fa-solid fa-arrow-right"></i>
-            </Link>
-        </div>
-
-        {/* Tái sử dụng grid card nhưng có thể map dữ liệu khác nếu muốn */}
-        <div className="grid-4">
-            {monNgonNoiBat.map((mon) => (
-                <article className="card" key={`new-${mon.id}`}>
-                    <img src={mon.HinhAnh} alt={mon.TenMon} className="card-img" />
-                    <div className="card-body">
-                        <Link to={`/cong-thuc/${mon.id}`} className="card-title">
-                            {mon.TenMon}
-                        </Link>
-                        <div className="card-meta">
-                            <i className="fa-regular fa-clock"></i> {mon.ThoiGianNau}p
-                            &nbsp;|&nbsp;
-                            <span>{mon.DoKho}</span>
-                        </div>
-                        <div className="card-footer">
-                            <div className="author">
-                                <img src={mon.tacGia.AnhDaiDien} alt="Avatar" />
-                                <span>{mon.tacGia.HoTen}</span>
-                            </div>
-                            <div className="rating">
-                                <i className="fa-solid fa-star"></i> {mon.average_rating}
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            ))}
-        </div>
+       {/* Trâm-xóa  */}
 
         {/* ================= SECTION 4: AI BANNER ================= */}
         <div className="ai-banner">
