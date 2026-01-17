@@ -4,7 +4,7 @@ import "../../assets/css/auth-style.css";
 import { useNavigate } from "react-router-dom";
 
 export default function DangNhapDangKy() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [tab, setTab] = useState("login");
   const [showPassword, setShowPassword] = useState({});
 
@@ -29,6 +29,7 @@ export default function DangNhapDangKy() {
     if (res.success) {
       localStorage.setItem("user", JSON.stringify(res.user));
         alert("✅ Đăng nhập thành công");
+        localStorage.setItem("user", JSON.stringify(res.user));
         navigate("/");
     } else {
       alert("❌ " + res.message);
