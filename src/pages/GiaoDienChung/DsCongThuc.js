@@ -1,8 +1,10 @@
 // Thảo
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const DsCongThuc = () => {
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
 
@@ -30,6 +32,16 @@ const DsCongThuc = () => {
     return "Không rõ";
   };
 
+  const handleCreateRecipe = () => {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      navigate("/dang-nhap");
+    } else {
+      navigate("/nguoi-dung/cong-thuc/tao-cong-thuc");
+    }
+  };
+
   return (
     <main className="container">
       <div className="page-header">
@@ -39,10 +51,12 @@ const DsCongThuc = () => {
         </div>
         <div className="header-row">
           <h1>Khám phá công thức</h1>
-          <button className="btn btn-primary">
-            <Link to="/tao-cong-thuc" style={{ color: "white" }}>
-              Thêm công thức mới
-            </Link>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleCreateRecipe}
+          >
+            Thêm công thức mới
           </button>
         </div>
       </div>
