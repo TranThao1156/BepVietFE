@@ -1229,6 +1229,222 @@ blockquote p { margin-bottom: 0; }
     background-color: #c0392b;
     color: #fff;
 }
+.user-dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ff7a18;
+}
+
+.user-menu {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 220px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  padding: 12px;
+  z-index: 9999;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all .25s ease;
+}
+
+/* hover giữ menu */
+
+
+.user-name {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.user-email {
+  font-size: 13px;
+  color: #777;
+}
+
+.user-menu a,
+.user-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.user-menu button {
+  color: #e74c3c;
+}
+/* =========================================
+   USER DROPDOWN 
+   ========================================= */
+
+.user-dropdown {
+    position: relative;
+    display: inline-block;
+    padding: 5px 0; /* Tăng diện tích hover cho khung bao ngoài */
+}
+
+/* Avatar styling */
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ff7a18; /* Màu cam chủ đạo */
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-dropdown:hover .user-avatar {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+}
+
+/* Menu Dropdown */
+.user-menu {
+    position: absolute;
+    top: 120%; /* Đẩy xuống dưới avatar một chút */
+    right: 0;
+    width: 260px; /* Rộng hơn chút để thoải mái nội dung */
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    
+    /* Hiệu ứng bóng đổ xịn hơn */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+    
+    /* Ẩn mặc định để làm hiệu ứng hiện ra */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px); /* Dịch xuống một chút để trượt lên */
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    
+    z-index: 9999;
+}
+
+/* --- QUAN TRỌNG: CẦU NỐI VÔ HÌNH --- 
+   Lớp giả này lấp khoảng trống giữa Avatar và Menu 
+   để chuột không bị mất focus */
+.user-menu::before {
+    content: "";
+    position: absolute;
+    top: -20px; /* Kéo dài lên trên chạm vào avatar */
+    left: 0;
+    width: 100%;
+    height: 30px; 
+    background: transparent; /* Trong suốt */
+    display: block;
+}
+
+/* Tam giác nhỏ chỉ lên trên (Trang trí) */
+.user-menu::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: 15px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    transform: rotate(45deg);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-left: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Hiệu ứng khi Hover vào cha (.user-dropdown) */
+.user-dropdown:hover .user-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Nội dung bên trong Menu */
+.user-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 2px;
+}
+
+.user-email {
+    font-size: 0.9rem;
+    color: #9CA3AF;
+    margin-bottom: 15px;
+    word-break: break-all; /* Ngắt dòng nếu email quá dài */
+}
+
+/* Đường kẻ ngang */
+.user-menu hr {
+    border: none;
+    border-top: 1px solid #F3F4F6;
+    margin: 10px 0;
+}
+
+/* Các link và nút */
+.user-menu a,
+.user-menu button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: inherit;
+    font-weight: 500;
+    color: #4B5563;
+    transition: background 0.2s, color 0.2s;
+    text-decoration: none; /* Bỏ gạch chân mặc định của thẻ a */
+}
+
+/* Icon (nếu bạn muốn thêm icon vào trong link sau này) */
+.user-menu a:hover,
+.user-menu button:hover {
+    background-color: #FFF7ED; /* Màu nền cam nhạt khi hover */
+    color: #FF6B35; /* Màu chữ cam đậm */
+}
+
+/* Riêng nút Đăng xuất */
+.user-menu button {
+    color: #EF4444; /* Màu đỏ nhẹ */
+    margin-top: 5px;
+}
+
+.user-menu button:hover {
+    background-color: #FEF2F2; /* Nền đỏ nhạt */
+    color: #DC2626; /* Chữ đỏ đậm */
+}
+.vai-tro {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+.vai-tro.admin {
+    color: #dc3545; /* Màu đỏ cho Admin */
+    background: #f8d7da;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.vai-tro.user {
+    color: #28a745; /* Màu xanh lá cho Người dùng */
+    background: #d4edda;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
 .recipe-left-sidebar {   /* <--- TÊN MỚI */
     width: 280px;
     flex-shrink: 0;
