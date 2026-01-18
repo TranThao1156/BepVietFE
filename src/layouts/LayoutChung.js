@@ -25,10 +25,10 @@ const LayoutChung = () => {
 
   // Trâm -thêm: Hàm xử lý khi bấm nút Tìm kiếm
   const handleSearch = () => {
-    if (keyword.trim()) {
+    
       // Chuyển hướng sang trang công thức kèm từ khóa trên URL
       navigate(`/cong-thuc?keyword=${encodeURIComponent(keyword)}`);
-    }
+    
   };
 
   // Hàm kiểm tra link active (thay thế cho request()->routeIs() của Laravel)
@@ -85,6 +85,7 @@ const LayoutChung = () => {
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  onFocus={(e) => e.target.select()}
                 />
                 
                 {/* Trâm -thêm: Sự kiện click nút Tìm */}
