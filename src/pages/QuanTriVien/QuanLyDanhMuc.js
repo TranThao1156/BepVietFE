@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 const QuanLyDanhMuc = () => {
@@ -7,6 +7,9 @@ const QuanLyDanhMuc = () => {
     const [loading, setLoading] = useState(true);     // Trạng thái đang tải
     const [pagination, setPagination] = useState({}); // Thông tin phân trang
     const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
+    const [suggestions, setSuggestions] = useState([]); // Lưu danh sách gợi ý
+    const [showSuggestions, setShowSuggestions] = useState(false); // Ẩn/Hiện gợi ý
+    const searchTimeoutRef = useRef(null); // Dùng để Debounce (tránh gọi API liên tục)
 
     // 2. Hàm gọi API
     const fetchCategories = async (page = 1, search = '') => {
@@ -67,10 +70,51 @@ const QuanLyDanhMuc = () => {
     }, []);
 
     // 4. Xử lý tìm kiếm khi nhấn Enter
-    const handleSearch = (e) => {
-        if (e.key === 'Enter') {
-            fetchCategories(1, searchTerm);
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+
+        // Nếu xóa hết chữ thì ẩn gợi ý
+        if (value.length === 0) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            fetchCategories(1, ''); // Load lại bảng đầy đủ
+            return;
         }
+
+        // --- KỸ THUẬT DEBOUNCE (Chờ người dùng dừng gõ 300ms mới gọi API) ---
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        searchTimeoutRef.current = setTimeout(async () => {
+            try {
+                // Gọi API tìm kiếm riêng cho gợi ý
+                const token = localStorage.getItem('user_token') || localStorage.getItem('access_token');
+                // Gọi đúng API search hiện tại
+                const url = `http://localhost:8000/api/admin/danh-muc?search=${value}`;
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                // Lấy danh sách kết quả (Laravel trả về data.data)
+                if (data.data && data.data.length > 0) {
+                    setSuggestions(data.data);
+                    setShowSuggestions(true);
+                } else {
+                    setShowSuggestions(false);
+                }
+            } catch (error) {
+                console.error("Lỗi gợi ý:", error);
+            }
+        }, 300); // 300ms
+    };
+    const selectSuggestion = (name) => {
+        setSearchTerm(name);       // 1. Điền tên vào ô input
+        setShowSuggestions(false); // 2. Ẩn danh sách gợi ý
+        fetchCategories(1, name);  // 3. Kích hoạt tìm kiếm cho bảng chính
     };
     const handleDelete = async (id) => {
         // 1. Hỏi xác nhận
@@ -132,9 +176,35 @@ const QuanLyDanhMuc = () => {
                         type="text"
                         placeholder="Tìm kiếm danh mục..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onKeyDown={handleSearch}
+                        onChange={handleInputChange} // Đổi hàm onChange ở đây
+                        onKeyDown={(e) => {
+                            // Nếu nhấn Enter thì tắt gợi ý và tìm kiếm luôn
+                            if (e.key === 'Enter') {
+                                setShowSuggestions(false);
+                                fetchCategories(1, searchTerm);
+                            }
+                        }}
+                        // (Tùy chọn) Khi click ra ngoài thì ẩn (đơn giản nhất là dùng onBlur delay)
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     />
+
+                    {/* --- DANH SÁCH GỢI Ý --- */}
+                    {showSuggestions && suggestions.length > 0 && (
+                        <ul className="suggestions-list">
+                            {suggestions.map((item) => (
+                                <li
+                                    key={item.Ma_DM}
+                                    onClick={() => selectSuggestion(item.TenDM)}
+                                >
+                                    {item.TenDM}
+                                    {/* (Có thể hiển thị thêm loại cho đẹp) */}
+                                    <span style={{ float: 'right', fontSize: '0.8em', color: '#999' }}>
+                                        {item.LoaiDM}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
 
                 <Link to="/quan-tri/quan-ly-danh-muc/tao-danh-muc" className="btn btn-primary">
