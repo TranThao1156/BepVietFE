@@ -19,6 +19,30 @@ const DsCongThuc = () => {
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get('keyword') || '';
 
+  // --- 👇 Trâm - chức năng: 1. KHAI BÁO STATE CHO BỘ LỌC 👇 ---
+  const [filters, setFilters] = useState({
+    region: 'all',
+    category: 'all',
+    difficulty: 'all',
+    time: 'all'
+  });
+  // Biến này dùng để kích hoạt useEffect chạy lại khi bấm nút "Lọc kết quả"
+  const [applyFilter, setApplyFilter] = useState(false);
+
+  // --- 👇 Trâm - chức năng: 2. HÀM XỬ LÝ KHI CHỌN RADIO/CHECKBOX 👇 ---
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // --- 👇 Trâm - chức năng: 3. HÀM XỬ LÝ KHI BẤM NÚT "LỌC KẾT QUẢ" 👇 ---
+  const handleApplyFilter = () => {
+    setPage(1); // Reset về trang 1
+    setApplyFilter(!applyFilter); // Đổi giá trị để kích hoạt useEffect
+  };
+
   // Trâm-đã sửa: Viết lại useEffect để gọi API tìm kiếm
   useEffect(() => {
     const fetchData = async () => {
@@ -28,8 +52,14 @@ const DsCongThuc = () => {
         const res = await timKiemCongThuc({
           page: page,
           limit: 6,
-          sort: sort,     // Gửi kèm kiểu sắp xếp
-          keyword: keyword // Gửi kèm từ khóa
+          sort: sort,       // Gửi kèm kiểu sắp xếp
+          keyword: keyword, // Gửi kèm từ khóa
+          
+          // --- 👇 Trâm - chức năng: 4. GỬI KÈM THAM SỐ LỌC XUỐNG API 👇 ---
+          region: filters.region,
+          category: filters.category,
+          difficulty: filters.difficulty,
+          time: filters.time
         });
 
         if (res.success) {
@@ -45,13 +75,16 @@ const DsCongThuc = () => {
     };
 
     fetchData();
-  }, [page, sort, keyword]); // Trâm-đã sửa: Chạy lại khi Page, Sort hoặc Keyword thay đổi
+    // Trâm-đã sửa: Thêm applyFilter vào dependency để chạy lại khi bấm nút Lọc
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, sort, keyword, applyFilter]); 
 
   const mapDoKho = (value) => {
+    // Vì database có thể lưu chữ hoặc số, map lại cho chắc chắn
     if (value === 1 || value === "Dễ") return "Dễ";
     if (value === 2 || value === "Trung bình") return "Trung bình";
     if (value === 3 || value === "Khó") return "Khó";
-    return "Không rõ";
+    return value; 
   };
 
   const handleCreateRecipe = () => {
@@ -84,19 +117,22 @@ const DsCongThuc = () => {
       </div>
 
       <div className="discovery-layout">
-        {/* --- SIDEBAR BỘ LỌC (GIỮ NGUYÊN) --- */}
+        {/* --- SIDEBAR BỘ LỌC --- */}
         <aside className="sidebar-filters">
+          
+          {/* 1. LỌC VÙNG MIỀN */}
           <div className="filter-group">
             <h3>
               <i className="fa-solid fa-earth-asia"></i> Vùng miền
             </h3>
+            {/* Trâm - chức năng: Thêm value, checked, onChange */}
             <label className="custom-radio">
-              <input type="radio" name="region" defaultChecked />
+              <input type="radio" name="region" value="all" checked={filters.region === 'all'} onChange={handleFilterChange} />
               <span className="radio-mark"></span>
               <span>Tất cả</span>
             </label>
             <label className="custom-radio">
-              <input type="radio" name="region" />
+              <input type="radio" name="region" value="1" checked={filters.region === '1'} onChange={handleFilterChange}/>
               <span className="radio-mark"></span>
               <div>
                 <span>Miền Bắc</span>
@@ -104,7 +140,7 @@ const DsCongThuc = () => {
               </div>
             </label>
             <label className="custom-radio">
-              <input type="radio" name="region" />
+              <input type="radio" name="region" value="2" checked={filters.region === '2'} onChange={handleFilterChange}/>
               <span className="radio-mark"></span>
               <div>
                 <span>Miền Trung</span>
@@ -112,7 +148,7 @@ const DsCongThuc = () => {
               </div>
             </label>
             <label className="custom-radio">
-              <input type="radio" name="region" />
+              <input type="radio" name="region" value="3" checked={filters.region === '3'} onChange={handleFilterChange}/>
               <span className="radio-mark"></span>
               <div>
                 <span>Miền Nam</span>
@@ -121,79 +157,123 @@ const DsCongThuc = () => {
             </label>
           </div>
 
+          {/* 2. LỌC LOẠI MÓN */}
           <div className="filter-group">
             <h3>
               <i className="fa-solid fa-utensils"></i> Loại món
             </h3>
-            <label className="custom-checkbox">
-              <input type="checkbox" />
-              <span className="checkmark"></span> Món khai vị
-            </label>
-            <label className="custom-checkbox">
-              <input type="checkbox" defaultChecked />
-              <span className="checkmark"></span> Món chính
-            </label>
-            <label className="custom-checkbox">
-              <input type="checkbox" />
-              <span className="checkmark"></span> Tráng miệng
-            </label>
-            <label className="custom-checkbox">
-              <input type="checkbox" />
-              <span className="checkmark"></span> Đồ uống
-            </label>
+            
+            {/* Trâm - chức năng: Thêm style trực tiếp để tạo thanh cuộn mà KHÔNG CẦN sửa CSS */}
+            <div style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '5px' }}>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="all" checked={filters.category === 'all'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Tất cả
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="1" checked={filters.category === '1'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món mặn
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="2" checked={filters.category === '2'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món chay
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="3" checked={filters.category === '3'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món ngọt
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="4" checked={filters.category === '4'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món xào
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="5" checked={filters.category === '5'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món chiên
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="6" checked={filters.category === '6'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món hấp
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="7" checked={filters.category === '7'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món nướng
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="8" checked={filters.category === '8'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món canh
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="9" checked={filters.category === '9'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Món ăn vặt
+                </label>
+                <label className="custom-radio">
+                    <input type="radio" name="category" value="10" checked={filters.category === '10'} onChange={handleFilterChange}/>
+                    <span className="radio-mark"></span> Tráng miệng
+                </label>
+            </div>
           </div>
 
+          {/* 3. LỌC THỜI GIAN & ĐỘ KHÓ */}
           <div className="filter-group">
             <h3>
               <i className="fa-solid fa-clock"></i> Thời gian & Độ khó
             </h3>
 
-            <div className="difficulty-tags">
-              <label>
-                <input
-                  type="radio"
-                  name="difficulty"
-                  className="hidden-input"
-                />
-                <span className="tag-pill bg-red">Dễ</span>
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="difficulty"
-                  className="hidden-input"
-                  defaultChecked
-                />
-                <span className="tag-pill bg-gray">Trung bình</span>
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="difficulty"
-                  className="hidden-input"
-                />
-                <span className="tag-pill bg-gray">Khó</span>
-              </label>
+            {/* Độ khó - Trâm - chức năng: Thêm value, checked, onChange */}
+          {/* DÙNG DROPDOWN (GỌN ĐẸP) */}
+            <div className="difficulty-tags" style={{ marginBottom: '15px' }}>
+              <select
+                name="difficulty"
+                value={filters.difficulty}
+                onChange={handleFilterChange}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #ccc',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  color: '#333'
+                }}
+              >
+                <option value="all">-- Tất cả độ khó --</option>
+                <option value="1">Dễ</option>
+                <option value="2">Trung bình</option>
+                <option value="3">Khó</option>
+              </select>
             </div>
+            
 
+            {/* Thời gian - Trâm - chức năng: Thêm value, checked, onChange và nút < 15 phút */}
             <div className="time-filter">
               <label className="custom-radio">
-                <input type="radio" name="time" defaultChecked />
+                <input type="radio" name="time" value="all" checked={filters.time === 'all'} onChange={handleFilterChange} />
                 <span className="radio-mark"></span> Tất cả
               </label>
+              {/* Thêm nút 15 phút */}
               <label className="custom-radio">
-                <input type="radio" name="time" />
+                <input type="radio" name="time" value="under_15" checked={filters.time === 'under_15'} onChange={handleFilterChange} />
+                <span className="radio-mark"></span> &lt; 15 phút
+              </label>
+              <label className="custom-radio">
+                <input type="radio" name="time" value="under_30" checked={filters.time === 'under_30'} onChange={handleFilterChange} />
                 <span className="radio-mark"></span> &lt; 30 phút
               </label>
               <label className="custom-radio">
-                <input type="radio" name="time" />
+                <input type="radio" name="time" value="30_60" checked={filters.time === '30_60'} onChange={handleFilterChange} />
                 <span className="radio-mark"></span> 30 - 60 phút
+              </label>
+              <label className="custom-radio">
+                <input type="radio" name="time" value="over_60" checked={filters.time === 'over_60'} onChange={handleFilterChange} />
+                <span className="radio-mark"></span> &gt; 60 phút
               </label>
             </div>
           </div>
 
           <div className="filter-actions">
-            <button className="btn-filter">
+            {/* Trâm - chức năng: Thêm sự kiện onClick */}
+            <button className="btn-filter" onClick={handleApplyFilter}>
               <i className="fa-solid fa-filter"></i> Lọc kết quả
             </button>
           </div>
