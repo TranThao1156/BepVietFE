@@ -98,7 +98,7 @@ const LayoutChung = () => {
                       Hồ sơ cá nhân
                     </Link>
 
-                    <Link to="/quan-tri/kiem-duyet">Quản lý hệ thống</Link>
+                    <Link to="/quan-tri">Quản lý hệ thống</Link>
                     </>
                   ) : (
                     // Nếu là USER (1) -> Link tới trang Thông tin cá nhân

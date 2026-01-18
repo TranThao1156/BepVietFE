@@ -32,6 +32,24 @@ const DsCongThuc = () => {
     return "Không rõ";
   };
 
+  // --- HÀM XỬ LÝ URL AVATAR ---
+  const getAvatarUrl = (user) => {
+    if (!user) return "https://ui-avatars.com/api/?name=User&background=random";
+    
+    // Nếu có ảnh trong DB
+    if (user.AnhDaiDien) {
+      // Nếu là link online (Google/Facebook)
+      if (user.AnhDaiDien.startsWith("http")) return user.AnhDaiDien;
+      
+      // Nếu là ảnh upload local
+      // Lưu ý: Đảm bảo đường dẫn này khớp với nơi bạn lưu ảnh user trong Laravel
+      return `http://127.0.0.1:8000/storage/img/NguoiDung/${user.AnhDaiDien}`;
+    }
+
+    // Fallback: Tạo avatar theo tên
+    return `https://ui-avatars.com/api/?name=${user.HoTen}&background=random`;
+  };
+
   const handleCreateRecipe = () => {
     const token = localStorage.getItem("access_token");
 
@@ -62,7 +80,7 @@ const DsCongThuc = () => {
       </div>
 
       <div className="discovery-layout">
-        {/* --- SIDEBAR BỘ LỌC --- */}
+        {/* --- SIDEBAR BỘ LỌC (Giữ nguyên) --- */}
         <aside className="sidebar-filters">
           <div className="filter-group">
             <h3>
@@ -210,7 +228,10 @@ const DsCongThuc = () => {
                   </div>
 
                   <div className="card-body">
-                    <span className="category-tag">DM #{recipe.Ma_DM}</span>
+                    {/* SỬA 1: recipe.danh_muc (khớp với model function danh_muc) */}
+                    <span className="category-tag">
+                      {recipe.danh_muc ? recipe.danh_muc.TenDM : "Món ngon"}
+                    </span>
 
                     <Link
                       to={`/cong-thuc/${recipe.Ma_CT}`}
@@ -231,12 +252,18 @@ const DsCongThuc = () => {
                     </div>
 
                     <div className="card-footer">
+                      {/* SỬA 2: recipe.nguoidung (khớp với model function nguoidung) */}
                       <div className="author">
                         <img
-                          src={`https://ui-avatars.com/api/?name=BepViet&background=random`}
+                          src={getAvatarUrl(recipe.nguoidung)}
                           alt="Avatar"
+                          style={{ objectFit: "cover" }}
                         />
-                        <span>Bếp Việt</span>
+                        <span>
+                          {recipe.nguoidung
+                            ? recipe.nguoidung.HoTen
+                            : "Ẩn danh"}
+                        </span>
                       </div>
                       <div className="rating">
                         <i className="fa-solid fa-star"></i> 5.0
@@ -245,6 +272,8 @@ const DsCongThuc = () => {
                   </div>
                 </article>
               ))}
+
+              {/* Phân trang */}
               {lastPage > 1 && (
                 <div className="pagination">
                   <button

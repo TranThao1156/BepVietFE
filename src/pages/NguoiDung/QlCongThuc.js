@@ -58,19 +58,42 @@ const QlCongThuc = () => {
     }
   };
 
-  // Hàm xóa (Cần gọi API xóa thật)
+  // Hàm xóa
   const handleDelete = async (id, name) => {
     if (window.confirm(`Bạn có chắc chắn muốn xóa món "${name}" không?`)) {
       try {
         const token = localStorage.getItem("access_token");
-        // Gọi API xóa (Bạn cần tạo route này ở Backend sau)
-        // await fetch(`http://127.0.0.1:8000/api/user/cong-thuc/${id}`, { method: 'DELETE', ... });
 
-        // Tạm thời chỉ filter bỏ khỏi giao diện
-        setRecipes(recipes.filter((r) => r.Ma_CT !== id));
-        alert("Đã xóa thành công!");
+        // Gọi API xóa
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/user/cong-thuc/xoa-cong-thuc/${id}`,
+          {
+            method: "POST", 
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          },
+        );
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          alert(data.message || "Đã xóa thành công!");
+
+          // Nếu trang hiện tại chỉ còn 1 món và đó chính là món vừa xóa (và không phải trang 1)
+          // Thì lùi về trang trước đó để không bị màn hình trắng
+          if (recipes.length === 1 && pagination.current_page > 1) {
+            fetchRecipes(pagination.current_page - 1);
+          } else {
+            // Ngược lại: Tải lại trang hiện tại (Món ở trang sau sẽ tự tràn lên lấp chỗ trống)
+            fetchRecipes(pagination.current_page);
+          }
+        } else {
+          alert(data.message || "Xóa thất bại");
+        }
       } catch (err) {
-        alert("Xóa thất bại");
+        console.error(err);
+        alert("Lỗi kết nối đến server");
       }
     }
   };
@@ -150,28 +173,33 @@ const QlCongThuc = () => {
                 recipes.map((recipe) => (
                   <tr key={recipe.Ma_CT}>
                     <td>
-                      <img
-                        // Kiểm tra nếu là link online hay link local
-                        src={
-                          recipe.HinhAnh && recipe.HinhAnh.startsWith("http")
-                            ? recipe.HinhAnh
-                            : recipe.HinhAnh
-                              ? `http://127.0.0.1:8000/storage/img/CongThuc/${recipe.HinhAnh}`
-                              : "https://via.placeholder.com/150?text=No+Image" // Ảnh mặc định nếu null
-                        }
-                        className="table-thumb"
-                        alt={recipe.TenMon}
-                        onError={(e) => {
-                          e.target.src = "https://via.placeholder.com/80";
-                        }} // Ảnh lỗi thì hiện placeholder
-                      />
+                      <Link to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}`}>
+                        <img
+                          // Kiểm tra nếu là link online hay link local
+                          src={
+                            recipe.HinhAnh && recipe.HinhAnh.startsWith("http")
+                              ? recipe.HinhAnh
+                              : recipe.HinhAnh
+                                ? `http://127.0.0.1:8000/storage/img/CongThuc/${recipe.HinhAnh}`
+                                : "https://via.placeholder.com/150?text=No+Image" // Ảnh mặc định nếu null
+                          }
+                          className="table-thumb"
+                          alt={recipe.TenMon}
+                          onError={(e) => {
+                            e.target.src = "https://via.placeholder.com/80";
+                          }} // Ảnh lỗi thì hiện placeholder
+                        />
+                      </Link>
                     </td>
                     <td>
+                      <Link to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}`}>
+                      
                       <div className="table-title">{recipe.TenMon}</div>
                       <div className="table-subtitle">
                         {recipe.loai_mon?.TenLoaiMon} •{" "}
                         {recipe.vung_mien?.TenVungMien}
                       </div>
+                      </Link>
                     </td>
                     <td className="table-date">
                       {formatDate(recipe.created_at)}
