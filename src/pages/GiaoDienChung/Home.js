@@ -1,46 +1,65 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
 
 const Home = () => {
-  // --- MOCK DATA (Dữ liệu giả lập thay cho Database) ---
-  const monNgonNoiBat = [
-    {
-      id: 1,
-      TenMon: "Phở Bò Gia Truyền Nam Định",
-      HinhAnh: "https://images.unsplash.com/photo-1582878826618-c05326eff935?q=80&w=2070&auto=format&fit=crop",
-      ThoiGianNau: 90,
-      DoKho: "Trung bình",
-      average_rating: 4.9,
-      tacGia: { HoTen: "Bếp cô Minh", AnhDaiDien: "https://randomuser.me/api/portraits/women/44.jpg" }
-    },
-    {
-      id: 2,
-      TenMon: "Cơm Tấm Sườn Bì Chả",
-      HinhAnh: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?q=80&w=1000&auto=format&fit=crop",
-      ThoiGianNau: 45,
-      DoKho: "Dễ",
-      average_rating: 4.7,
-      tacGia: { HoTen: "Chef Tuấn", AnhDaiDien: "https://randomuser.me/api/portraits/men/32.jpg" }
-    },
-    {
-      id: 3,
-      TenMon: "Gỏi Cuốn Tôm Thịt",
-      HinhAnh: "https://images.unsplash.com/photo-1548596638-349c25055b80?q=80&w=1000&auto=format&fit=crop",
-      ThoiGianNau: 30,
-      DoKho: "Rất dễ",
-      average_rating: 5.0,
-      tacGia: { HoTen: "Lan Nhi", AnhDaiDien: "https://randomuser.me/api/portraits/women/65.jpg" }
-    },
-    {
-      id: 4,
-      TenMon: "Bánh Xèo Miền Tây",
-      HinhAnh: "https://images.unsplash.com/photo-1551185627-2b7b3b421274?q=80&w=1000&auto=format&fit=crop",
-      ThoiGianNau: 60,
-      DoKho: "Khó",
-      average_rating: 4.5,
-      tacGia: { HoTen: "Mẹ Gấu", AnhDaiDien: "https://randomuser.me/api/portraits/women/68.jpg" }
+  // 17/01/2026 Thi Lấy dữ liệu từ API từ BE
+    const [monNgonNoiBat, setMonNgonNoiBat] = useState([]);
+    const [monMoi, setMonMoi] = useState([]);
+    const [monMienBac, setMonMienBac] = useState(null);
+    const [monMienTrung, setMonMienTrung] = useState(null);
+    const [monMienNam, setMonMienNam] = useState(null);
+    const [loading, setLoading] = useState(true);
+   useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const [noiBatRes, moiRes, bacRes, trungRes, namRes] = await Promise.all([
+        fetch("http://127.0.0.1:8000/api/cong-thuc/mon-noi-bat").then(r => {
+          if (!r.ok) throw new Error("Lỗi mon-noi-bat");
+          return r.json();
+        }),
+        fetch("http://127.0.0.1:8000/api/cong-thuc/mon-moi").then(r => {
+          if (!r.ok) throw new Error("Lỗi mon-moi");
+          return r.json();
+        }),
+        fetch("http://127.0.0.1:8000/api/cong-thuc/mien-noi-bat/bac").then(r => {
+          if (!r.ok) throw new Error("Lỗi món nổi bật miền Bắc");
+          return r.json();
+        }),
+        fetch("http://127.0.0.1:8000/api/cong-thuc/mien-noi-bat/trung").then(r => {
+          if (!r.ok) throw new Error("Lỗi món nổi bật miền Trung");
+          return r.json();
+        }),
+        fetch("http://127.0.0.1:8000/api/cong-thuc/mien-noi-bat/nam").then(r => {
+          if (!r.ok) throw new Error("Lỗi món nổi bật miền Nam");
+          return r.json();
+        })
+      ]);
+      // Kiểm tra kết quả trả về
+      console.log("Bắc:", bacRes);
+      console.log("Trung:", trungRes);
+      console.log("Nam:", namRes);
+
+      if (noiBatRes.success) setMonNgonNoiBat(noiBatRes.data);
+      if (moiRes.success) setMonMoi(moiRes.data);
+      if (bacRes.success) setMonMienBac(bacRes.data);
+      if (trungRes.success) setMonMienTrung(trungRes.data);
+      if (namRes.success) setMonMienNam(namRes.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  fetchData();
+}, []);
+
+    if (loading) 
+    {
+        return <p style={{ textAlign: 'center' }}>Đang tải dữ liệu...</p>;
+    }
 
   return (
     <>
@@ -69,35 +88,35 @@ const Home = () => {
 
         <div className="grid-4">
             {monNgonNoiBat.map((mon) => (
-                <article className="card" key={mon.id}>
+                <article className="card" key={mon.Ma_CT}>
                     {/* Ảnh món ăn */}
                     <img 
-                        src={mon.HinhAnh} 
+                        src={`http://127.0.0.1:8000/storage/img/CongThuc/${mon.HinhAnh}`} 
                         alt={mon.TenMon} 
                         className="card-img" 
                     />
 
                     <div className="card-body">
                         {/* Tên món (Click vào sẽ sang trang chi tiết) */}
-                        <Link to={`/cong-thuc/${mon.id}`} className="card-title">
+                        <Link to={`/cong-thuc/${mon.Ma_CT}`} className="card-title">
                             {mon.TenMon}
                         </Link>
 
                         <div className="card-meta">
                             <i className="fa-regular fa-clock"></i> {mon.ThoiGianNau}p
-                            &nbsp;|&nbsp;
                             <span>{mon.DoKho}</span>
                         </div>
 
                         <div className="card-footer">
+                            {mon.nguoi_dung && (
                             <div className="author">
-                                <img 
-                                    src={mon.tacGia.AnhDaiDien} 
-                                    alt={mon.tacGia.HoTen} 
+                                <img
+                                src={`http://127.0.0.1:8000/storage/img/NguoiDung/${mon.nguoi_dung.AnhDaiDien}`}
+                                alt={mon.nguoi_dung.HoTen}
                                 />
-                                <span>{mon.tacGia.HoTen}</span>
+                                <span>{mon.nguoi_dung.HoTen}</span>
                             </div>
-
+                            )}
                             <div className="rating">
                                 <i className="fa-solid fa-star"></i> {mon.average_rating}
                             </div>
@@ -113,24 +132,39 @@ const Home = () => {
         </div>
         
         <div className="grid-3">
-            <div className="region-card">
-                <img src="https://images.unsplash.com/photo-1555921015-5532091f6026?q=80&w=1000&auto=format&fit=crop" alt="Miền Bắc" />
+            <Link to="/cong-thuc/mien-bac" className="region-card">
+                {monMienBac&& (
+                <img
+                    src={`http://127.0.0.1:8000/storage/img/CongThuc/${monMienBac.HinhAnh}`}
+                    alt="Miền Bắc"
+                />
+                )}
                 <div className="region-overlay">
-                    <div className="region-title">Miền Bắc</div>
+                <div className="region-title">Miền Bắc</div>
                 </div>
-            </div>
-            <div className="region-card">
-                <img src="https://images.unsplash.com/photo-1565060169123-e99d821361c4?q=80&w=1000&auto=format&fit=crop" alt="Miền Trung" />
+            </Link>
+            <Link to="/cong-thuc/mien-trung" className="region-card">
+                {monMienTrung && (
+                <img
+                    src={`http://127.0.0.1:8000/storage/img/CongThuc/${monMienTrung.HinhAnh}`}
+                    alt="Miền Trung"
+                />
+                )}
                 <div className="region-overlay">
                     <div className="region-title">Miền Trung</div>
                 </div>
-            </div>
-            <div className="region-card">
-                <img src="https://images.unsplash.com/photo-1559592413-7cec4d0ea49b?q=80&w=1000&auto=format&fit=crop" alt="Miền Nam" />
+            </Link>
+            <Link to="/cong-thuc/mien-nam" className="region-card">
+                {monMienNam && (
+                <img
+                    src={`http://127.0.0.1:8000/storage/img/CongThuc/${monMienNam.HinhAnh}`}
+                    alt="Miền Nam"
+                />
+                )}      
                 <div className="region-overlay">
                     <div className="region-title">Miền Nam</div>
                 </div>
-            </div>
+            </Link>
         </div>
 
         {/* ================= SECTION 3: MÓN NGON MỚI ================= */}
@@ -143,22 +177,21 @@ const Home = () => {
 
         {/* Tái sử dụng grid card nhưng có thể map dữ liệu khác nếu muốn */}
         <div className="grid-4">
-            {monNgonNoiBat.map((mon) => (
-                <article className="card" key={`new-${mon.id}`}>
-                    <img src={mon.HinhAnh} alt={mon.TenMon} className="card-img" />
+            {monMoi.map((mon) => (
+                <article className="card" key={`new-${mon.Ma_CT}`}>
+                    <img src={`http://127.0.0.1:8000/storage/img/CongThuc/${mon.HinhAnh}`} alt={mon.TenMon} className="card-img" />
                     <div className="card-body">
-                        <Link to={`/cong-thuc/${mon.id}`} className="card-title">
+                        <Link to={`/cong-thuc/${mon.Ma_CT}`} className="card-title">
                             {mon.TenMon}
                         </Link>
                         <div className="card-meta">
                             <i className="fa-regular fa-clock"></i> {mon.ThoiGianNau}p
-                            &nbsp;|&nbsp;
                             <span>{mon.DoKho}</span>
                         </div>
                         <div className="card-footer">
                             <div className="author">
-                                <img src={mon.tacGia.AnhDaiDien} alt="Avatar" />
-                                <span>{mon.tacGia.HoTen}</span>
+                                <img src={`http://127.0.0.1:8000/storage/img/NguoiDung/${mon.nguoi_dung.AnhDaiDien}`} alt="Avatar" />
+                                <span>{mon.nguoi_dung.HoTen}</span>
                             </div>
                             <div className="rating">
                                 <i className="fa-solid fa-star"></i> {mon.average_rating}
