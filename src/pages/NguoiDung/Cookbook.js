@@ -11,7 +11,6 @@ const CookBook = () => {
     const fetchCookbooks = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        console.log("Token hiện tại:", token);
         if (!token) { navigate('/dang-nhap'); return; }
 
         const response = await fetch('http://localhost:8000/api/user/cookbook', {
@@ -24,7 +23,10 @@ const CookBook = () => {
 
         const data = await response.json();
         if (data.success) {
-          setDsCookbook(data.data);
+          // Lọc dữ liệu ngay khi lấy về: Chỉ lấy những cái có TrangThai != 0
+          // (Phòng trường hợp API trả về cả những cái đã xóa)
+          const activeCookbooks = data.data.filter(cb => cb.TrangThai !== 0);
+          setDsCookbook(activeCookbooks);
         }
       } catch (error) {
         console.error("Lỗi:", error);
@@ -35,6 +37,45 @@ const CookBook = () => {
 
     fetchCookbooks();
   }, [navigate]);
+
+  // --- HÀM XỬ LÝ XÓA MỀM (ẨN ĐI) ---
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bạn có chắc muốn ẩn bộ sưu tập này không?')) {
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('access_token');
+        
+        // Lưu ý: Backend cần có route nhận method PUT để cập nhật
+        // Chúng ta gửi TrangThai = 0 lên
+        const response = await fetch(`http://localhost:8000/api/user/cookbook/${id}`, {
+            method: 'PUT', // Dùng PUT để cập nhật
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json' // Bắt buộc có dòng này khi gửi body
+            },
+            body: JSON.stringify({
+                TrangThai: 0 // Gửi trạng thái muốn cập nhật
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.success || response.ok) {
+            // Xóa thành công thì loại bỏ khỏi danh sách trên giao diện ngay lập tức
+            setDsCookbook(current => current.filter(cb => cb.id !== id));
+            alert('Đã xóa bộ sưu tập thành công!');
+        } else {
+            alert(data.message || 'Lỗi khi cập nhật trạng thái.');
+        }
+
+    } catch (error) {
+        console.error("Lỗi:", error);
+        alert('Lỗi kết nối server.');
+    }
+  };
 
   const filteredCookbooks = dsCookbook.filter(cb => 
       cb.TenCookBook.toLowerCase().includes(searchTerm.toLowerCase())
@@ -72,12 +113,11 @@ const CookBook = () => {
             </div>
         ) : (
             filteredCookbooks.map((cookbook) => (
-                // Vì Service trả về 'id', nên ở đây dùng cookbook.id là ĐÚNG
                 <div className="cb-card" key={cookbook.id}>
                     <div className="cb-img-wrapper">
                         <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}`}>
                             <img 
-                                src={cookbook.AnhBia} // Service đã tạo link ảnh đầy đủ
+                                src={cookbook.AnhBia} 
                                 alt={cookbook.TenCookBook}
                                 onError={(e) => {e.target.src = 'https://placehold.co/600x400?text=No+Image'}}
                             />
@@ -88,7 +128,27 @@ const CookBook = () => {
                     </div>
                     
                     <div className="cb-body">
-                        <h3 className="cb-title">{cookbook.TenCookBook}</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                            <h3 className="cb-title" style={{ margin: 0, paddingRight: '10px' }}>
+                                {cookbook.TenCookBook}
+                            </h3>
+                            
+                            <button 
+                                onClick={() => handleDelete(cookbook.id)}
+                                title="Xóa bộ sưu tập"
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#ff4d4f',
+                                    fontSize: '16px',
+                                    padding: '0 5px'
+                                }}
+                            >
+                                <i className="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+
                         <div className="cb-footer">
                             <span className="cb-time">
                                 {cookbook.TrangThai === 0 
