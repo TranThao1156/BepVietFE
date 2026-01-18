@@ -181,9 +181,13 @@ const QuanLyDanhMuc = () => {
                                         <td>
                                             <div className="action-group">
                                                 {/* Các nút này hiện tại chỉ để hiển thị, chưa cần logic */}
-                                                <button className="btn-icon">
+                                                <Link
+                                                    to={`/quan-tri/quan-ly-danh-muc/sua-danh-muc/${cat.Ma_DM}`}
+                                                    className="btn-icon"
+                                                    title="Sửa danh mục" // Thêm title để di chuột vào thấy chữ
+                                                >
                                                     <i className="fas fa-pen"></i>
-                                                </button>
+                                                </Link>
                                                 <button
                                                     className="btn-icon"
                                                     onClick={() => handleDelete(cat.Ma_DM)}
