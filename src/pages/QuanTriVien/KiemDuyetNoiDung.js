@@ -1,29 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const KiemDuyetNoiDung = () => {
+  // --- CẤU HÌNH API ---
+  const API_URL = 'http://localhost:8000/api/admin';
+
   // --- QUẢN LÝ STATE ---
-  const [contentType, setContentType] = useState('recipes'); // 'recipes' hoặc 'blogs'
+  // Mặc định hiển thị 'blogs' để dùng API ngay
+  const [contentType, setContentType] = useState('blogs'); 
   const [statusFilter, setStatusFilter] = useState('pending'); // 'pending', 'approved', 'rejected'
+  
+  // Dữ liệu Blog lấy từ API
+  const [blogData, setBlogData] = useState([]); 
+  const [loading, setLoading] = useState(false);
 
-  // --- DỮ LIỆU GIẢ LẬP (MOCK DATA) ---
-  const recipesData = [
-    { id: 'REC-001', name: 'Phở Bò (Demo)', author: 'NguyenVanA', status: 'pending' },
-    { id: 'REC-002', name: 'Bún Chả Hà Nội', author: 'LeThiB', status: 'approved' },
-    { id: 'REC-003', name: 'Canh Cua (Ảnh mờ)', author: 'TranVanC', status: 'rejected' },
-    { id: 'REC-004', name: 'Cơm Tấm Sườn Bì', author: 'ChefTuan', status: 'pending' },
-  ];
+  // --- HELPER 1: Map trạng thái từ Database (Tiếng Việt) -> UI (Tiếng Anh) ---
+  // Quan trọng: Phải khớp với dữ liệu trong bảng 'blog' của bạn
+  const mapStatusFromDB = (dbStatus) => {
+    switch(dbStatus) {
+      case 'Chờ duyệt': return 'pending';
+      case 'Chấp nhận': return 'approved'; // DB bạn dùng từ 'Chấp nhận'
+      case 'Từ chối':   return 'rejected';
+      
+      // Case dự phòng cho các từ khóa cũ/không dấu
+      case 'ChoDuyet':  return 'pending';
+      case 'DaDuyet':   return 'approved';
+      case 'TuChoi':    return 'rejected';
+      
+      default: return 'pending';
+    }
+  };
 
-  const blogsData = [
-    { id: 'ART-001', title: '5 Mẹo nấu ăn ngon', author: 'ChefMaster', status: 'pending' },
-    { id: 'ART-002', title: 'Review Quán Ngon Q1', author: 'FoodReviewer', status: 'approved' },
-    { id: 'ART-003', title: 'Cách bảo quản rau củ', author: 'MomCook', status: 'pending' },
-  ];
+  // --- 1. HÀM GỌI API LẤY DANH SÁCH ---
+  const fetchBlogs = useCallback(async () => {
+    // Chỉ xử lý API cho Blog
+    if (contentType !== 'blogs') return;
 
-  // --- LOGIC LỌC DỮ LIỆU ---
-  const currentList = contentType === 'recipes' ? recipesData : blogsData;
-  const filteredData = currentList.filter(item => item.status === statusFilter);
+    setLoading(true);
+    const token = localStorage.getItem('token');
 
-  // --- HÀM HỖ TRỢ: Badge trạng thái ---
+    try {
+      // Gọi API với filter hiện tại
+      const response = await fetch(`${API_URL}/duyet-blog?trang_thai=${statusFilter}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) throw new Error('UNAUTHORIZED');
+        throw new Error('Lỗi kết nối server');
+      }
+
+      const result = await response.json();
+
+      // Map dữ liệu API vào State
+      const formattedData = result.data.map(item => ({
+        id: item.Ma_Blog,        // ID dùng để hiển thị
+        title: item.TieuDe,      // Tiêu đề
+        author: item.Ma_ND,      // ID Tác giả
+        status: mapStatusFromDB(item.TrangThaiDuyet), // Chuyển đổi trạng thái
+        originalId: item.Ma_Blog // ID gốc để gửi lại API khi xử lý
+      }));
+
+      setBlogData(formattedData);
+
+    } catch (error) {
+      console.error("Lỗi:", error);
+      if (error.message === 'UNAUTHORIZED') {
+        alert("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [contentType, statusFilter]);
+
+  // --- 2. HÀM XỬ LÝ DUYỆT / TỪ CHỐI (CẬP NHẬT TỨC THÌ) ---
+  const handleAction = async (id, action) => {
+    // 1. Xác nhận người dùng
+    if (!window.confirm(`Bạn có chắc chắn muốn ${action === 'approve' ? 'duyệt' : 'từ chối'} bài viết này?`)) return;
+
+    const token = localStorage.getItem('token');
+    
+    try {
+      // 2. Gọi API Backend để lưu vào DB
+      const response = await fetch(`${API_URL}/duyet-blog/xu-ly`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          ma_blog: id,
+          hanh_dong: action
+        })
+      });
+
+      if (!response.ok) throw new Error('Lỗi xử lý từ Server');
+
+      // 3. CẬP NHẬT GIAO DIỆN NGAY LẬP TỨC (Optimistic UI Update)
+      // Không cần gọi lại fetchBlogs(), ta tự sửa state local
+      setBlogData(prevData => {
+        // Lọc bỏ bài viết vừa xử lý ra khỏi danh sách hiện tại
+        // Vì danh sách hiện tại đang filter theo status (ví dụ 'pending')
+        // Khi đổi trạng thái, nó tự động không thỏa mãn điều kiện filter nữa -> biến mất.
+        return prevData.filter(item => item.originalId !== id);
+      });
+
+
+    } catch (error) {
+      alert("Có lỗi xảy ra: " + error.message);
+      fetchBlogs(); 
+    }
+  };
+
+  // --- USE EFFECT: Gọi API khi chuyển tab hoặc đổi filter ---
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
+
+  // --- HELPER: Badge trạng thái ---
   const getStatusBadge = (status) => {
     switch(status) {
         case 'pending': return <span className="status-badge warning">Chờ duyệt</span>;
@@ -38,107 +137,115 @@ const KiemDuyetNoiDung = () => {
         <div className="page-header-flex">
             <div className="header-text">
                 <h1>Kiểm duyệt nội dung</h1>
-                <p className="subtitle">Phê duyệt hoặc từ chối nội dung người dùng đóng góp.</p>
+                <p className="subtitle">Quản lý các bài viết từ API Laravel.</p>
             </div>
+            
+            {/* Nếu bạn chưa làm API Công thức, có thể ẩn nút này hoặc giữ làm placeholder */}
             <div className="header-actions">
-                <button 
-                    className={`btn ${contentType === 'recipes' ? 'btn-primary' : 'btn-white'}`}
-                    onClick={() => setContentType('recipes')}
-                >
-                    Duyệt công thức
-                </button>
-                <button 
+                <button
                     className={`btn ${contentType === 'blogs' ? 'btn-primary' : 'btn-white'}`}
                     onClick={() => setContentType('blogs')}
                 >
                     Duyệt bài viết
                 </button>
+                <button
+                    className={`btn ${contentType === 'recipes' ? 'btn-primary' : 'btn-white'}`}
+                    onClick={() => setContentType('recipes')}
+                >
+                    Duyệt công thức
+                </button>
             </div>
         </div>
 
         <div className="card">
+            {/* Tab trạng thái */}
             <div className="tabs-nav">
-                <button 
-                    className={`tab-link ${statusFilter === 'pending' ? 'active' : ''}`} 
-                    onClick={() => setStatusFilter('pending')}
-                >
-                    Chờ duyệt 
-                    <span className="badge-count">
-                        {currentList.filter(i => i.status === 'pending').length}
-                    </span>
-                </button>
-
-                <button 
-                    className={`tab-link ${statusFilter === 'approved' ? 'active' : ''}`} 
-                    onClick={() => setStatusFilter('approved')}
-                >
-                    Đã duyệt
-                </button>
-
-                <button 
-                    className={`tab-link ${statusFilter === 'rejected' ? 'active' : ''}`} 
-                    onClick={() => setStatusFilter('rejected')}
-                >
-                    Từ chối
-                </button>
+                {['pending', 'approved', 'rejected'].map(status => (
+                    <button
+                        key={status}
+                        className={`tab-link ${statusFilter === status ? 'active' : ''}`}
+                        onClick={() => setStatusFilter(status)}
+                    >
+                        {status === 'pending' ? 'Chờ duyệt' : status === 'approved' ? 'Đã duyệt' : 'Từ chối'}
+                    </button>
+                ))}
             </div>
 
+            {/* Bảng dữ liệu */}
             <div className="table-responsive">
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th width="40%">
-                                {contentType === 'recipes' ? 'Món ăn' : 'Tiêu đề bài viết'}
-                            </th>
-                            <th width="20%">Tác giả</th>
-                            <th width="15%">Trạng thái</th>
-                            <th width="15%" className="text-right">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredData.length > 0 ? (
-                            filteredData.map((item) => (
-                                <tr key={item.id} className="item-row">
-                                    <td>
-                                        <strong>{item.name || item.title}</strong>
-                                        <br/>
-                                        <span className="sub-text">#{item.id}</span>
-                                    </td>
-                                    <td>{item.author}</td>
-                                    <td>{getStatusBadge(item.status)}</td>
-                                    <td className="text-right">
-                                        <div className="action-group">
-                                            <button className="btn-icon" title="Xem chi tiết">
-                                                <i className="fa-regular fa-eye"></i>
-                                            </button>
-                                            
-                                            {item.status === 'pending' && (
-                                                <>
-                                                    <button className="btn-icon success" title="Phê duyệt">
-                                                        <i className="fa-solid fa-check"></i>
+                {loading ? (
+                    <div style={{padding: '30px', textAlign: 'center', color: '#666'}}>Đang tải dữ liệu từ API...</div>
+                ) : (
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th width="40%">Tiêu đề bài viết</th>
+                                <th width="20%">Tác giả (Mã ND)</th>
+                                <th width="15%">Trạng thái</th>
+                                <th width="15%" className="text-right">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* Logic hiển thị: Nếu là blogs thì hiện data từ API, recipes thì hiện thông báo */}
+                            {contentType === 'blogs' ? (
+                                blogData.length > 0 ? (
+                                    blogData.map((item) => (
+                                        <tr key={item.id} className="item-row">
+                                            <td>
+                                                <strong>{item.title}</strong>
+                                                <br/>
+                                                <span className="sub-text">#{item.id}</span>
+                                            </td>
+                                            <td>{item.author}</td>
+                                            <td>{getStatusBadge(item.status)}</td>
+                                            <td className="text-right">
+                                                <div className="action-group">
+                                                    {/* Nút Xem chi tiết */}
+                                                    <button className="btn-icon" title="Xem chi tiết">
+                                                        <i className="fa-regular fa-eye"></i>
                                                     </button>
-                                                    <button className="btn-icon danger" title="Từ chối">
-                                                        <i className="fa-solid fa-xmark"></i>
-                                                    </button>
-                                                </>
-                                            )}
-                                            
-                                            <button className="btn-icon" title="Xóa">
-                                                <i className="fa-solid fa-trash-can"></i>
-                                            </button>
-                                        </div>
+
+                                                    {/* Nút Duyệt/Từ chối chỉ hiện khi trạng thái là Pending */}
+                                                    {item.status === 'pending' && (
+                                                        <>
+                                                            <button 
+                                                                className="btn-icon success" 
+                                                                title="Phê duyệt"
+                                                                onClick={() => handleAction(item.originalId, 'approve')}
+                                                            >
+                                                                <i className="fa-solid fa-check"></i>
+                                                            </button>
+                                                            <button 
+                                                                className="btn-icon danger" 
+                                                                title="Từ chối"
+                                                                onClick={() => handleAction(item.originalId, 'reject')}
+                                                            >
+                                                                <i className="fa-solid fa-xmark"></i>
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="4" style={{textAlign: 'center', padding: '30px', color: '#888'}}>
+                                            Không có bài viết nào ở trạng thái này.
+                                        </td>
+                                    </tr>
+                                )
+                            ) : (
+                                // Placeholder cho phần Recipes
+                                <tr>
+                                    <td colSpan="4" style={{textAlign: 'center', padding: '30px', color: '#888'}}>
+                                        Tính năng duyệt công thức đang được phát triển.
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" style={{textAlign: 'center', padding: '30px', color: '#888'}}>
-                                    Không có dữ liệu nào ở trạng thái này.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     </main>
