@@ -117,12 +117,17 @@ const LayoutChung = () => {
 
                   {/* --- LOGIC ĐIỀU HƯỚNG THEO VAI TRÒ --- */}
                   {user.VaiTro === 0 ? (
-                    // Nếu là ADMIN (0) -> Link tới trang Quản trị
+                    <>
+                    <Link to="/nguoi-dung/thong-tin-ca-nhan">
+                      Hồ sơ cá nhân
+                    </Link>
+
                     <Link to="/quan-tri/kiem-duyet">Quản lý hệ thống</Link>
+                    </>
                   ) : (
                     // Nếu là USER (1) -> Link tới trang Thông tin cá nhân
                     <Link to="/nguoi-dung/thong-tin-ca-nhan">
-                      Thông tin cá nhân
+                      Hồ sơ cá nhân
                     </Link>
                   )}
 
