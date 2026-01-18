@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '../assets/css/admin.css'; // Import CSS riêng cho Admin
 
 const AdminLayout = () => {
@@ -7,9 +8,12 @@ const AdminLayout = () => {
         <div className="admin-container">
             {/* --- SIDEBAR --- */}
             <nav className="sidebar">
-                <div className="logo-area">
+                {/* <div className="logo-area">
                     <i className="fas fa-utensils"></i> Bếp Việt
-                </div>
+                </div> */}
+                <Link to="/" className="logo-area">
+                    <i className="fa-solid fa-utensils"></i> Bếp Việt
+                </Link>
 
                 <div className="admin-profile">
                     <div className="avatar-circle">

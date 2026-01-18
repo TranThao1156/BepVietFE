@@ -1,21 +1,114 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 
 const ChiTietCookbook = () => {
-  // Hàm xử lý xóa cookbook
-  const handleDelete = () => {
-    if (window.confirm('Bạn có chắc muốn xóa Cookbook này không?')) {
-      // Gọi API xóa ở đây
-      console.log('Đã xóa cookbook');
+  const { id } = useParams(); // Lấy ID từ URL
+  const navigate = useNavigate();
+  
+  const [cookbook, setCookbook] = useState(null); // Thông tin cookbook
+  const [recipes, setRecipes] = useState([]); // Danh sách món ăn
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // 1. Fetch dữ liệu từ API
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        // --- THÊM ĐOẠN NÀY ---
+        const token = localStorage.getItem('access_token'); // Lấy token từ bộ nhớ
+        
+        // Nếu bắt buộc đăng nhập mà không có token thì đá về trang login
+        // (Hoặc nếu muốn cho xem công khai thì phải sửa Route bên Laravel ra ngoài nhóm middleware)
+        if (!token) {
+             console.log("Chưa có token, không thể gọi API user");
+             // navigate('/dang-nhap'); // Bỏ comment dòng này nếu muốn bắt buộc login
+             return; 
+        }
+        // ---------------------
+
+        const response = await fetch(`http://localhost:8000/api/user/cookbook/chi-tiet/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // <--- QUAN TRỌNG NHẤT: Gửi kèm Token
+            }
+        });
+
+        // Nếu token hết hạn hoặc sai (Lỗi 401/403)
+        if (response.status === 401 || response.status === 403) {
+            alert("Phiên đăng nhập hết hạn.");
+            navigate('/dang-nhap');
+            return;
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          setCookbook(result.data.info);
+          setRecipes(result.data.recipes);
+        } else {
+          // Xử lý trường hợp không tìm thấy nhưng không phải lỗi server
+          console.error(result.message);
+        }
+      } catch (error) {
+        console.error("Lỗi kết nối:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetail();
+  }, [id, navigate]);;
+
+  // 2. Hàm Xóa Cookbook (gọi API xóa đã làm ở bước trước)
+  const handleDeleteCookbook = async () => {
+    if (!window.confirm('Bạn có chắc muốn xóa Cookbook này không?')) return;
+    
+    // Gọi API xóa (giả sử bạn đã có token)
+    const token = localStorage.getItem('access_token');
+    try {
+        const res = await fetch(`http://localhost:8000/api/user/cookbook/${id}`, {
+            method: 'PUT', // Hoặc DELETE tùy backend
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+            navigate('/nguoi-dung/cookbook');
+        }
+    } catch (err) {
+        console.error(err);
     }
   };
 
-  // Hàm xử lý bỏ lưu món ăn
-  const handleUnsave = (recipeName) => {
-    if (window.confirm(`Bạn muốn bỏ món "${recipeName}" khỏi bộ sưu tập?`)) {
-      console.log('Đã bỏ lưu:', recipeName);
-    }
+  // 3. Hàm Bỏ lưu món ăn (Cần backend hỗ trợ API xóa record trong ct_cookbook)
+  const handleUnsave = async (recipeId) => {
+    if (!window.confirm(`Bạn muốn bỏ món này khỏi bộ sưu tập?`)) return;
+    
+    // Tạm thời chỉ xóa ở Frontend để demo
+    setRecipes(current => current.filter(r => r.Ma_CT !== recipeId));
+    // TODO: Gọi API Backend để xóa thật trong CSDL
+    // await fetch(...)
   };
+
+  // 4. Lọc danh sách món ăn theo ô tìm kiếm
+  const filteredRecipes = recipes.filter(r => 
+    r.TenMon.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) return <div style={{textAlign:'center', marginTop: 50}}>Đang tải dữ liệu...</div>;
+if (!cookbook) {
+    return (
+        <div style={{ padding: '50px', textAlign: 'center' }}>
+            <h2 style={{ color: 'red' }}>⚠️ Đã xảy ra lỗi!</h2>
+            <p>Không thể tải dữ liệu Cookbook.</p>
+            <p>Vui lòng mở <b>Console</b> (F12 - Console) để xem chi tiết lỗi màu đỏ.</p>
+            <button onClick={() => window.location.reload()} style={{padding: '10px 20px', cursor: 'pointer'}}>
+                Thử tải lại trang
+            </button>
+            <br/><br/>
+            <Link to="/nguoi-dung/cookbook">Quay lại danh sách</Link>
+        </div>
+    );
+}
 
   return (
     <main className="main-content">
@@ -23,37 +116,34 @@ const ChiTietCookbook = () => {
       <div style={{ marginBottom: '20px' }}>
         <Link 
           to="/nguoi-dung/cookbook" 
-          style={{ 
-            textDecoration: 'none', 
-            color: 'var(--text-gray)', 
-            fontSize: '0.9rem', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '5px' 
-          }}
+          style={{ textDecoration: 'none', color: '#666', display: 'flex', alignItems: 'center', gap: '5px' }}
         >
           <i className="fa-solid fa-arrow-left"></i> Quay lại danh sách Cookbook
         </Link>
       </div>
 
-      {/* Hero Section - Thông tin Cookbook */}
+      {/* Hero Section */}
       <div className="cookbook-hero">
         <div className="hero-cover">
           <img 
-            src="https://i.pinimg.com/564x/a5/6e/b7/a56eb7232d398e4ba436fc713d3d6448.jpg" 
-            alt="Cover" 
+            src={cookbook.AnhBia} 
+            alt={cookbook.TenCookBook} 
+            onError={(e) => {e.target.src = 'https://placehold.co/600x400?text=No+Image'}}
           />
         </div>
         <div className="hero-info">
           <div className="hero-meta">
-            <span><i className="fa-solid fa-layer-group"></i> 12 Công thức</span>
+            <span><i className="fa-solid fa-layer-group"></i> {cookbook.SoLuongMon} Công thức</span>
+            <span style={{marginLeft: '15px'}}>
+                 {cookbook.TrangThai === 0 ? <i className="fa-solid fa-lock"></i> : <i className="fa-solid fa-globe"></i>}
+            </span>
           </div>
 
-          <h1 className="hero-title">Món ngon đãi tiệc cuối tuần</h1>
+          <h1 className="hero-title">{cookbook.TenCookBook}</h1>
           
           <div className="hero-actions">
             <Link 
-              to="/nguoi-dung/sua-cookbook/1" // Giả sử ID là 1
+              to={`/nguoi-dung/sua-cookbook/${cookbook.id}`} 
               className="btn btn-outline-gray" 
               style={{ padding: '8px 20px' }}
             >
@@ -62,7 +152,7 @@ const ChiTietCookbook = () => {
             
             <button 
               className="btn btn-outline-gray" 
-              onClick={handleDelete}
+              onClick={handleDeleteCookbook}
               style={{ padding: '8px 20px', color: '#EF4444', borderColor: '#FECACA' }}
             >
               <i className="fa-regular fa-trash-can"></i> Xóa
@@ -73,122 +163,69 @@ const ChiTietCookbook = () => {
 
       {/* Filter / Search Toolbar */}
       <div className="filter-toolbar">
-        <div className="result-count">Danh sách món ăn (4)</div>
+        <div className="result-count">Danh sách món ăn ({filteredRecipes.length})</div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <div className="dashboard-search" style={{ marginBottom: 0, width: '250px' }}>
             <i className="fa-solid fa-magnifying-glass"></i>
             <input 
               type="text" 
-              placeholder="Tìm trong bộ sưu tập..." 
+              placeholder="Tìm món trong bộ sưu tập..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               style={{ padding: '10px 10px 10px 40px' }}
             />
           </div>
         </div>
       </div>
 
-      {/* Grid danh sách món ăn đã lưu */}
+      {/* Grid danh sách món ăn */}
       <div className="saved-recipe-grid">
-
-        {/* Card 1 */}
-        <div className="saved-card">
-          <div className="saved-thumb">
-            <img src="https://i.pinimg.com/564x/0a/27/3f/0a273f1107297e55554477c956976214.jpg" alt="Food" />
-            <button 
-              className="btn-unsave" 
-              title="Bỏ lưu khỏi Cookbook này"
-              onClick={() => handleUnsave('Phở Bò Gia Truyền')}
-            >
-              <i className="fa-solid fa-minus"></i>
-            </button>
-          </div>
-          <div className="saved-body">
-            <div className="saved-author">
-              <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" />
-              <span>Bếp của Lan</span>
-            </div>
-            <Link to="#" className="saved-title">Phở Bò Gia Truyền Nam Định - Nước dùng đậm đà</Link>
-            <div className="saved-meta-row">
-              <div className="meta-item"><i className="fa-regular fa-clock"></i> 60p</div>
-              <div className="meta-item"><i className="fa-solid fa-star" style={{ color: '#F59E0B' }}></i> 4.8</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="saved-card">
-          <div className="saved-thumb">
-            <img src="https://i.pinimg.com/564x/78/3d/e2/783de21b4a3a60e513511eb49594f6f2.jpg" alt="Food" />
-            <button 
-              className="btn-unsave" 
-              title="Bỏ lưu"
-              onClick={() => handleUnsave('Gà nướng mật ong')}
-            >
-              <i className="fa-solid fa-minus"></i>
-            </button>
-          </div>
-          <div className="saved-body">
-            <div className="saved-author">
-              <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" />
-              <span>Chef Tuấn</span>
-            </div>
-            <Link to="#" className="saved-title">Gà nướng mật ong sốt tiêu đen</Link>
-            <div className="saved-meta-row">
-              <div className="meta-item"><i className="fa-regular fa-clock"></i> 45p</div>
-              <div className="meta-item"><i className="fa-solid fa-star" style={{ color: '#F59E0B' }}></i> 4.5</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3 */}
-        <div className="saved-card">
-          <div className="saved-thumb">
-            <img src="https://i.pinimg.com/564x/4a/07/74/4a07747e9282855140d348006236b28b.jpg" alt="Food" />
-            <button 
-              className="btn-unsave" 
-              title="Bỏ lưu"
-              onClick={() => handleUnsave('Salad bơ trứng')}
-            >
-              <i className="fa-solid fa-minus"></i>
-            </button>
-          </div>
-          <div className="saved-body">
-            <div className="saved-author">
-              <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" />
-              <span>Mẹ Gấu</span>
-            </div>
-            <Link to="#" className="saved-title">Salad bơ trứng lòng đào Healthy</Link>
-            <div className="saved-meta-row">
-              <div className="meta-item"><i className="fa-regular fa-clock"></i> 15p</div>
-              <div className="meta-item"><i className="fa-solid fa-star" style={{ color: '#F59E0B' }}></i> 4.9</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4 */}
-        <div className="saved-card">
-          <div className="saved-thumb">
-            <img src="https://i.pinimg.com/564x/55/54/10/5554101e406f52233800247657924619.jpg" alt="Food" />
-            <button 
-              className="btn-unsave" 
-              title="Bỏ lưu"
-              onClick={() => handleUnsave('Bò Lúc Lắc')}
-            >
-              <i className="fa-solid fa-minus"></i>
-            </button>
-          </div>
-          <div className="saved-body">
-            <div className="saved-author">
-              <img src="https://randomuser.me/api/portraits/men/85.jpg" alt="User" />
-              <span>Huy MasterChef</span>
-            </div>
-            <Link to="#" className="saved-title">Bò Lúc Lắc khoai tây chiên kiểu Pháp</Link>
-            <div className="saved-meta-row">
-              <div className="meta-item"><i className="fa-regular fa-clock"></i> 30p</div>
-              <div className="meta-item"><i className="fa-solid fa-star" style={{ color: '#F59E0B' }}></i> 4.7</div>
-            </div>
-          </div>
-        </div>
-
+        {filteredRecipes.length === 0 ? (
+            <p>Chưa có món ăn nào trong bộ sưu tập này.</p>
+        ) : (
+            filteredRecipes.map((recipe) => (
+                <div className="saved-card" key={recipe.Ma_CT}>
+                  <div className="saved-thumb">
+                    <Link to={`/cong-thuc/${recipe.Ma_CT}`}>
+                        <img 
+                            src={recipe.HinhAnh} 
+                            alt={recipe.TenMon} 
+                            onError={(e) => {e.target.src = 'https://placehold.co/600x400?text=No+Image'}}
+                        />
+                    </Link>
+                    <button 
+                      className="btn-unsave" 
+                      title="Bỏ lưu khỏi Cookbook này"
+                      onClick={() => handleUnsave(recipe.Ma_CT)}
+                    >
+                      <i className="fa-solid fa-minus"></i>
+                    </button>
+                  </div>
+                  <div className="saved-body">
+                    <div className="saved-author">
+                      <img 
+                        src={recipe.AvatarTacGia} 
+                        alt={recipe.TacGia} 
+                        onError={(e) => {e.target.src = 'https://placehold.co/100?text=U'}}
+                      />
+                      <span>{recipe.TacGia}</span>
+                    </div>
+                    <Link to={`/cong-thuc/${recipe.Ma_CT}`} className="saved-title">
+                        {recipe.TenMon}
+                    </Link>
+                    <div className="saved-meta-row">
+                      <div className="meta-item">
+                        <i className="fa-regular fa-clock"></i> {recipe.ThoiGianNau}p
+                      </div>
+                      {/* Nếu có rating thì hiện ở đây */}
+                      <div className="meta-item">
+                        <i className="fa-solid fa-star" style={{ color: '#F59E0B' }}></i> --
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            ))
+        )}
       </div>
 
     </main>
