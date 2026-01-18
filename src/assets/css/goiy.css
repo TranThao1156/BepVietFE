@@ -1,0 +1,30 @@
+/* CSS cho danh sách gợi ý */
+.suggestions-list {
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%; /* Rộng bằng ô input */
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  top: 100%; /* Nằm ngay dưới input */
+  left: 0;
+}
+
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+.suggestion-item:hover {
+  background-color: #f3f4f6;
+}
+
+.ingredient-row {
+  position: relative; /* Để danh sách gợi ý căn theo dòng này */
+}

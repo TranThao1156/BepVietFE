@@ -455,18 +455,28 @@ body {
     font-size: 0.9rem; /* Icon check to hơn chút */
 }
 
-/* Button style riêng cho form này */
 .btn-outline-gray {
-    background: white;
-    border: 1px solid #E5E7EB;
-    color: var(--text-dark);
-    padding: 10px 24px;
-    border-radius: 30px;
-    font-weight: 600;
-    cursor: pointer;
+  background: white;
+  border: 1px solid #E5E7EB;
+  color: var(--text-gray);
+
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+  transition: 0.2s;
 }
+
 .btn-outline-gray:hover {
-    background: #F3F4F6;
+  background: #F3F4F6;
+  color: var(--text-dark);
+  border-color: #D1D5DB;
 }
 
 .form-actions-left {
@@ -932,7 +942,13 @@ body {
 }
 .btn-dashed-full:hover { border-color: var(--primary-color); color: var(--primary-color); background: #FFF7ED; }
 
-.form-submit-area { text-align: right; margin-top: 30px; }
+.form-submit-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* trái – phải rõ ràng */
+  margin-top: 24px;
+}
+
 .btn-large { padding: 12px 40px; font-size: 1rem; }
 
 /* Responsive */
@@ -1017,26 +1033,7 @@ body {
 }
 
 /* Button Quay lại */
-.btn-outline-gray {
-    background: white;
-    border: 1px solid #E5E7EB;
-    color: var(--text-gray);
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.2s;
-}
 
-.btn-outline-gray:hover {
-    background: #F3F4F6;
-    color: var(--text-dark);
-    border-color: #D1D5DB;
-}
 
 /* Fix responsive cho editor */
 @media (max-width: 768px) {
