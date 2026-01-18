@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router';
 import LayoutNguoiDung from '../layouts/LayoutNguoiDung';
 import ThongTinCaNhan from '../pages/NguoiDung/ThongTinCaNhan';
 import CookBook from '../pages/NguoiDung/Cookbook';
