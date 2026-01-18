@@ -38,7 +38,7 @@ const DsCongThuc = () => {
     if (!token) {
       navigate("/dang-nhap");
     } else {
-      navigate("/nguoi-dung/cong-thuc/tao-cong-thuc");
+      navigate("/nguoi-dung/ql-cong-thuc/tao-cong-thuc");
     }
   };
 

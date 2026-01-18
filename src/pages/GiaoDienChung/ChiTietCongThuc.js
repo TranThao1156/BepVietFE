@@ -12,8 +12,6 @@ const ChitietCongthuc = () => {
   const [commentContent, setCommentContent] = useState("");
 
   useEffect(() => {
-
-
     fetch(`http://127.0.0.1:8000/api/cong-thuc/${id}`, {
       credentials: "include",
     })
@@ -110,6 +108,7 @@ const ChitietCongthuc = () => {
             </aside>
 
             {/* CÁC BƯỚC */}
+            {/* CÁC BƯỚC THỰC HIỆN */}
             <div className="main-instructions">
               <h2>Hướng dẫn thực hiện</h2>
               <div className="steps-container">
@@ -118,12 +117,34 @@ const ChitietCongthuc = () => {
                     <div className="step-number">{step.STT}</div>
                     <div className="step-content">
                       <p>{step.NoiDung}</p>
+
+                      {/* SỬA PHẦN HIỂN THỊ ẢNH Ở ĐÂY */}
                       {step.HinhAnh && (
-                        <img
-                          className="step-img"
-                          src={`http://127.0.0.1:8000/storage/img/BuocThucHien/${step.HinhAnh}`}
-                          alt={`Bước ${step.STT}`}
-                        />
+                        <div
+                          className="step-images-grid"
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            flexWrap: "wrap",
+                            marginTop: "10px",
+                          }}
+                        >
+                          {/* 1. Tách chuỗi ảnh thành mảng bằng dấu chấm phẩy ; */}
+                          {step.HinhAnh.split(";").map((imgName, index) => (
+                            <img
+                              key={index}
+                              className="step-img"
+                              src={`http://127.0.0.1:8000/storage/img/BuocThucHien/${imgName}`}
+                              alt={`Bước ${step.STT} - Ảnh ${index + 1}`}
+                              style={{
+                                maxWidth: "200px", // Giới hạn kích thước ảnh cho đẹp
+                                height: "auto",
+                                borderRadius: "8px",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>

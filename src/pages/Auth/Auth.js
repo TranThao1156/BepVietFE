@@ -31,8 +31,8 @@ export default function DangNhapDangKy() {
       localStorage.setItem("user", JSON.stringify(res.user));
       if (res.token) {
             localStorage.setItem("access_token", res.token); 
-        } else if (res.access_token) {
-            localStorage.setItem("access_token", res.access_token);
+        } else if (res.token) {
+            localStorage.setItem("access_token", res.token);
         }
         alert("✅ Đăng nhập thành công");
         localStorage.setItem("user", JSON.stringify(res.user));
