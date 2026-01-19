@@ -14,18 +14,11 @@ const KiemDuyetNoiDung = () => {
   const [loading, setLoading] = useState(false);
 
   // --- HELPER 1: Map trạng thái từ Database (Tiếng Việt) -> UI (Tiếng Anh) ---
-  // Quan trọng: Phải khớp với dữ liệu trong bảng 'blog' của bạn
   const mapStatusFromDB = (dbStatus) => {
     switch(dbStatus) {
       case 'Chờ duyệt': return 'pending';
-      case 'Chấp nhận': return 'approved'; // DB bạn dùng từ 'Chấp nhận'
+      case 'Chấp nhận': return 'approved'; 
       case 'Từ chối':   return 'rejected';
-      
-      // Case dự phòng cho các từ khóa cũ/không dấu
-      case 'ChoDuyet':  return 'pending';
-      case 'DaDuyet':   return 'approved';
-      case 'TuChoi':    return 'rejected';
-      
       default: return 'pending';
     }
   };
@@ -137,7 +130,7 @@ const KiemDuyetNoiDung = () => {
         <div className="page-header-flex">
             <div className="header-text">
                 <h1>Kiểm duyệt nội dung</h1>
-                <p className="subtitle">Quản lý các bài viết từ API Laravel.</p>
+                <p className="subtitle">Quản lý các bài viết.</p>
             </div>
             
             {/* Nếu bạn chưa làm API Công thức, có thể ẩn nút này hoặc giữ làm placeholder */}

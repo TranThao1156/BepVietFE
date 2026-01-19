@@ -53,7 +53,7 @@ const AdminLayout = () => {
 
                 <div className="sidebar-footer">
                     <a href="/" className="logout-btn">
-                        <i className="fas fa-sign-out-alt"></i> Đăng xuất
+                        <i className="fas fa-sign-out-alt"></i> Trở về trang chính
                     </a>
                 </div>
             </nav>
