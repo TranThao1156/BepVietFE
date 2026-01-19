@@ -255,13 +255,13 @@ const DsCongThuc = () => {
                       {/* SỬA 2: recipe.nguoidung (khớp với model function nguoidung) */}
                       <div className="author">
                         <img
-                          src={getAvatarUrl(recipe.nguoidung)}
+                          src={getAvatarUrl(recipe.nguoi_dung)}
                           alt="Avatar"
                           style={{ objectFit: "cover" }}
                         />
                         <span>
-                          {recipe.nguoidung
-                            ? recipe.nguoidung.HoTen
+                          {recipe.nguoi_dung
+                            ? recipe.nguoi_dung.HoTen
                             : "Ẩn danh"}
                         </span>
                       </div>
