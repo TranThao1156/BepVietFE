@@ -1,7 +1,42 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const QlBlog = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Cho mọi nguoi dùng đều có thể xem được danh sách blog của chính họ
+    const fetchBlogs = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("access_token");
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/user/blog-ca-nhan`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        const result = await response.json();
+        if(result.success) {
+          setBlogs(result.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách blog:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  if (loading) return <p style={{ textAlign: 'center' }}>Đang tải dữ liệu...</p>;
+
   // Hàm xử lý xóa bài viết
   const handleDelete = (e, blogTitle) => {
     // Ngăn chặn hành vi mặc định nếu nút nằm trong thẻ Link (dù ở đây là button, nhưng thói quen tốt)
@@ -31,111 +66,63 @@ const QlBlog = () => {
           <p>Lan tỏa niềm đam mê ẩm thực của bạn</p>
         </Link>
 
-        {/* Blog Card 1 */}
-        <div className="blog-manage-card">
-          <div className="blog-card-thumb">
-            <Link to="/nguoi-dung/ql-blog/chi-tiet-blog/1">
-              <img 
-                src="https://images.unsplash.com/photo-1626082927389-d3164294050d?q=80&w=1000&auto=format&fit=crop" 
-                alt="Thịt bò" 
-              />
-            </Link>
-            <span className="status-label label-success">Đã đăng</span>
-          </div>
-          <div className="blog-card-body">
-            <div className="blog-meta-date"><i className="fa-regular fa-clock"></i> 12/11/2023</div>
-            <h3 className="blog-card-title">5 Mẹo chọn thịt bò tươi ngon cho món Phở</h3>
-            <p className="blog-card-desc">Để nấu được nồi phở ngon, việc chọn thịt bò là quan trọng nhất. Hãy cùng tìm hiểu cách chọn...</p>
-            <div className="blog-card-footer">
-              <span><i className="fa-regular fa-eye"></i> 1.2k lượt xem</span>
-              <span><i className="fa-regular fa-comment"></i> 45 bình luận</span>
+        {/* Blog Card  */}
+        {blogs.map((blog) => (
+          <div className="blog-manage-card" key={blog.Ma_Blog}>
+            <div className="blog-card-thumb">
+              <Link to={`/blog/${blog.Ma_Blog}`} className="card-img">
+                <img
+                  src={`http://127.0.0.1:8000/storage/img/Blog/${blog.HinhAnh}`}
+                  alt={blog.TieuDe}
+                />
+              </Link>
+              <span
+                className={`status-label ${
+                  blog.TrangThaiDuyet === 'Chấp nhận'
+                    ? 'label-success'
+                    : blog.TrangThaiDuyet === 'Từ chối'
+                    ? 'label-danger'
+                    : 'label-warning'
+                }`}
+              >
+                {blog.TrangThaiDuyet}
+              </span>
+            </div>
+            <div className="blog-card-body">
+              <div className="blog-meta-date">
+                <i className="fa-regular fa-clock"></i>{" "}
+                {blog.created_at}
+              </div>
+              <Link to={`/blog/${blog.Ma_Blog}`} className="blog-card-link" >
+              <h3 className="blog-card-title">{blog.TieuDe}</h3>
+              </Link>
+              <p className="blog-card-desc">
+                {blog.ND_ChiTiet?.slice(0, 120)}...
+              </p>
+
+              <div className="blog-card-footer">
+                <span><i className="fa-regular fa-comment"></i> {blog.binh_luan_count ?? 0}</span>
+              </div>
+            </div>
+
+            <div className="blog-actions">
+              <Link
+                to={`/nguoi-dung/ql-blog/sua-blog/${blog.Ma_Blog}`}
+                className="btn-icon btn-edit"
+              >
+                <i className="fa-regular fa-pen-to-square"></i>
+              </Link>
+
+              <button
+                className="btn-icon btn-delete"
+                onClick={(e) => handleDelete(e, blog.TieuDe)}
+              >
+                <i className="fa-regular fa-trash-can"></i>
+              </button>
             </div>
           </div>
-          <div className="blog-actions">
-            <Link to="/nguoi-dung/ql-blog/sua-blog" className="btn-icon btn-edit" title="Sửa">
-              <i className="fa-regular fa-pen-to-square"></i>
-            </Link>
-            <button 
-              className="btn-icon btn-delete" 
-              title="Xóa" 
-              onClick={(e) => handleDelete(e, '5 Mẹo chọn thịt bò')}
-            >
-              <i className="fa-regular fa-trash-can"></i>
-            </button>
-          </div>
-        </div>
-
-        {/* Blog Card 2 */}
-        <div className="blog-manage-card">
-          <div className="blog-card-thumb">
-            <Link to="/nguoi-dung/ql-blog/chi-tiet-blog/2">
-              <img 
-                src="https://images.unsplash.com/photo-1555243896-c709bfa0b564?q=80&w=1000&auto=format&fit=crop" 
-                alt="Nhà hàng chay" 
-              />
-            </Link>
-            <span className="status-label label-warning">Chờ duyệt</span>
-          </div>
-          <div className="blog-card-body">
-            <div className="blog-meta-date"><i className="fa-regular fa-clock"></i> Hôm qua</div>
-            <h3 className="blog-card-title">Review nhà hàng chay nổi tiếng tại Quận 1</h3>
-            <p className="blog-card-desc">Trải nghiệm không gian và ẩm thực tại Bếp Chay Xanh, một điểm đến không thể bỏ qua...</p>
-            <div className="blog-card-footer">
-              <span><i className="fa-regular fa-eye"></i> 0 lượt xem</span>
-              <span><i className="fa-regular fa-comment"></i> 0 bình luận</span>
-            </div>
-          </div>
-          <div className="blog-actions">
-            <Link to="/nguoi-dung/ql-blog/sua-blog" className="btn-icon btn-edit" title="Sửa">
-              <i className="fa-regular fa-pen-to-square"></i>
-            </Link>
-            <button 
-              className="btn-icon btn-delete" 
-              title="Xóa" 
-              onClick={(e) => handleDelete(e, 'Review nhà hàng chay')}
-            >
-              <i className="fa-regular fa-trash-can"></i>
-            </button>
-          </div>
-        </div>
-
-        {/* Blog Card 3 */}
-        <div className="blog-manage-card">
-          <div className="blog-card-thumb">
-            <Link to="/nguoi-dung/ql-blog/sua-blog">
-              <img 
-                src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop" 
-                alt="Rau củ" 
-              />
-            </Link>
-            <span className="status-label label-warning">Chờ duyệt</span>
-          </div>
-          <div className="blog-card-body">
-            <div className="blog-meta-date"><i className="fa-regular fa-clock"></i> Vừa xong</div>
-            <h3 className="blog-card-title">Cách bảo quản rau củ trong tủ lạnh được lâu</h3>
-            <p className="blog-card-desc">Tổng hợp các phương pháp bảo quản rau củ quả tươi lâu mà không mất chất dinh dưỡng...</p>
-            <div className="blog-card-footer">
-              <span><i className="fa-regular fa-eye"></i> 0 lượt xem</span>
-              <span><i className="fa-regular fa-comment"></i> 0 bình luận</span>
-            </div>
-          </div>
-
-          <div className="blog-actions">
-            <Link to="/nguoi-dung/ql-blog/sua-blog" className="btn-icon btn-edit" title="Sửa">
-              <i className="fa-regular fa-pen-to-square"></i>
-            </Link>
-            <button 
-              className="btn-icon btn-delete" 
-              title="Xóa" 
-              onClick={(e) => handleDelete(e, 'Cách bảo quản rau củ')}
-            >
-              <i className="fa-regular fa-trash-can"></i>
-            </button>
-          </div>
-        </div>
-
+        ))}
       </div>
-
     </main>
   );
 };
