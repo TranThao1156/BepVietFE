@@ -9,6 +9,12 @@ const ChiTietCookbook = () => {
   const [recipes, setRecipes] = useState([]); // Danh sách món ăn
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  
+  
 
   // 1. Fetch dữ liệu từ API
   useEffect(() => {
@@ -59,7 +65,63 @@ const ChiTietCookbook = () => {
 
     fetchDetail();
   }, [id, navigate]);;
+  const handleStartEdit = () => {
+    setEditName(cookbook.TenCookBook);
+    setPreviewImage(cookbook.AnhBia); 
+    setSelectedFile(null);
+    setIsEditing(true);
+  };
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        setSelectedFile(file);
+        setPreviewImage(URL.createObjectURL(file)); // Xem trước ảnh vừa chọn
+    }
+  };
 
+  // Hàm 3: Lưu thay đổi (Gọi API)
+  const handleSave = async () => {
+    if (!editName.trim()) {
+        alert("Tên không được để trống!");
+        return;
+    }
+
+    const token = localStorage.getItem('access_token');
+    
+    // Tạo FormData để chứa text và file
+    const formData = new FormData();
+    formData.append('TenCookBook', editName);
+    formData.append('_method', 'PUT'); // Để Laravel hiểu là PUT
+    
+    if (selectedFile) {
+        formData.append('AnhBia', selectedFile);
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8000/api/user/cookbook/${id}`, {
+            method: 'POST', // Gửi POST kèm _method: PUT
+            headers: { 'Authorization': `Bearer ${token}` }, // Không set Content-Type!
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            setCookbook(prev => ({ 
+                ...prev, 
+                TenCookBook: data.data.TenCookBook,
+                AnhBia: data.data.AnhBia 
+            }));
+            setIsEditing(false); // Tắt chế độ sửa
+            alert("Cập nhật thành công!");
+        } else {
+            alert(data.message || "Lỗi cập nhật.");
+        }
+    } catch (error) {
+        console.error("Lỗi:", error);
+        alert("Lỗi kết nối server.");
+    }
+  };
   // 2. Hàm Xóa Cookbook (gọi API xóa đã làm ở bước trước)
   const handleDeleteCookbook = async () => {
     if (!window.confirm('Bạn có chắc muốn xóa Cookbook này không?')) return;
@@ -161,41 +223,78 @@ const ChiTietCookbook = () => {
         </Link>
       </div>
 
-      {/* Hero Section */}
       <div className="cookbook-hero">
-        <div className="hero-cover">
-          <img
-            src={cookbook.AnhBia}
-            alt={cookbook.TenCookBook}
-            onError={(e) => { e.target.src = 'https://placehold.co/600x400?text=No+Image' }}
+        <div className="hero-cover" style={{ position: 'relative' }}>
+          {/* Ảnh bìa (Mờ đi khi đang sửa) */}
+          <img 
+            src={isEditing ? previewImage : cookbook.AnhBia} 
+            alt={cookbook.TenCookBook} 
+            onError={(e) => {e.target.src = 'https://placehold.co/600x400?text=No+Image'}}
+            style={{ opacity: isEditing ? 0.7 : 1, transition: '0.3s' }}
           />
+          
+          {/* Nút chọn ảnh (Chỉ hiện khi isEditing = true) */}
+          {isEditing && (
+            <div style={{
+                position: 'absolute', top: '50%', left: '50%', 
+                transform: 'translate(-50%, -50%)', textAlign: 'center'
+            }}>
+                <label className="btn btn-primary" style={{ cursor: 'pointer', backgroundColor: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff', padding: '10px 20px', borderRadius: '5px' }}>
+                    <i className="fa-solid fa-camera"></i> Đổi ảnh
+                    <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                </label>
+            </div>
+          )}
         </div>
+
         <div className="hero-info">
           <div className="hero-meta">
             <span><i className="fa-solid fa-layer-group"></i> {cookbook.SoLuongMon} Công thức</span>
-            <span style={{ marginLeft: '15px' }}>
-              {cookbook.TrangThai === 0 ? <i className="fa-solid fa-lock"></i> : <i className="fa-solid fa-globe"></i>}
+            <span style={{marginLeft: '15px'}}>
+                 {cookbook.TrangThai === 0 ? <i className="fa-solid fa-lock"></i> : <i className="fa-solid fa-globe"></i>}
             </span>
           </div>
 
-          <h1 className="hero-title">{cookbook.TenCookBook}</h1>
-
+          {/* LOGIC HIỂN THỊ TÊN HOẶC Ô INPUT */}
+          {isEditing ? (
+             <input 
+                type="text" 
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="form-control"
+                style={{ fontSize: '2rem', fontWeight: 'bold', width: '100%', marginBottom: '10px', padding: '5px' }}
+             />
+          ) : (
+             <h1 className="hero-title">{cookbook.TenCookBook}</h1>
+          )}
+          
           <div className="hero-actions">
-            <Link
-              to={`/nguoi-dung/sua-cookbook/${cookbook.id}`}
-              className="btn btn-outline-gray"
-              style={{ padding: '8px 20px' }}
-            >
-              <i className="fa-solid fa-pen"></i> Chỉnh sửa
-            </Link>
-
-            <button
-              className="btn btn-outline-gray"
-              onClick={handleDeleteCookbook}
-              style={{ padding: '8px 20px', color: '#EF4444', borderColor: '#FECACA' }}
-            >
-              <i className="fa-regular fa-trash-can"></i> Xóa
-            </button>
+            {/* LOGIC ĐỔI NÚT BẤM */}
+            {isEditing ? (
+                <>
+                    <button onClick={handleSave} className="btn btn-primary" style={{ marginRight: '10px', backgroundColor: '#F59E0B', border: 'none', color: 'white', padding: '8px 20px' }}>
+                        <i className="fa-solid fa-floppy-disk"></i> Lưu
+                    </button>
+                    <button onClick={() => setIsEditing(false)} className="btn btn-outline-gray" style={{ padding: '8px 20px' }}>
+                        Hủy
+                    </button>
+                </>
+            ) : (
+                <>
+                    {/* Nút Sửa gọi hàm handleStartEdit thay vì Link */}
+                    <button onClick={handleStartEdit} className="btn btn-outline-gray" style={{ marginRight: '10px', padding: '8px 20px' }}>
+                        <i className="fa-solid fa-pen"></i> Chỉnh sửa
+                    </button>
+                    
+                    <button 
+                      className="btn btn-outline-gray" 
+                      onClick={handleDeleteCookbook}
+                      style={{ padding: '8px 20px', color: '#EF4444', borderColor: '#FECACA' }}
+                    >
+                      <i className="fa-regular fa-trash-can"></i> Xóa
+                    </button>
+                </>
+            )}
           </div>
         </div>
       </div>
