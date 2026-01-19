@@ -87,6 +87,20 @@ const DsCongThuc = () => {
     return value; 
   };
 
+  // --- HÀM XỬ LÝ URL AVATAR ---
+  const getAvatarUrl = (recipe) => {
+    if (recipe.nguoidung && recipe.nguoidung.AnhDaiDien) {
+    // Kiểm tra xem link có http chưa (phòng trường hợp ảnh online)
+        if (recipe.nguoidung.AnhDaiDien.startsWith('http')) {
+            return recipe.nguoidung.AnhDaiDien;
+        }
+        return `http://127.0.0.1:8000/storage/img/NguoiDung/${recipe.nguoidung.AnhDaiDien}`;
+    }
+    // Fallback: Dùng UI Avatars nếu không có ảnh
+    const name = recipe.nguoidung ? recipe.nguoidung.HoTen : `User ${recipe.Ma_ND}`;
+    return `https://ui-avatars.com/api/?name=${name}&background=random`;
+  };
+
   const handleCreateRecipe = () => {
     const token = localStorage.getItem("access_token");
 
@@ -117,7 +131,7 @@ const DsCongThuc = () => {
       </div>
 
       <div className="discovery-layout">
-        {/* --- SIDEBAR BỘ LỌC --- */}
+        {/* --- SIDEBAR BỘ LỌC (Giữ nguyên) --- */}
         <aside className="sidebar-filters">
           
           {/* 1. LỌC VÙNG MIỀN */}
@@ -322,9 +336,12 @@ const DsCongThuc = () => {
                         </Link>
                       </div>
 
-                      <div className="card-body">
-                        <span className="category-tag">DM #{recipe.Ma_DM}</span>
-
+                  <div className="card-body">
+                    {/* SỬA 1: recipe.danh_muc (khớp với model function danh_muc) */}
+                    <span className="category-tag">
+                      {/* Trâm -HIỂN THỊ DANH MỤC: Ưu tiên hiện Tên, nếu không có thì hiện Mã */}
+                      {recipe.danh_muc ? recipe.danh_muc.TenDM : `DM #${recipe.Ma_DM}`}
+                    </span>
                         <Link
                           to={`/cong-thuc/${recipe.Ma_CT}`}
                           className="card-title"
@@ -343,25 +360,32 @@ const DsCongThuc = () => {
                           </span>
                         </div>
 
-                        <div className="card-footer">
-                          <div className="author">
-                            <img
-                              src={`https://ui-avatars.com/api/?name=User+${recipe.Ma_ND}&background=random`}
-                              alt="Avatar"
-                            />
-                            <span>Đầu bếp #{recipe.Ma_ND}</span>
-                          </div>
-                          <div className="rating">
+                    <div className="card-footer">
+                      {/* SỬA 2: recipe.nguoidung (khớp với model function nguoidung) */}
+                     {/* Phân trang */}
+                      <div className="author">
+                        <img
+                          src={getAvatarUrl(recipe)}
+                          alt="Avatar"
+                          style={{ objectFit: "cover" }}
+                        />
+                        <span>
+                         {recipe.nguoidung ? recipe.nguoidung.HoTen : `Đầu bếp #${recipe.Ma_ND}`}
+                        </span>
+                      </div>
+                     <div className="rating">
                             {/* Trâm-đã sửa: Hiển thị SoLuotXem thay vì rating cứng */}
                             <i className="fa-solid fa-eye"></i> {recipe.SoLuotXem}
                           </div>
-                        </div>
-                      </div>
-                    </article>
+                    </div>
+                  </div>
+                </article>
                   ))
               ) : (
                   <p style={{padding: '20px'}}>Không tìm thấy công thức nào.</p>
               )}
+
+            
 
               {lastPage > 1 && (
                 <div className="pagination">

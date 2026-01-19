@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router';
 import LayoutNguoiDung from '../layouts/LayoutNguoiDung';
 import ThongTinCaNhan from '../pages/NguoiDung/ThongTinCaNhan';
 import CookBook from '../pages/NguoiDung/Cookbook';
@@ -21,7 +21,7 @@ export default function UserRoutes() {
       <Route element={<LayoutNguoiDung />}>
         <Route path="thong-tin-ca-nhan" element={<ThongTinCaNhan />} />
         <Route path="cookbook" element={<CookBook />} />
-        <Route path="cookbook/chi-tiet-cookbook" element={<ChiTietCookbook />} />
+        <Route path="cookbook/chi-tiet/:id" element={<ChiTietCookbook />} />
         <Route path="doi-mat-khau" element={<DoiMatKhau />} />
         <Route path="lich-su-truy-cap" element={<LichSuTruyCap />} />
         <Route path="ql-cong-thuc" element={<QlCongThuc />} />

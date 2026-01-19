@@ -26,22 +26,25 @@ export default function DangNhapDangKy() {
 
     const res = await login(data);
     console.log("👉 DỮ LIỆU SERVER TRẢ VỀ:", res);
-    if (res.success) {
-      
-      localStorage.setItem("user", JSON.stringify(res.user));
-      if (res.token) {
-            localStorage.setItem("access_token", res.token); 
-        } else if (res.token) {
-            localStorage.setItem("access_token", res.token);
-        }
-        alert("✅ Đăng nhập thành công");
-        // localStorage.setItem("user", JSON.stringify(res.user));
+    
+    try {
+      const res = await login(data);
 
-        // Trâm- thêm Lưu Token (Thay vào chỗ dòng bị trùng)
-        localStorage.setItem("token", res.token);
+      if (res.success) {
+        // 1. Lưu Token & User
+        console.log("TOKEN:", res.token);
+        console.log("USER:", res.user);
+        localStorage.setItem("access_token", res.token);
+        localStorage.setItem("user", JSON.stringify(res.user));
+
+        alert("✅ Đăng nhập thành công");
         navigate("/");
-    } else {
-      alert("❌ " + res.message);
+      } else {
+        alert("❌ " + (res.message || "Đăng nhập thất bại"));
+      }
+    } catch (error) {
+      console.error("Lỗi đăng nhập:", error);
+      alert("❌ Lỗi kết nối đến Server");
     }
   };
 
@@ -58,14 +61,14 @@ export default function DangNhapDangKy() {
     }
 
     const data = {
-        TenTK: e.target.TenTK.value,
-        MatKhau: matKhau,
-        HoTen: e.target.HoTen.value,
-        Email: e.target.Email.value,
-        Sdt: e.target.Sdt.value,
-        GioiTinh: e.target.GioiTinh.value,
-        QuocTich: e.target.QuocTich.value,
-        DiaChi: e.target.DiaChi.value,
+      TenTK: e.target.TenTK.value,
+      MatKhau: matKhau,
+      HoTen: e.target.HoTen.value,
+      Email: e.target.Email.value,
+      Sdt: e.target.Sdt.value,
+      GioiTinh: e.target.GioiTinh.value,
+      QuocTich: e.target.QuocTich.value,
+      DiaChi: e.target.DiaChi.value,
     };
 
     const res = await register(data);
@@ -221,48 +224,48 @@ export default function DangNhapDangKy() {
               </div>
             </div>
             <div className="form-row">
-                <div className="form-group">
-                    <label>Giới tính</label>
-                    <select name="GioiTinh" required>
-                    <option value="">-- Chọn --</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                    <option value="Khác">Khác</option>
-                    </select>
-                </div>
+              <div className="form-group">
+                <label>Giới tính</label>
+                <select name="GioiTinh" required>
+                  <option value="">-- Chọn --</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                  <option value="Khác">Khác</option>
+                </select>
+              </div>
 
-                <div className="form-group">
-                    <label>Quốc tịch</label>
-                    <input
-                    type="text"
-                    name="QuocTich"
-                    placeholder="Việt Nam"
-                    required
-                    />
-                </div>
-                </div>
-
-                <div className="form-row">
-                <div className="form-group">
-                    <label>Số điện thoại</label>
-                    <input
-                    type="tel"
-                    name="Sdt"
-                    placeholder="09xxxxxxxx"
-                    required
-                    />
-                </div>
-                </div>
-
-                <div className="form-group">
-                <label>Địa chỉ</label>
+              <div className="form-group">
+                <label>Quốc tịch</label>
                 <input
-                    type="text"
-                    name="DiaChi"
-                    placeholder="Số nhà, đường, quận..."
-                    required
+                  type="text"
+                  name="QuocTich"
+                  placeholder="Việt Nam"
+                  required
                 />
-                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Số điện thoại</label>
+                <input
+                  type="tel"
+                  name="Sdt"
+                  placeholder="09xxxxxxxx"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Địa chỉ</label>
+              <input
+                type="text"
+                name="DiaChi"
+                placeholder="Số nhà, đường, quận..."
+                required
+              />
+            </div>
 
             <button type="submit" className="btn-submit">
               Đăng ký thành viên

@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "../../assets/css/congthuc.css";
 
 const TaoCongThuc = () => {
   // State
   const [tenMon, setTenMon] = useState("");
   const [moTa, setMoTa] = useState("");
   const [thoiGianNau, setThoiGianNau] = useState(60);
-  const [doKho, setDoKho] = useState("Dễ"); // UI hiển thị text
-  const [khauPhan, setKhauPhan] = useState(2); // Thêm state khẩu phần (backend required)
+  const [doKho, setDoKho] = useState("Dễ");
+  const [khauPhan, setKhauPhan] = useState(2);
   const [maVM, setMaVM] = useState(1);
   const [maLM, setMaLM] = useState(2);
   const [maDM, setMaDM] = useState(3);
@@ -16,25 +17,28 @@ const TaoCongThuc = () => {
   const [dsLoaiMon, setDsLoaiMon] = useState([]);
   const [dsVungMien, setDsVungMien] = useState([]);
 
-  const [coverImage, setCoverImage] = useState(null); // Để hiển thị xem trước
-  const [coverFile, setCoverFile] = useState(null); // Để gửi lên server
+  const [coverImage, setCoverImage] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
 
-  // State danh sách nguyên liệu (Dùng key nội bộ frontend cho dễ quản lý UI)
+  // State danh sách nguyên liệu
   const [ingredients, setIngredients] = useState([
     { id: 1, name: "", qty: "", unit: "" },
   ]);
+
+  // STATE MỚI CHO GỢI Ý NGUYÊN LIỆU 
+  const [suggestedIngredients, setSuggestedIngredients] = useState([]);
+  const [activeIngIndex, setActiveIngIndex] = useState(null);
+  const wrapperRef = useRef(null);
 
   useEffect(() => {
     const fetchOptions = async () => {
       try {
         const res = await fetch("http://127.0.0.1:8000/api/tuy-chon-cong-thuc");
         const data = await res.json();
-
         setDsDanhMuc(data.danhmuc);
         setDsLoaiMon(data.loaimon);
         setDsVungMien(data.vungmien);
 
-        // (Tùy chọn) Set giá trị mặc định là phần tử đầu tiên nếu danh sách có dữ liệu
         if (data.danhmuc.length > 0) setMaDM(data.danhmuc[0].Ma_DM);
         if (data.loaimon.length > 0) setMaLM(data.loaimon[0].Ma_LM);
         if (data.vungmien.length > 0) setMaVM(data.vungmien[0].Ma_VM);
@@ -42,28 +46,69 @@ const TaoCongThuc = () => {
         console.error("Lỗi tải dữ liệu tùy chọn:", error);
       }
     };
-
     fetchOptions();
+
+    // Sự kiện click ra ngoài để đóng gợi ý
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setSuggestedIngredients([]);
+        setActiveIngIndex(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
-  // State danh sách bước (Dùng key nội bộ frontend)
   const [steps, setSteps] = useState([
     { id: 1, STT: 1, content: "", image: "" },
   ]);
 
   const navigate = useNavigate();
+
   // --- HANDLERS ---
 
-  // Xử lý ảnh bìa (Preview)
   const handleCoverChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setCoverFile(file); // Lưu file thực tế
-      setCoverImage(URL.createObjectURL(file)); // Tạo link xem trước
+      setCoverFile(file);
+      setCoverImage(URL.createObjectURL(file));
     }
   };
 
-  // Thêm nguyên liệu
+  // HÀM MỚI: Xử lý tìm kiếm nguyên liệu
+  const handleSearchIngredient = async (index, value) => {
+    const d = [...ingredients];
+    d[index].name = value;
+    setIngredients(d);
+
+    if (value.length > 1) {
+      setActiveIngIndex(index);
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/nguyen-lieu/goi-y?q=${value}`
+        );
+        const data = await res.json();
+        setSuggestedIngredients(data);
+      } catch (err) {
+        console.error("Lỗi tìm kiếm nguyên liệu", err);
+      }
+    } else {
+      setSuggestedIngredients([]);
+    }
+  };
+
+  // Chọn nguyên liệu từ gợi ý 
+  const selectSuggestion = (index, item) => {
+    const d = [...ingredients];
+    d[index].name = item.TenNguyenLieu;
+    d[index].unit = item.DonViDo;
+    setIngredients(d);
+    setSuggestedIngredients([]);
+    setActiveIngIndex(null);
+  };
+
   const addIngredient = () => {
     const newId =
       ingredients.length > 0
@@ -75,27 +120,25 @@ const TaoCongThuc = () => {
     ]);
   };
 
-  // Xóa nguyên liệu
   const removeIngredient = (id) => {
     if (ingredients.length > 1) {
       setIngredients(ingredients.filter((item) => item.id !== id));
     }
   };
 
-  // Thêm bước làm
   const addStep = () => {
     const newId =
       steps.length > 0 ? Math.max(...steps.map((s) => s.id)) + 1 : 1;
-    // STT tự động tăng theo số lượng phần tử
     const nextSTT = steps.length + 1;
-    setSteps([...steps, { id: newId, STT: nextSTT, content: "", image: null }]);
+    setSteps([
+      ...steps,
+      { id: newId, STT: nextSTT, content: "", image: "" }, // Sửa null thành chuỗi rỗng để thống nhất
+    ]);
   };
 
-  // Xóa bước làm
   const removeStep = (id) => {
     if (steps.length > 1) {
       const newSteps = steps.filter((item) => item.id !== id);
-      // Cập nhật lại STT cho tuần tự sau khi xóa
       const reorderedSteps = newSteps.map((step, index) => ({
         ...step,
         STT: index + 1,
@@ -104,27 +147,20 @@ const TaoCongThuc = () => {
     }
   };
 
-  // --- HÀM MỚI: Xử lý Upload NHIỀU ẢNH (AJAX) ---
   const handleStepImageUpload = async (index, e) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-    // 1. Tạo FormData để chứa nhiều file
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("images[]", files[i]); // Chú ý: images[]
-    }
+    formData.append("image", file);
 
     try {
       const token = localStorage.getItem("access_token");
-
-      // 2. Gọi API Upload riêng
       const res = await fetch("http://127.0.0.1:8000/api/upload-anh-buoc", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
-          // KHÔNG set Content-Type, để trình duyệt tự set multipart/form-data
         },
         body: formData,
       });
@@ -132,21 +168,23 @@ const TaoCongThuc = () => {
       const data = await res.json();
 
       if (data.success) {
-        const newSteps = [...steps];
+        setSteps((prevSteps) => {
+          const newSteps = [...prevSteps];
+          const currentStep = { ...newSteps[index] };
+          const currentImages = currentStep.image
+            ? currentStep.image.split(";")
+            : [];
 
-        // 3. Logic nối chuỗi bằng dấu chấm phẩy ;
-        // Lấy chuỗi ảnh cũ, tách ra thành mảng (nếu có)
-        const currentImages = newSteps[index].image
-          ? newSteps[index].image.split(";")
-          : [];
-
-        // Gộp ảnh cũ + ảnh mới vừa upload xong
-        const newImages = [...currentImages, ...data.images];
-
-        // Nối lại thành chuỗi để lưu vào state
-        newSteps[index].image = newImages.join(";");
-
-        setSteps(newSteps);
+          if (!currentImages.includes(data.image)) {
+            currentImages.push(data.image);
+          }
+          currentStep.image = currentImages.join(";");
+          newSteps[index] = currentStep;
+          return newSteps;
+        });
+        e.target.value = null;
+      } else {
+        console.error("Lỗi từ server:", data.message);
       }
     } catch (err) {
       console.error("Lỗi upload ảnh bước:", err);
@@ -154,34 +192,24 @@ const TaoCongThuc = () => {
     }
   };
 
-  // --- HÀM MỚI: Xóa ảnh nhỏ trong bước ---
   const removeStepImage = (stepIndex, imgName) => {
     const newSteps = [...steps];
     if (!newSteps[stepIndex].image) return;
-
     let images = newSteps[stepIndex].image.split(";");
-    // Lọc bỏ ảnh muốn xóa
     images = images.filter((img) => img !== imgName);
-
-    // Nối lại và cập nhật state
     newSteps[stepIndex].image = images.join(";");
     setSteps(newSteps);
   };
 
-  // --- SUBMIT FORM ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const token = localStorage.getItem("access_token");
     if (!token) {
       alert("Bạn chưa đăng nhập");
       return;
     }
 
-    // Tạo đối tượng FormData
     const formData = new FormData();
-
-    // Append các trường text
     formData.append("TenMon", tenMon);
     formData.append("MoTa", moTa || "");
     formData.append("KhauPhan", khauPhan);
@@ -191,19 +219,16 @@ const TaoCongThuc = () => {
     formData.append("Ma_LM", maLM);
     formData.append("Ma_DM", maDM);
 
-    // Append File ảnh (quan trọng nhất)
     if (coverFile) {
       formData.append("HinhAnh", coverFile);
     }
 
-    // Xử lý mảng Nguyên Liệu cho Laravel (dạng NguyenLieu[0][TenNguyenLieu])
     ingredients.forEach((ing, index) => {
       formData.append(`NguyenLieu[${index}][TenNguyenLieu]`, ing.name);
       formData.append(`NguyenLieu[${index}][DonViDo]`, ing.unit);
       formData.append(`NguyenLieu[${index}][DinhLuong]`, ing.qty || 0.1);
     });
 
-    // Xử lý mảng Bước Thực Hiện
     steps.forEach((step, index) => {
       formData.append(`BuocThucHien[${index}][STT]`, step.STT);
       formData.append(`BuocThucHien[${index}][NoiDung]`, step.content);
@@ -211,20 +236,21 @@ const TaoCongThuc = () => {
     });
 
     try {
-      // Gọi API
-      const res = await fetch("http://127.0.0.1:8000/api/user/cong-thuc/them-cong-thuc", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/user/cong-thuc/them-cong-thuc",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       const data = await res.json();
 
       if (!res.ok) {
-        // Xử lý lỗi validation từ Laravel trả về (thường là errors object)
         if (data.errors) {
           const errorMessages = Object.values(data.errors).flat().join("\n");
           throw new Error(errorMessages);
@@ -232,8 +258,8 @@ const TaoCongThuc = () => {
         throw new Error(data.message || "Có lỗi xảy ra");
       }
 
-      alert("Tạo công thức thành công!");
-      navigate("/nguoi-dung/ql-cong-thuc"); // Điều hướng sau khi thành công
+      alert("Đăng công thức thành công! Hãy chờ duyệt để được đăng công khai");
+      navigate("/nguoi-dung/ql-cong-thuc");
     } catch (err) {
       console.error(err);
       alert("Lỗi: \n" + err.message);
@@ -253,34 +279,18 @@ const TaoCongThuc = () => {
           <div className="section-title-sm">
             <i className="fa-regular fa-image"></i> ẢNH BÌA MÓN ĂN
           </div>
-
           <div
             className={`upload-area-large ${coverImage ? "has-image" : ""}`}
-            style={
-              coverImage
-                ? { backgroundImage: `url(${coverImage})`, padding: "40px" }
-                : {}
-            }
+            style={coverImage ? { backgroundImage: `url(${coverImage})` } : {}}
           >
             <div className="upload-content">
               {coverImage ? (
-                <>
-                  <i
-                    className="fa-solid fa-pen-to-square upload-icon"
-                    style={{
-                      color: "white",
-                      textShadow: "0 2px 4px rgba(0,0,0,0.5)",
-                    }}
-                  ></i>
-                  <p
-                    style={{
-                      color: "white",
-                      textShadow: "0 2px 4px rgba(0,0,0,0.5)",
-                    }}
-                  >
+                <div className="cover-content-active">
+                  <i className="fa-solid fa-pen-to-square upload-icon"></i>
+                  <p>
                     <strong>Nhấn để thay đổi ảnh</strong>
                   </p>
-                </>
+                </div>
               ) : (
                 <>
                   <i className="fa-solid fa-cloud-arrow-up upload-icon"></i>
@@ -300,12 +310,11 @@ const TaoCongThuc = () => {
           </div>
         </label>
 
-        {/* --- SECTION 2: THÔNG TIN CHUNG --- */}
+        {/* SECTION 2: THÔNG TIN CHUNG */}
         <div className="form-section-card">
           <div className="section-title-sm">
             <i className="fa-solid fa-circle-info"></i> THÔNG TIN CHUNG
           </div>
-
           <div className="form-group">
             <label>
               Tên món ăn <span className="text-danger">*</span>
@@ -318,7 +327,6 @@ const TaoCongThuc = () => {
               onChange={(e) => setTenMon(e.target.value)}
             />
           </div>
-
           <div className="form-group">
             <label>Mô tả</label>
             <textarea
@@ -327,7 +335,6 @@ const TaoCongThuc = () => {
               onChange={(e) => setMoTa(e.target.value)}
             ></textarea>
           </div>
-
           <div className="form-grid-2">
             <div className="form-group">
               <label>
@@ -343,7 +350,6 @@ const TaoCongThuc = () => {
                 />
               </div>
             </div>
-
             <div className="form-group">
               <label>
                 Khẩu phần (người) <span className="text-danger">*</span>
@@ -359,7 +365,6 @@ const TaoCongThuc = () => {
               </div>
             </div>
           </div>
-
           <div className="form-grid-2">
             <div className="form-group">
               <label>Độ khó</label>
@@ -375,7 +380,6 @@ const TaoCongThuc = () => {
                 </select>
               </div>
             </div>
-
             <div className="form-group">
               <label>Vùng miền</label>
               <div className="input-icon-group">
@@ -395,7 +399,6 @@ const TaoCongThuc = () => {
               </div>
             </div>
           </div>
-
           <div className="form-grid-2">
             <div className="form-group">
               <label>Loại món</label>
@@ -415,7 +418,6 @@ const TaoCongThuc = () => {
                 </select>
               </div>
             </div>
-
             <div className="form-group">
               <label>Danh mục</label>
               <div className="input-icon-group">
@@ -437,38 +439,58 @@ const TaoCongThuc = () => {
           </div>
         </div>
 
-        {/* --- SECTION 3: NGUYÊN LIỆU (DYNAMIC LIST) --- */}
-        <div className="form-section-card">
+        {/* SECTION 3: NGUYÊN LIỆU */}
+        <div className="form-section-card" ref={wrapperRef}>
           <div className="section-title-sm">
             <i className="fa-solid fa-basket-shopping"></i> NGUYÊN LIỆU
           </div>
 
           <div className="ingredients-wrapper">
+            {/* Header */}
             <div className="ingredients-header">
-              <span>Tên nguyên liệu</span>
-              <span>Số lượng</span>
-              <span>Đơn vị</span>
+              <span className="col-name">Tên nguyên liệu</span>
+              <span className="col-qty">Số lượng</span>
+              <span className="col-unit">Đơn vị</span>
+              <span className="col-action"></span>
             </div>
 
             {ingredients.map((ing, index) => (
               <div className="ingredient-row" key={ing.id}>
-                <input
-                  className="ing-name"
-                  placeholder="VD: Thịt bò"
-                  value={ing.name}
-                  required
-                  onChange={(e) => {
-                    const d = [...ingredients];
-                    d[index].name = e.target.value;
-                    setIngredients(d);
-                  }}
-                />
+                {/* 1. TÊN NGUYÊN LIỆU */}
+                <div className="ing-name-wrapper">
+                  <input
+                    className="ing-name"
+                    placeholder="VD: Thịt bò"
+                    value={ing.name}
+                    required
+                    onChange={(e) =>
+                      handleSearchIngredient(index, e.target.value)
+                    }
+                  />
 
+                  {/* Dropdown Gợi ý */}
+                  {activeIngIndex === index &&
+                    suggestedIngredients.length > 0 && (
+                      <ul className="suggestions-list">
+                        {suggestedIngredients.map((item, idx) => (
+                          <li
+                            key={idx}
+                            onClick={() => selectSuggestion(index, item)}
+                          >
+                            <span>{item.TenNguyenLieu}</span>
+                            <small>{item.DonViDo}</small>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                </div>
+
+                {/* 2. SỐ LƯỢNG */}
                 <input
                   className="ing-qty"
                   type="number"
                   step="0.1"
-                  placeholder="VD: 500"
+                  placeholder="SL"
                   value={ing.qty}
                   required
                   onChange={(e) => {
@@ -478,9 +500,10 @@ const TaoCongThuc = () => {
                   }}
                 />
 
+                {/* 3. ĐƠN VỊ */}
                 <input
                   className="ing-unit"
-                  placeholder="VD: gram"
+                  placeholder="Đơn vị"
                   value={ing.unit}
                   required
                   onChange={(e) => {
@@ -490,22 +513,18 @@ const TaoCongThuc = () => {
                   }}
                 />
 
-                {ingredients.length > 1 && (
-                  <button
-                    type="button"
-                    className="remove-img"
-                    style={{
-                      marginLeft: "10px",
-                      background: "none",
-                      color: "#EF4444",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => removeIngredient(ing.id)}
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
-                )}
+                {/* Nút Xóa */}
+                <div className="remove-btn-wrapper">
+                  {ingredients.length > 1 && (
+                    <button
+                      type="button"
+                      className="remove-img"
+                      onClick={() => removeIngredient(ing.id)}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -519,7 +538,7 @@ const TaoCongThuc = () => {
           </button>
         </div>
 
-        {/* --- SECTION 4: CÁCH LÀM (DYNAMIC LIST) --- */}
+        {/* SECTION 4: CÁCH LÀM */}
         <div className="form-section-card">
           <div className="section-title-sm">
             <i className="fa-solid fa-list-ol"></i> CÁCH LÀM
@@ -541,82 +560,36 @@ const TaoCongThuc = () => {
                     }}
                   ></textarea>
 
-                  {/* KHU VỰC HIỂN THỊ VÀ UPLOAD ẢNH */}
                   <div className="step-media-area">
                     <div className="add-step-img">
-                      <label
-                        style={{
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px",
-                        }}
-                      >
+                      <label className="label-add-step-img">
                         <i className="fa-solid fa-camera"></i>
                         <span>Thêm ảnh</span>
                         <input
                           type="file"
                           hidden
-                          multiple // QUAN TRỌNG: Cho phép chọn nhiều ảnh
                           accept="image/*"
                           onChange={(e) => handleStepImageUpload(index, e)}
                         />
                       </label>
                     </div>
 
-                    {/* Hiển thị danh sách ảnh đã upload */}
+                    {/* Danh sách ảnh đã upload */}
                     {step.image && (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "10px",
-                          marginTop: "10px",
-                          flexWrap: "wrap",
-                        }}
-                      >
+                      <div className="step-images-list">
                         {step.image.split(";").map((imgName, imgIdx) => (
-                          <div
-                            key={imgIdx}
-                            style={{
-                              position: "relative",
-                              width: "80px",
-                              height: "80px",
-                            }}
-                          >
+                          <div key={imgIdx} className="step-image-item">
                             <img
-                              // Lưu ý: Đảm bảo đường dẫn storage đúng với config của bạn
                               src={`http://127.0.0.1:8000/storage/img/BuocThucHien/${imgName}`}
-                              alt="Step"
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                borderRadius: "4px",
-                                border: "1px solid #ddd",
-                              }}
+                              alt={`Bước ${step.STT} - Ảnh ${imgIdx + 1}`}
                             />
-                            {/* Nút xóa ảnh nhỏ */}
                             <button
                               type="button"
+                              className="btn-remove-step-img"
                               onClick={() => removeStepImage(index, imgName)}
-                              style={{
-                                position: "absolute",
-                                top: -5,
-                                right: -5,
-                                background: "#EF4444",
-                                color: "white",
-                                borderRadius: "50%",
-                                width: "20px",
-                                height: "20px",
-                                border: "none",
-                                cursor: "pointer",
-                                fontSize: "10px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
+                              title="Xóa ảnh này"
                             >
-                              <i className="fa-solid fa-times"></i>
+                              <i className="fa-solid fa-xmark"></i>
                             </button>
                           </div>
                         ))}
@@ -624,20 +597,11 @@ const TaoCongThuc = () => {
                     )}
                   </div>
                 </div>
-
                 {steps.length > 1 && (
                   <button
                     type="button"
+                    className="btn-remove-step"
                     onClick={() => removeStep(step.id)}
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "10px",
-                      border: "none",
-                      background: "transparent",
-                      color: "#9CA3AF",
-                      cursor: "pointer",
-                    }}
                     title="Xóa bước này"
                   >
                     <i className="fa-solid fa-xmark"></i>
@@ -646,22 +610,19 @@ const TaoCongThuc = () => {
               </div>
             ))}
           </div>
-
           <button type="button" className="btn-dashed-full" onClick={addStep}>
             <i className="fa-solid fa-plus"></i> Thêm bước mới
           </button>
         </div>
 
-        {/* --- ACTIONS --- */}
         <div className="form-submit-area">
           <Link
             to="/nguoi-dung/ql-cong-thuc"
-            className="btn-outline-gray"
-
+            className="btn-outline-gray btn-back"
           >
             <i className="fa-solid fa-arrow-left"></i> Quay lại
           </Link>
-          <button type="submit" className="btn btn-primary btn-large" >
+          <button type="submit" className="btn btn-primary btn-large">
             Đăng công thức
           </button>
         </div>
