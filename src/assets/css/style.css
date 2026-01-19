@@ -19,6 +19,7 @@ body {
     color: var(--text-dark);
     background-color: #FDFDFD;
     line-height: 1.5;
+    height: 100%;
 }
 
 a { text-decoration: none; color: inherit; transition: 0.3s; }
@@ -31,6 +32,11 @@ img { max-width: 100%; display: block; }
     padding: 0 20px;
 }
 
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 /* =========================================
    2. COMPONENTS (NÚT, THẺ, INPUT)
    ========================================= */
@@ -1583,4 +1589,44 @@ blockquote p { margin-bottom: 0; }
 .btn-submit-review:hover {
     background-color: #e5533d;
     transform: translateY(-1px); /* Hiệu ứng nhấc nút lên khi hover */
+}
+.chat-wrapper {
+  height: 100%;
+  display: flex;
+}
+
+.chat-layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.chat-sidebar {
+  width: 280px;
+  
+  color: white;
+}
+
+/* Main chat */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+/* Khung messages scroll */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Input luôn nằm dưới */
+.input-area-wrapper {
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  padding: 10px;
 }
