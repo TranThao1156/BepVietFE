@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { changePassword } from '../../api/doimatkhauApi';
 
 const DoiMatKhau = () => {
   // State để quản lý việc ẩn/hiện cho 3 ô input
@@ -6,10 +7,55 @@ const DoiMatKhau = () => {
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [form, setForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const onChange = (key) => (e) => {
+    setForm((p) => ({ ...p, [key]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Xử lý logic đổi mật khẩu ở đây
-    alert('Đã gửi yêu cầu đổi mật khẩu!');
+    setError('');
+    setSuccess('');
+
+    if (!form.currentPassword || !form.newPassword || !form.confirmPassword) {
+      setError('Vui lòng nhập đầy đủ thông tin.');
+      return;
+    }
+    if (form.newPassword !== form.confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // NOTE: Nếu backend dùng tên field khác (vd: oldPassword/newPassword), sửa lại tại đây cho khớp.
+      const payload = await changePassword({
+        current_password: form.currentPassword,          // Sửa thành current_password
+        new_password: form.newPassword,                  // Sửa thành new_password
+        new_password_confirmation: form.confirmPassword
+      });
+
+      // Chấp nhận vài dạng response phổ biến
+      const msg =
+        (payload && (payload.message || payload.msg)) ||
+        'Đổi mật khẩu thành công.';
+      setSuccess(msg);
+
+      setForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err) {
+      setError(err?.message || 'Đổi mật khẩu thất bại.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -37,13 +83,18 @@ const DoiMatKhau = () => {
       {/* Form Đổi mật khẩu */}
       <div className="password-form-container">
         <form onSubmit={handleSubmit}>
-          
+          {error ? <div className="alert alert-danger">{error}</div> : null}
+          {success ? <div className="alert alert-success">{success}</div> : null}
+
           <div className="form-group">
             <label>Mật khẩu hiện tại</label>
             <div className="password-input-wrapper">
-              <input 
-                type={showCurrentPass ? "text" : "password"} 
-                placeholder="Nhập mật khẩu hiện tại" 
+              <input
+                type={showCurrentPass ? "text" : "password"}
+                placeholder="Nhập mật khẩu hiện tại"
+                value={form.currentPassword}
+                onChange={onChange('currentPassword')}
+                autoComplete="current-password"
               />
               <i 
                 className={`fa-regular ${showCurrentPass ? "fa-eye-slash" : "fa-eye"} toggle-password`}
@@ -56,9 +107,12 @@ const DoiMatKhau = () => {
           <div className="form-group">
             <label>Mật khẩu mới</label>
             <div className="password-input-wrapper">
-              <input 
-                type={showNewPass ? "text" : "password"} 
-                placeholder="Nhập mật khẩu mới" 
+              <input
+                type={showNewPass ? "text" : "password"}
+                placeholder="Nhập mật khẩu mới"
+                value={form.newPassword}
+                onChange={onChange('newPassword')}
+                autoComplete="new-password"
               />
               <i 
                 className={`fa-regular ${showNewPass ? "fa-eye-slash" : "fa-eye"} toggle-password`}
@@ -71,9 +125,12 @@ const DoiMatKhau = () => {
           <div className="form-group">
             <label>Xác nhận mật khẩu mới</label>
             <div className="password-input-wrapper">
-              <input 
-                type={showConfirmPass ? "text" : "password"} 
-                placeholder="Nhập lại mật khẩu mới" 
+              <input
+                type={showConfirmPass ? "text" : "password"}
+                placeholder="Nhập lại mật khẩu mới"
+                value={form.confirmPassword}
+                onChange={onChange('confirmPassword')}
+                autoComplete="new-password"
               />
               <i 
                 className={`fa-regular ${showConfirmPass ? "fa-eye-slash" : "fa-eye"} toggle-password`}
@@ -84,10 +141,22 @@ const DoiMatKhau = () => {
           </div>
 
           <div className="form-actions-left">
-            <button type="button" className="btn btn-outline-gray">Hủy bỏ</button>
-            <button type="submit" className="btn btn-primary">Lưu thay đổi</button>
+            <button
+              type="button"
+              className="btn btn-outline-gray"
+              onClick={() => {
+                setError('');
+                setSuccess('');
+                setForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+              }}
+              disabled={submitting}
+            >
+              Hủy bỏ
+            </button>
+            <button type="submit" className="btn btn-primary" disabled={submitting}>
+              {submitting ? 'Đang lưu...' : 'Lưu thay đổi'}
+            </button>
           </div>
-
         </form>
       </div>
     </main>

@@ -1,9 +1,17 @@
 import React from 'react';
 import { Link, useParams } from 'react-router';
-
+import BinhLuanBlog from '../NguoiDung/BinhLuanBlog'; //Trâm import BinhLuanBlog
 const ChitietBlog = () => {
   const { id } = useParams();
-
+    //Trâm thêm 
+  const currentUser = {
+      id: 1, 
+      HoTen: "Trâm (User Test)", 
+      VaiTro: 1, 
+      AnhDaiDien: "https://via.placeholder.com/150"
+  };
+  // hết phần của Trâm
+  
   // Dữ liệu giả cho 1 bài viết
   const post = {
     title: "10 mẹo giữ rau củ tươi lâu trong tủ lạnh mà bà nội trợ nào cũng nên biết",
@@ -82,21 +90,12 @@ const ChitietBlog = () => {
                 </div>
 
                 {/* BÌNH LUẬN TĨNH */}
-                <div className="comments-section" style={{maxWidth: '100%'}}>
-                    <h3>Bình luận ({post.comments})</h3>
-                    <div className="comment-form">
-                        <textarea placeholder="Bạn nghĩ gì về bài viết này?"></textarea>
-                        <button className="btn btn-primary" style={{float: 'right'}}>Gửi bình luận</button>
-                        <div style={{clear: 'both'}}></div>
-                    </div>
-                    <div className="comment-item" style={{marginTop: '30px', display: 'flex', gap: '15px'}}>
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" style={{width: '40px', height: '40px', borderRadius: '50%'}} />
-                        <div>
-                            <div style={{marginBottom: '5px'}}><strong>Hoàng Nam</strong></div>
-                            <p style={{color: 'var(--text-dark)'}}>Bài viết rất hữu ích! Trước giờ mình toàn rửa sạch rồi mới cất, hèn chi rau nhanh hỏng.</p>
-                            <div style={{color: 'var(--text-gray)', fontSize: '0.8rem', marginTop: '5px'}}>Trả lời • 2 giờ trước</div>
-                        </div>
-                    </div>
+                <div style={{ marginTop: '40px' }}>
+                    <BinhLuanBlog 
+                        blogId={id}             // Truyền ID lấy từ URL
+                        currentUser={currentUser} // Truyền User lấy từ state
+                        initialComments={[]}      // Ban đầu rỗng, sẽ load khi component chạy (hoặc truyền list từ API chi tiết)
+                    />
                 </div>
             </article>
 
