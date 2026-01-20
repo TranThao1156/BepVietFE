@@ -38,6 +38,11 @@ const ChitietCongthuc = () => {
       setLoading(false);
     }
   }, [id]);
+  const handleSaveCookbook = () => {
+    // Tại đây bạn sẽ gọi API để lưu vào database
+    console.log("Lưu công thức:", recipe.Ma_CT);
+    alert("Đã lưu công thức vào Cookbook của bạn!");
+  };
 
   useEffect(() => {
     //  Trâm - THÊM ĐOẠN NÀY: Lấy user từ localStorage khi mới vào trang
@@ -133,6 +138,9 @@ const ChitietCongthuc = () => {
                   ))}
                 </ul>
               </div>
+              <button className="btn-save-cookbook" onClick={handleSaveCookbook}>
+                <i className="fa-regular fa-bookmark"></i> Lưu vào Cookbook
+              </button>
             </aside>
 
             {/* CÁC BƯỚC */}

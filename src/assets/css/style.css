@@ -1548,6 +1548,37 @@ blockquote p { margin-bottom: 0; }
     background-color: #e5533d;
     transform: translateY(-1px); /* Hiệu ứng nhấc nút lên khi hover */
 }
+.btn-save-cookbook {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+    width: 100%;              /* Chiếm hết chiều ngang của sidebar */
+    margin-top: 15px;         /* Cách phần nguyên liệu 1 khoảng */
+    padding: 12px 20px;
+    
+    background-color: var(--primary-color); /* Màu cam chủ đạo */
+    color: var(--white);
+    border: none;
+    border-radius: 8px;       /* Bo góc nhẹ cho hiện đại */
+    
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(255, 107, 53, 0.2);
+}
+
+.btn-save-cookbook:hover {
+    background-color: #e55a2b; /* Màu đậm hơn khi hover */
+    transform: translateY(-2px); /* Hiệu ứng nổi lên nhẹ */
+    box-shadow: 0 6px 10px rgba(255, 107, 53, 0.3);
+}
+
+.btn-save-cookbook i {
+    font-size: 1.1rem;
+}
 .chat-wrapper {
   height: 100%;
   display: flex;

@@ -1,0 +1,16 @@
+[33mc05ad60[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mQuangKhoi[m[33m, [m[1;31morigin/QuangKhoi[m[33m)[m HEAD@{0}: commit: đổi ảnh và đổi tên cookbook
+[33m27eaa76[m HEAD@{1}: commit: xoa mon an trong cookbook
+[33m9c02990[m HEAD@{2}: commit: hiển thị chi tiết cookbook(danh sách công thức trong cookbook)
+[33m8c3d45d[m HEAD@{3}: commit: Tìm kiếm danh mục kết hợp gợi í tìm kiếm
+[33m581aeb4[m HEAD@{4}: commit: sửa danh mục
+[33m01811cc[m HEAD@{5}: commit (merge): hiển thị danh sách danh mục, tạo danh mục và xóa danh mục
+[33m07bad00[m HEAD@{6}: commit: hiển thị danh sách cookbook người dùng
+[33me34de3f[m HEAD@{7}: commit: Thêm cookbook (chỉnh sửa sau khi phân quyền)
+[33md2bd3bb[m HEAD@{8}: pull origin main: Fast-forward
+[33m8062c74[m HEAD@{9}: commit: sửa lỗi chitietcongthuc hienthi
+[33m8229d2a[m HEAD@{10}: commit: Chinh sua taocookbook, chuc nang tao cookbook
+[33m6eff17f[m HEAD@{11}: commit (merge): merge
+[33m269c029[m HEAD@{12}: commit: admin.css
+[33mbff89ec[m[33m ([m[1;32mmaster[m[33m, [m[1;32mLeKhoi[m[33m)[m HEAD@{13}: checkout: moving from LeKhoi to QuangKhoi
+[33mbff89ec[m[33m ([m[1;32mmaster[m[33m, [m[1;32mLeKhoi[m[33m)[m HEAD@{14}: checkout: moving from master to LeKhoi
+[33mbff89ec[m[33m ([m[1;32mmaster[m[33m, [m[1;32mLeKhoi[m[33m)[m HEAD@{15}: commit (initial): Giao diện react phần chung và phần admin
