@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import BinhLuanBlog from '../NguoiDung/BinhLuanBlog'; //Trâm import BinhLuanBlog
 const ChitietBlog = () => {
   const { id } = useParams();
     //Trâm thêm 
-  const currentUser = {
-      id: 1, 
-      HoTen: "Trâm (User Test)", 
-      VaiTro: 1, 
-      AnhDaiDien: "https://via.placeholder.com/150"
-  };
+const [currentUser, setCurrentUser] = useState(null);
+
+useEffect(() => {
+    const userStr = localStorage.getItem("user"); // Key này được lưu lúc bạn Login thành công
+    if (userStr) {
+        try {
+            setCurrentUser(JSON.parse(userStr));
+        } catch (e) {
+            console.error("Lỗi parse user từ localStorage");
+        }
+    }
+}, []);
   // hết phần của Trâm
   
   // Dữ liệu giả cho 1 bài viết
@@ -83,13 +89,13 @@ const ChitietBlog = () => {
                     </div>
                     <div className="share-buttons">
                         <span>Chia sẻ:</span>
-                        <a href="#" className="share-icon facebook"><i className="fa-brands fa-facebook"></i></a>
-                        <a href="#" className="share-icon pinterest"><i className="fa-brands fa-pinterest"></i></a>
-                        <a href="#" className="share-icon twitter"><i className="fa-brands fa-twitter"></i></a>
+                        <a href="#!" className="share-icon facebook"><i className="fa-brands fa-facebook"></i></a>
+                        <a href="#!" className="share-icon pinterest"><i className="fa-brands fa-pinterest"></i></a>
+                        <a href="#!" className="share-icon twitter"><i className="fa-brands fa-twitter"></i></a>
                     </div>
                 </div>
 
-                {/* BÌNH LUẬN TĨNH */}
+                {/* Trâm - BÌNH LUẬN */}
                 <div style={{ marginTop: '40px' }}>
                     <BinhLuanBlog 
                         blogId={id}             // Truyền ID lấy từ URL

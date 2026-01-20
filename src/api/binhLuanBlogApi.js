@@ -1,8 +1,7 @@
 // File: src/api/binhLuanBlogApi.js
+const BASE_URL_PUBLIC = "http://127.0.0.1:8000/api"; // Không có /user
+const BASE_URL = "http://127.0.0.1:8000/api/user"; // Có /user cho Thêm/Sửa/Xóa
 
-const BASE_URL = "http://127.0.0.1:8000/api/user";
-
-// Hàm lấy token từ LocalStorage để xác thực
 const getHeaders = () => {
     const token = localStorage.getItem("token"); 
     return {
@@ -11,15 +10,15 @@ const getHeaders = () => {
     };
 };
 
-// 1. Thêm bình luận Blog
-export const addBlogComment = async (maBlog, noiDung) => {
-    // Gọi đúng đường dẫn Backend đã quy ước
+// 1. Thêm bình luận Blog (Phiên bản duy nhất - Hỗ trợ cả mới và trả lời)
+export const addBlogComment = async (maBlog, noiDung, parentId = null) => {
     const response = await fetch(`${BASE_URL}/binh-luan-blog`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify({
             Ma_Blog: maBlog,
-            NoiDungBL: noiDung // ⚠️ Key này phải khớp với database (NoiDungBL)
+            NoiDungBL: noiDung,
+            Parent_ID: parentId // Khớp với BinhLuanBlogService đã sửa
         })
     });
     return response.json();
@@ -42,4 +41,14 @@ export const deleteComment = async (id) => {
         headers: getHeaders()
     });
     return response.json();
+};
+
+// 4. Lấy danh sách bình luận (SỬA LẠI URL Ở ĐÂY)
+export const getBlogComments = async (maBlog) => {
+    const response = await fetch(`${BASE_URL_PUBLIC}/binh-luan-blog/${maBlog}`, {
+        method: "GET", // Khớp với Route::get trong api.php
+        headers: { "Content-Type": "application/json" } // Không cần token để xem công khai
+    });
+    return response.json();
+
 };

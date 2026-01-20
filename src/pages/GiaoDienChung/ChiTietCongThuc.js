@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import DanhGiaSao from '../NguoiDung/DanhGiaSao'; // Trâm - import DanhGiaSao
 
 const ChitietCongthuc = () => {
   const { id } = useParams();
@@ -7,11 +8,21 @@ const ChitietCongthuc = () => {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [userRating, setUserRating] = useState(0);
-  const [hoverStar, setHoverStar] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
   const [commentContent, setCommentContent] = useState("");
 
   useEffect(() => {
+    //  Trâm - THÊM ĐOẠN NÀY: Lấy user từ localStorage khi mới vào trang
+    const userStr = localStorage.getItem("user"); // Hoặc key mà bạn dùng lưu user
+    if (userStr) {
+        try {
+            setCurrentUser(JSON.parse(userStr));
+        } catch (e) {
+            console.error("Lỗi parse user", e);
+        }
+    }
+    // hết phần của Trâm
+
     fetch(`http://127.0.0.1:8000/api/cong-thuc/${id}`, {
       credentials: "include",
     })
@@ -153,33 +164,21 @@ const ChitietCongthuc = () => {
             </div>
           </div>
 
-          {/* ĐÁNH GIÁ */}
-          <div className="comments-section">
-            <h3 className="section-title">Đánh giá</h3>
-
-            <div className="rating-row">
-              <span>Đánh giá của bạn:</span>
-              <div className="stars-select">
-                {[...Array(5)].map((_, index) => {
-                  const value = index + 1;
-                  return (
-                    <i
-                      key={index}
-                      className="fa-solid fa-star"
-                      style={{
-                        cursor: "pointer",
-                        color:
-                          value <= (hoverStar || userRating)
-                            ? "#ffc107"
-                            : "#e4e5e9",
-                      }}
-                      onClick={() => setUserRating(value)}
-                      onMouseEnter={() => setHoverStar(value)}
-                      onMouseLeave={() => setHoverStar(0)}
-                    ></i>
-                  );
-                })}
-              </div>
+          {/*Trâm - ĐÁNH GIÁ */}
+          <div className="comments-section" style={{ marginTop: '40px' }}>
+            <h3 className="section-title">Đánh giá & Bình luận</h3>
+            
+            {/* 1. GỌI COMPONENT ĐÁNH GIÁ SAO VÀO ĐÂY */}
+            <div style={{ marginBottom: '20px' }}>
+                {/* Truyền dữ liệu vào component của Trâm */}
+                <div style={{ marginBottom: '20px' }}>
+                    <DanhGiaSao 
+                        maCongThuc={id}
+                        currentUser={currentUser}
+                        // Lấy TrungBinhSao từ API trả về, nếu chưa có thì hiện 0
+                        initialAvgRating={recipe.TrungBinhSao || 0} 
+                    />
+                </div>
             </div>
 
             <textarea
