@@ -42,7 +42,8 @@ const ChitietBlog = () => {
                         <img src={`http://127.0.0.1:8000/storage/img/NguoiDung/${blog.TacGia.AnhDaiDien}`} alt={blog.TacGia.HoTen} />
                         <div>
                             <strong>{blog.TacGia.HoTen}</strong>
-                            <span>Đăng ngày {blog.NgayDang}</span>
+                            {/* Điều chỉnh Ngày đăng chỉ hiện đ/mm/yyyy */}
+                            <span>Đăng ngày {(new Date(blog.NgayDang)).toLocaleDateString()}</span>
                         </div>
                     </div>
                     <div className="meta-stats">
@@ -51,7 +52,9 @@ const ChitietBlog = () => {
                 </div>
 
                 <div className="article-featured-img">
-                    <img src={`http://127.0.0.1:8000/storage/img/Blog/${blog.HinhAnh}`} alt={blog.TieuDe} />
+                    {/* <img src={`http://127.0.0.1:8000/storage/img/Blog/${blog.HinhAnh}`}  */}
+                    <img src={blog.HinhAnh}
+                    alt={blog.TieuDe} />
                 </div>
 
                 <div
@@ -130,7 +133,8 @@ const ChitietBlog = () => {
                     {blog.BlogLienQuan.map(item => (
                     <div className="related-item" key={item.Ma_Blog}>
                         <img
-                        src={`http://127.0.0.1:8000/storage/img/Blog/${item.HinhAnh}`}
+                        // src={`http://127.0.0.1:8000/storage/img/Blog/${item.HinhAnh}`}
+                        src={item.HinhAnh}
                         alt={item.TieuDe}
                         />
                         <div className="related-info">

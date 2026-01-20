@@ -72,7 +72,8 @@ const QlBlog = () => {
             <div className="blog-card-thumb">
               <Link to={`/blog/${blog.Ma_Blog}`} className="card-img">
                 <img
-                  src={`http://127.0.0.1:8000/storage/img/Blog/${blog.HinhAnh}`}
+                  // src={`http://127.0.0.1:8000/storage/img/Blog/${blog.HinhAnh}`}
+                  src={blog.HinhAnh}
                   alt={blog.TieuDe}
                 />
               </Link>
@@ -91,7 +92,8 @@ const QlBlog = () => {
             <div className="blog-card-body">
               <div className="blog-meta-date">
                 <i className="fa-regular fa-clock"></i>{" "}
-                {blog.created_at}
+                {/* Điều chỉnh Ngày đăng chỉ hiện dd/mm/yyyy */}
+                {(new Date(blog.created_at)).toLocaleDateString()}
               </div>
               <Link to={`/blog/${blog.Ma_Blog}`} className="blog-card-link" >
               <h3 className="blog-card-title">{blog.TieuDe}</h3>
