@@ -1661,3 +1661,113 @@ blockquote p { margin-bottom: 0; }
   background: white;
   padding: 10px;
 }
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Nền tối mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Đảm bảo nằm trên cùng */
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-box {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: 12px;
+    width: 450px;
+    max-width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+    animation: slideDown 0.3s ease-out;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+    text-align: center;
+}
+
+.modal-body {
+    margin-bottom: 25px;
+}
+
+.modal-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: var(--text-gray);
+}
+
+.modal-select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    font-size: 1rem;
+    color: var(--text-dark);
+    background-color: #F9FAFB;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.modal-select:focus {
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #F3F4F6;
+    padding-top: 20px;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-cancel {
+    background-color: #F3F4F6;
+    color: var(--text-gray);
+}
+
+.btn-cancel:hover {
+    background-color: #E5E7EB;
+    color: var(--text-dark);
+}
+
+.btn-confirm {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #e55a2b;
+    transform: translateY(-1px);
+}
+
+/* Hiệu ứng chuyển động nhẹ */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
