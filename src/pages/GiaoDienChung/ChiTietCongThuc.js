@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+// Trâm - đã sửa: gộp import React (tránh import trùng gây lỗi)
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import DanhGiaSao from '../NguoiDung/DanhGiaSao'; // Trâm - import DanhGiaSao
 
 const ChitietCongthuc = () => {
   const { id } = useParams();
@@ -7,31 +9,54 @@ const ChitietCongthuc = () => {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [userRating, setUserRating] = useState(0);
-  const [hoverStar, setHoverStar] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
   const [commentContent, setCommentContent] = useState("");
 
-  useEffect(() => {
+  const API_URL = "http://127.0.0.1:8000";
 
+  // Trâm - đã sửa: thêm hàm fetchRecipeDetail để dùng lại khi cần reload (vd: sau khi đánh giá sao)
+  const fetchRecipeDetail = useCallback(async () => {
+    setLoading(true);
 
-    fetch(`http://127.0.0.1:8000/api/cong-thuc/${id}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setRecipe(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
+    const headers = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/cong-thuc/${id}`, {
+        credentials: "include",
+        method: "GET",
+        headers,
       });
+      const json = await res.json();
+      setRecipe(json?.data ?? null);
+    } catch (err) {
+      console.error(err);
+      setRecipe(null);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
   const handleSaveCookbook = () => {
     // Tại đây bạn sẽ gọi API để lưu vào database
     console.log("Lưu công thức:", recipe.Ma_CT);
     alert("Đã lưu công thức vào Cookbook của bạn!");
   };
+
+  useEffect(() => {
+    //  Trâm - THÊM ĐOẠN NÀY: Lấy user từ localStorage khi mới vào trang
+    const userStr = localStorage.getItem("user"); // Hoặc key mà bạn dùng lưu user
+    if (userStr) {
+        try {
+            setCurrentUser(JSON.parse(userStr));
+        } catch (e) {
+            console.error("Lỗi parse user", e);
+        }
+    }
+    // hết phần của Trâm
+    fetchRecipeDetail();
+  }, [fetchRecipeDetail]);
 
   if (loading) return <p>Đang tải dữ liệu...</p>;
   if (!recipe) return <p>Không tìm thấy công thức</p>;
@@ -50,7 +75,7 @@ const ChitietCongthuc = () => {
                 <img
                   src={
                     recipe.nguoidung?.AnhDaiDien
-                      ? `http://127.0.0.1:8000/storage/img/NguoiDung/${recipe.nguoidung.AnhDaiDien}`
+                      ? `${API_URL}/storage/img/NguoiDung/${recipe.nguoidung.AnhDaiDien}`
                       : "https://i.pravatar.cc/150"
                   }
                   alt={recipe.nguoidung?.HoTen}
@@ -68,7 +93,7 @@ const ChitietCongthuc = () => {
 
             <div className="recipe-hero-img">
               <img
-                src={`http://127.0.0.1:8000/storage/img/CongThuc/${recipe.HinhAnh}`}
+                src={`${API_URL}/storage/img/CongThuc/${recipe.HinhAnh}`}
                 alt={recipe.TenMon}
               />
             </div>
@@ -104,7 +129,8 @@ const ChitietCongthuc = () => {
               <div className="ingredients-box">
                 <h3>Nguyên liệu</h3>
                 <ul className="ingredients-list">
-                  {recipe.nguyen_lieu.map((item) => (
+                  {/* Trâm - đã sửa: null-safe để tránh lỗi khi API chưa trả mảng */}
+                  {(recipe.nguyen_lieu ?? []).map((item) => (
                     <li key={item.Ma_NL}>
                       <i className="fa-solid fa-check"></i>
                       {item.pivot.DinhLuong} {item.DonViDo} {item.TenNguyenLieu}
@@ -118,20 +144,47 @@ const ChitietCongthuc = () => {
             </aside>
 
             {/* CÁC BƯỚC */}
+            {/* CÁC BƯỚC THỰC HIỆN */}
             <div className="main-instructions">
               <h2>Hướng dẫn thực hiện</h2>
               <div className="steps-container">
-                {recipe.buoc_thuc_hien.map((step) => (
+                {/* Trâm - đã sửa: null-safe để tránh lỗi khi API chưa trả mảng */}
+                {(recipe.buoc_thuc_hien ?? []).map((step) => (
                   <div className="step-item" key={step.Ma_BTH}>
                     <div className="step-number">{step.STT}</div>
                     <div className="step-content">
                       <p>{step.NoiDung}</p>
+
+                      {/* SỬA PHẦN HIỂN THỊ ẢNH Ở ĐÂY */}
                       {step.HinhAnh && (
-                        <img
-                          className="step-img"
-                          src={`http://127.0.0.1:8000/storage/img/BuocThucHien/${step.HinhAnh}`}
-                          alt={`Bước ${step.STT}`}
-                        />
+                        <div
+                          className="step-images-grid"
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            flexWrap: "wrap",
+                            marginTop: "10px",
+                          }}
+                        >
+                          {/* 1. Tách chuỗi ảnh thành mảng bằng dấu chấm phẩy ; */}
+                          {step.HinhAnh.split(";")
+                            .map((x) => x.trim())
+                            .filter(Boolean)
+                            .map((imgName, index) => (
+                            <img
+                              key={index}
+                              className="step-img"
+                              src={`${API_URL}/storage/img/BuocThucHien/${imgName}`}
+                              alt={`Bước ${step.STT} - Ảnh ${index + 1}`}
+                              style={{
+                                maxWidth: "200px", // Giới hạn kích thước ảnh cho đẹp
+                                height: "auto",
+                                borderRadius: "8px",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -140,34 +193,25 @@ const ChitietCongthuc = () => {
             </div>
           </div>
 
-          {/* ĐÁNH GIÁ */}
-          <div className="comments-section">
-            <h3 className="section-title">Đánh giá</h3>
-
-            <div className="rating-row">
-              <span>Đánh giá của bạn:</span>
-              <div className="stars-select">
-                {[...Array(5)].map((_, index) => {
-                  const value = index + 1;
-                  return (
-                    <i
-                      key={index}
-                      className="fa-solid fa-star"
-                      style={{
-                        cursor: "pointer",
-                        color:
-                          value <= (hoverStar || userRating)
-                            ? "#ffc107"
-                            : "#e4e5e9",
-                      }}
-                      onClick={() => setUserRating(value)}
-                      onMouseEnter={() => setHoverStar(value)}
-                      onMouseLeave={() => setHoverStar(0)}
-                    ></i>
-                  );
-                })}
-              </div>
+          {/*Trâm - ĐÁNH GIÁ */}
+          <div className="comments-section" style={{ marginTop: '40px' }}>
+            <h3 className="section-title">Đánh giá & Bình luận</h3>
+            
+            {/* 1. GỌI COMPONENT ĐÁNH GIÁ SAO VÀO ĐÂY */}
+            <div style={{ marginBottom: '20px' }}>
+                {/* Truyền dữ liệu vào component của Trâm */}
+                <div style={{ marginBottom: '20px' }}>
+                    <DanhGiaSao 
+                       maCongThuc={id}
+                        currentUser={currentUser}
+                        initialAvgRating={recipe.TrungBinhSao || 0} 
+                      initialReviews={recipe.danh_gia ?? []} // Danh sách đánh giá lấy từ API show
+                        onRatingSuccess={fetchRecipeDetail} // Truyền hàm để tải lại khi có đánh giá mới
+                    
+                    />
+                </div>
             </div>
+            
 
             <textarea
               className="review-textarea-clean"
@@ -191,7 +235,7 @@ const ChitietCongthuc = () => {
               <article className="related-item" key={item.Ma_CT}>
                 <Link to={`/cong-thuc/${item.Ma_CT}`}>
                   <img
-                    src={`http://127.0.0.1:8000/storage/img/CongThuc/${item.HinhAnh}`}
+                    src={`${API_URL}/storage/img/CongThuc/${item.HinhAnh}`}
                     alt={item.TenMon}
                   />
                 </Link>

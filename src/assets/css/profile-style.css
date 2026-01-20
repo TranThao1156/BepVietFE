@@ -87,9 +87,10 @@ body {
 .profile-card {
     background: var(--white);
     border-radius: var(--border-radius);
-    padding: 40px 20px;
+    padding: 20px 10px;
     text-align: center;
     border: 1px solid #E5E7EB;
+    margin-bottom: 40px;
 }
 
 .avatar-wrapper {
@@ -100,13 +101,37 @@ body {
 }
 
 .avatar-circle2 {
-    width: 100%; height: 100%;
-    background-color: #FFEDD5; /* Màu cam nhạt */
-    color: var(--primary-color);
+    /* Kích thước & Hình dáng */
+    width: 100%; 
+    height: 100%;
+    aspect-ratio: 1 / 1; /* Đảm bảo luôn tròn tuyệt đối */
+    border-radius: 50%;
+
+    /* Màu sắc & Hiệu ứng nền */
+    background-color: #FFEDD5;
+    color: var(--primary-color, #d97706); /* Fallback color nếu biến chưa định nghĩa */
+    border: 2px solid #ffffff; /* Viền trắng tạo độ tách biệt */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Đổ bóng mềm */
+
+    /* Typography (Căn giữa chữ) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 2.5rem;
     font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
+    font-family: system-ui, -apple-system, sans-serif; /* Font chữ hiện đại */
+    text-transform: uppercase; /* Chữ cái luôn viết hoa */
+    user-select: none; /* Không cho bôi đen chữ */
+    
+    /* Hiệu ứng mượt mà */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Thêm hiệu ứng khi di chuột vào (tùy chọn) */
+.avatar-circle2:hover {
+    transform: scale(1.05); /* Phóng to nhẹ */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .btn-upload-avatar {
@@ -455,18 +480,28 @@ body {
     font-size: 0.9rem; /* Icon check to hơn chút */
 }
 
-/* Button style riêng cho form này */
 .btn-outline-gray {
-    background: white;
-    border: 1px solid #E5E7EB;
-    color: var(--text-dark);
-    padding: 10px 24px;
-    border-radius: 30px;
-    font-weight: 600;
-    cursor: pointer;
+  background: white;
+  border: 1px solid #E5E7EB;
+  color: var(--text-gray);
+
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+  transition: 0.2s;
 }
+
 .btn-outline-gray:hover {
-    background: #F3F4F6;
+  background: #F3F4F6;
+  color: var(--text-dark);
+  border-color: #D1D5DB;
 }
 
 .form-actions-left {
@@ -672,6 +707,7 @@ body {
 
 
 /* 2. Blog Manage Card (Standard) */
+
 .blog-manage-card {
     background: var(--white);
     border: 1px solid #E5E7EB;
@@ -702,6 +738,7 @@ body {
 }
 .label-success { background: #10B981; } /* Xanh lá */
 .label-warning { background: #F59E0B; } /* Vàng cam */
+.label-danger { background: #EF4444; }  /* Đỏ */
 
 .blog-card-body {
     padding: 20px;
@@ -715,6 +752,7 @@ body {
     font-size: 1.05rem; font-weight: 700; margin-bottom: 10px;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     line-height: 1.4;
+    cursor: pointer;
 }
 
 .blog-card-desc {
@@ -932,7 +970,13 @@ body {
 }
 .btn-dashed-full:hover { border-color: var(--primary-color); color: var(--primary-color); background: #FFF7ED; }
 
-.form-submit-area { text-align: right; margin-top: 30px; }
+.form-submit-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* trái – phải rõ ràng */
+  margin-top: 24px;
+}
+
 .btn-large { padding: 12px 40px; font-size: 1rem; }
 
 /* Responsive */
@@ -1017,26 +1061,7 @@ body {
 }
 
 /* Button Quay lại */
-.btn-outline-gray {
-    background: white;
-    border: 1px solid #E5E7EB;
-    color: var(--text-gray);
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.2s;
-}
 
-.btn-outline-gray:hover {
-    background: #F3F4F6;
-    color: var(--text-dark);
-    border-color: #D1D5DB;
-}
 
 /* Fix responsive cho editor */
 @media (max-width: 768px) {
@@ -1186,6 +1211,7 @@ body {
     background: rgba(0,0,0,0.5);
     border-radius: 10px;
     z-index: 0;
+    pointer-events: none;
 }
 
 .upload-area-large.has-image .upload-content {

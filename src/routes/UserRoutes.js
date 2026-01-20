@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router';
 import LayoutNguoiDung from '../layouts/LayoutNguoiDung';
 import ThongTinCaNhan from '../pages/NguoiDung/ThongTinCaNhan';
 import CookBook from '../pages/NguoiDung/Cookbook';
@@ -26,8 +26,8 @@ export default function UserRoutes() {
         <Route path="lich-su-truy-cap" element={<LichSuTruyCap />} />
         <Route path="ql-cong-thuc" element={<QlCongThuc />} />
         <Route path="ql-blog" element={<QlBlog />} />
-        <Route path="ql-blog/sua-blog" element={<SuaBlog />} />
-        <Route path="ql-cong-thuc/sua-cong-thuc" element={<SuaCongThuc />} />
+        <Route path="ql-blog/sua-blog/:id" element={<SuaBlog />} />
+        <Route path="ql-cong-thuc/sua-cong-thuc/:Ma_CT" element={<SuaCongThuc />} />
         <Route path="ql-blog/tao-blog" element={<TaoBlog />} />
         <Route path="ql-cong-thuc/tao-cong-thuc" element={<TaoCongThuc />} />
         <Route path="cookbook/tao-cookbook" element={<TaoCookbook />} />

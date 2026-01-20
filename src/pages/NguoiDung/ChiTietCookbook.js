@@ -122,24 +122,7 @@ const ChiTietCookbook = () => {
         alert("Lỗi kết nối server.");
     }
   };
-  // 2. Hàm Xóa Cookbook (gọi API xóa đã làm ở bước trước)
-  const handleDeleteCookbook = async () => {
-    if (!window.confirm('Bạn có chắc muốn xóa Cookbook này không?')) return;
-
-    // Gọi API xóa (giả sử bạn đã có token)
-    const token = localStorage.getItem('access_token');
-    try {
-      const res = await fetch(`http://localhost:8000/api/user/cookbook/${id}`, {
-        method: 'PUT', // Hoặc DELETE tùy backend
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        navigate('/nguoi-dung/cookbook');
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  
 
   // 3. Hàm Bỏ lưu món ăn (Cần backend hỗ trợ API xóa record trong ct_cookbook)
   const handleUnsave = async (recipeId, recipeName) => {
@@ -284,14 +267,6 @@ const ChiTietCookbook = () => {
                     {/* Nút Sửa gọi hàm handleStartEdit thay vì Link */}
                     <button onClick={handleStartEdit} className="btn btn-outline-gray" style={{ marginRight: '10px', padding: '8px 20px' }}>
                         <i className="fa-solid fa-pen"></i> Chỉnh sửa
-                    </button>
-                    
-                    <button 
-                      className="btn btn-outline-gray" 
-                      onClick={handleDeleteCookbook}
-                      style={{ padding: '8px 20px', color: '#EF4444', borderColor: '#FECACA' }}
-                    >
-                      <i className="fa-regular fa-trash-can"></i> Xóa
                     </button>
                 </>
             )}
