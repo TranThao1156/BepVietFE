@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// Trâm - đã sửa: gộp import React (tránh import trùng gây lỗi)
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import DanhGiaSao from '../NguoiDung/DanhGiaSao'; // Trâm - import DanhGiaSao
 
@@ -11,6 +12,33 @@ const ChitietCongthuc = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [commentContent, setCommentContent] = useState("");
 
+  const API_URL = "http://127.0.0.1:8000";
+
+  // Trâm - đã sửa: thêm hàm fetchRecipeDetail để dùng lại khi cần reload (vd: sau khi đánh giá sao)
+  const fetchRecipeDetail = useCallback(async () => {
+    setLoading(true);
+
+    const headers = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/cong-thuc/${id}`, {
+        credentials: "include",
+        method: "GET",
+        headers,
+      });
+      const json = await res.json();
+      setRecipe(json?.data ?? null);
+    } catch (err) {
+      console.error(err);
+      setRecipe(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
   useEffect(() => {
     //  Trâm - THÊM ĐOẠN NÀY: Lấy user từ localStorage khi mới vào trang
     const userStr = localStorage.getItem("user"); // Hoặc key mà bạn dùng lưu user
@@ -22,20 +50,8 @@ const ChitietCongthuc = () => {
         }
     }
     // hết phần của Trâm
-
-    fetch(`http://127.0.0.1:8000/api/cong-thuc/${id}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setRecipe(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, [id]);
+    fetchRecipeDetail();
+  }, [fetchRecipeDetail]);
 
   if (loading) return <p>Đang tải dữ liệu...</p>;
   if (!recipe) return <p>Không tìm thấy công thức</p>;
@@ -54,7 +70,7 @@ const ChitietCongthuc = () => {
                 <img
                   src={
                     recipe.nguoidung?.AnhDaiDien
-                      ? `http://127.0.0.1:8000/storage/img/NguoiDung/${recipe.nguoidung.AnhDaiDien}`
+                      ? `${API_URL}/storage/img/NguoiDung/${recipe.nguoidung.AnhDaiDien}`
                       : "https://i.pravatar.cc/150"
                   }
                   alt={recipe.nguoidung?.HoTen}
@@ -72,7 +88,7 @@ const ChitietCongthuc = () => {
 
             <div className="recipe-hero-img">
               <img
-                src={`http://127.0.0.1:8000/storage/img/CongThuc/${recipe.HinhAnh}`}
+                src={`${API_URL}/storage/img/CongThuc/${recipe.HinhAnh}`}
                 alt={recipe.TenMon}
               />
             </div>
@@ -108,7 +124,8 @@ const ChitietCongthuc = () => {
               <div className="ingredients-box">
                 <h3>Nguyên liệu</h3>
                 <ul className="ingredients-list">
-                  {recipe.nguyen_lieu.map((item) => (
+                  {/* Trâm - đã sửa: null-safe để tránh lỗi khi API chưa trả mảng */}
+                  {(recipe.nguyen_lieu ?? []).map((item) => (
                     <li key={item.Ma_NL}>
                       <i className="fa-solid fa-check"></i>
                       {item.pivot.DinhLuong} {item.DonViDo} {item.TenNguyenLieu}
@@ -123,7 +140,8 @@ const ChitietCongthuc = () => {
             <div className="main-instructions">
               <h2>Hướng dẫn thực hiện</h2>
               <div className="steps-container">
-                {recipe.buoc_thuc_hien.map((step) => (
+                {/* Trâm - đã sửa: null-safe để tránh lỗi khi API chưa trả mảng */}
+                {(recipe.buoc_thuc_hien ?? []).map((step) => (
                   <div className="step-item" key={step.Ma_BTH}>
                     <div className="step-number">{step.STT}</div>
                     <div className="step-content">
@@ -141,11 +159,14 @@ const ChitietCongthuc = () => {
                           }}
                         >
                           {/* 1. Tách chuỗi ảnh thành mảng bằng dấu chấm phẩy ; */}
-                          {step.HinhAnh.split(";").map((imgName, index) => (
+                          {step.HinhAnh.split(";")
+                            .map((x) => x.trim())
+                            .filter(Boolean)
+                            .map((imgName, index) => (
                             <img
                               key={index}
                               className="step-img"
-                              src={`http://127.0.0.1:8000/storage/img/BuocThucHien/${imgName}`}
+                              src={`${API_URL}/storage/img/BuocThucHien/${imgName}`}
                               alt={`Bước ${step.STT} - Ảnh ${index + 1}`}
                               style={{
                                 maxWidth: "200px", // Giới hạn kích thước ảnh cho đẹp
@@ -173,13 +194,16 @@ const ChitietCongthuc = () => {
                 {/* Truyền dữ liệu vào component của Trâm */}
                 <div style={{ marginBottom: '20px' }}>
                     <DanhGiaSao 
-                        maCongThuc={id}
+                       maCongThuc={id}
                         currentUser={currentUser}
-                        // Lấy TrungBinhSao từ API trả về, nếu chưa có thì hiện 0
                         initialAvgRating={recipe.TrungBinhSao || 0} 
+                      initialReviews={recipe.danh_gia ?? []} // Danh sách đánh giá lấy từ API show
+                        onRatingSuccess={fetchRecipeDetail} // Truyền hàm để tải lại khi có đánh giá mới
+                    
                     />
                 </div>
             </div>
+            
 
             <textarea
               className="review-textarea-clean"
@@ -203,7 +227,7 @@ const ChitietCongthuc = () => {
               <article className="related-item" key={item.Ma_CT}>
                 <Link to={`/cong-thuc/${item.Ma_CT}`}>
                   <img
-                    src={`http://127.0.0.1:8000/storage/img/CongThuc/${item.HinhAnh}`}
+                    src={`${API_URL}/storage/img/CongThuc/${item.HinhAnh}`}
                     alt={item.TenMon}
                   />
                 </Link>

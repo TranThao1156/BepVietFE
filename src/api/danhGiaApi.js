@@ -24,8 +24,10 @@ export const guiDanhGia = async (maCongThuc, soSao) => {
 };
 
 // 2. Lấy số sao mình đã đánh giá trước đó (để tô màu vàng sẵn)
+// src/api/danhGiaApi.js
 export const layDanhGiaCuaToi = async (maCongThuc) => {
-    const response = await fetch(`${BASE_URL}/danh-gia/${maCongThuc}`, {
+    // Thêm /cua-toi vào URL
+    const response = await fetch(`${BASE_URL}/danh-gia/cua-toi/${maCongThuc}`, {
         method: "GET",
         headers: getHeaders()
     });
