@@ -25,12 +25,7 @@ const DsCongThuc = () => {
       .finally(() => setLoading(false));
   }, [page]);
 
-  const mapDoKho = (value) => {
-    if (value === 1 || value === "Dễ") return "Dễ";
-    if (value === 2 || value === "Trung bình") return "Trung bình";
-    if (value === 3 || value === "Khó") return "Khó";
-    return "Không rõ";
-  };
+  
 
   const handleCreateRecipe = () => {
     const token = localStorage.getItem("access_token");
@@ -40,6 +35,12 @@ const DsCongThuc = () => {
     } else {
       navigate("/nguoi-dung/cong-thuc/tao-cong-thuc");
     }
+  };
+  const mapDoKho = (value) => {
+    if (value === 1 || value === "Dễ") return "Dễ";
+    if (value === 2 || value === "Trung bình") return "Trung bình";
+    if (value === 3 || value === "Khó") return "Khó";
+    return "Không rõ";
   };
 
   return (

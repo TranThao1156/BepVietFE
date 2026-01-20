@@ -49,7 +49,7 @@ const CookBook = () => {
         
         // Lưu ý: Backend cần có route nhận method PUT để cập nhật
         // Chúng ta gửi TrangThai = 0 lên
-        const response = await fetch(`http://localhost:8000/api/user/cookbook/${id}`, {
+        const response = await fetch(`http://localhost:8000/api/user/cookbook/${id}/xoa`, {
             method: 'PUT', // Dùng PUT để cập nhật
             headers: {
                 'Authorization': `Bearer ${token}`,
