@@ -21,7 +21,7 @@ const ClientRoutes = () => {
         <Route index element={<Home />} /> {/* Đường dẫn gốc / */}
         
         <Route path="cong-thuc" element={<DsCongThuc />} />
-        <Route path="cong-thuc/:id" element={<ChitietCongthuc />} />
+        <Route path="cong-thuc/:idSlug" element={<ChitietCongthuc />} />
         
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:id" element={<ChitietBlog />} />
