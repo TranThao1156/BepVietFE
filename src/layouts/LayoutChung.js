@@ -10,13 +10,13 @@ const LayoutChung = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
-  // ✅ LOAD USER TỪ LOCALSTORAGE
+  // LOAD USER TỪ LOCALSTORAGE
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     setUser(storedUser ? JSON.parse(storedUser) : null);
   }, [location.pathname]);
 
-  // ✅ LOGOUT
+  // LOGOUT
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
@@ -99,7 +99,7 @@ const LayoutChung = () => {
                     className="user-avatar"
                     src={
                       user.AnhDaiDien
-                        ? `http://localhost:8000/img/NguoiDung/${user.AnhDaiDien}`
+                        ? `http://localhost:8000/storage/img/NguoiDung/${user.AnhDaiDien}`
                         : "http://localhost:8000/img/NguoiDung/default-avatar.png"
                     }
                     alt="avatar"
