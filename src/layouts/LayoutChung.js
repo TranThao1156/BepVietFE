@@ -100,7 +100,7 @@ const LayoutChung = () => {
                     src={
                       user.AnhDaiDien
                         ? `http://localhost:8000/storage/img/NguoiDung/${user.AnhDaiDien}`
-                        : "http://localhost:8000/img/NguoiDung/default-avatar.png"
+                        : "http://localhost:8000/storage/img/NguoiDung/default-avatar.png"
                     }
                     alt="avatar"
                   />
