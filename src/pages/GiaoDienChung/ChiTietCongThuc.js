@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 const ChitietCongthuc = () => {
@@ -11,9 +11,22 @@ const ChitietCongthuc = () => {
   const [hoverStar, setHoverStar] = useState(0);
   const [commentContent, setCommentContent] = useState("");
 
+  const API_URL = "http://127.0.0.1:8000";
+
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/cong-thuc/${id}`, {
+    const token = localStorage.getItem("access_token");
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    // Đăng nhập thì gửi Token kèm theo
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    fetch(`${API_URL}/api/cong-thuc/${id}`, {
       credentials: "include",
+      method: "GET",
+            headers: headers
     })
       .then((res) => res.json())
       .then((res) => {
@@ -43,7 +56,7 @@ const ChitietCongthuc = () => {
                 <img
                   src={
                     recipe.nguoidung?.AnhDaiDien
-                      ? `http://127.0.0.1:8000/storage/img/NguoiDung/${recipe.nguoidung.AnhDaiDien}`
+                      ? `${API_URL}/storage/img/NguoiDung/${recipe.nguoidung.AnhDaiDien}`
                       : "https://i.pravatar.cc/150"
                   }
                   alt={recipe.nguoidung?.HoTen}
@@ -61,7 +74,7 @@ const ChitietCongthuc = () => {
 
             <div className="recipe-hero-img">
               <img
-                src={`http://127.0.0.1:8000/storage/img/CongThuc/${recipe.HinhAnh}`}
+                src={`${API_URL}/storage/img/CongThuc/${recipe.HinhAnh}`}
                 alt={recipe.TenMon}
               />
             </div>
@@ -134,7 +147,7 @@ const ChitietCongthuc = () => {
                             <img
                               key={index}
                               className="step-img"
-                              src={`http://127.0.0.1:8000/storage/img/BuocThucHien/${imgName}`}
+                              src={`${API_URL}/storage/img/BuocThucHien/${imgName}`}
                               alt={`Bước ${step.STT} - Ảnh ${index + 1}`}
                               style={{
                                 maxWidth: "200px", // Giới hạn kích thước ảnh cho đẹp
@@ -204,7 +217,7 @@ const ChitietCongthuc = () => {
               <article className="related-item" key={item.Ma_CT}>
                 <Link to={`/cong-thuc/${item.Ma_CT}`}>
                   <img
-                    src={`http://127.0.0.1:8000/storage/img/CongThuc/${item.HinhAnh}`}
+                    src={`${API_URL}/storage/img/CongThuc/${item.HinhAnh}`}
                     alt={item.TenMon}
                   />
                 </Link>

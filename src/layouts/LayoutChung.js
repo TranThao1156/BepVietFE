@@ -1,21 +1,34 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Trâm -thêm useNavigate
 import "../assets/css/style.css";
 
 const LayoutChung = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
 
+  // Trâm -thêm: Khai báo state lưu từ khóa và hook chuyển trang
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+
   // ✅ LOAD USER TỪ LOCALSTORAGE
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     setUser(storedUser ? JSON.parse(storedUser) : null);
   }, [location.pathname]);
+
   // ✅ LOGOUT
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
     alert("👋 Đã đăng xuất");
+  };
+
+  // Trâm -thêm: Hàm xử lý khi bấm nút Tìm kiếm
+  const handleSearch = () => {
+    
+      // Chuyển hướng sang trang công thức kèm từ khóa trên URL
+      navigate(`/cong-thuc?keyword=${encodeURIComponent(keyword)}`);
+    
   };
 
   // Hàm kiểm tra link active (thay thế cho request()->routeIs() của Laravel)
@@ -60,15 +73,25 @@ const LayoutChung = () => {
               </ul>
             </nav>
 
-            {/* Khu vực bên phải */}
-            <div className="header-right">
-              <div className="toolbar-actions">
-                <div className="search-box">
-                  <i className="fa-solid fa-magnifying-glass"></i>
-                  <input type="text" placeholder="Tìm kiếm công thức..." />
-                  <button className="btn-search">Tìm</button>
-                </div>
+          <div className="header-right">
+            <div className="toolbar-actions">
+              <div className="search-box">
+                <i className="fa-solid fa-magnifying-glass"></i>
+                
+                {/* Trâm -thêm: Sự kiện nhập liệu và bấm Enter */}
+                <input 
+                  type="text" 
+                  placeholder="Tìm kiếm công thức..." 
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  onFocus={(e) => e.target.select()}
+                />
+                
+                {/* Trâm -thêm: Sự kiện click nút Tìm */}
+                <button className="btn-search" onClick={handleSearch}>Tìm</button>
               </div>
+            </div>
 
               {user ? (
                 <div className="user-dropdown">
@@ -125,6 +148,7 @@ const LayoutChung = () => {
          Nó sẽ hiển thị nội dung của các trang con (Home, Blog, AI...) tại đây.
       */}
         <Outlet />
+   
 
         {/* ================= FOOTER ================= */}
         <footer>
@@ -167,6 +191,7 @@ const LayoutChung = () => {
           </div>
         </footer>
       </div>
+      
     </>
   );
 };

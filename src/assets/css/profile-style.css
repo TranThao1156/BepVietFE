@@ -87,9 +87,10 @@ body {
 .profile-card {
     background: var(--white);
     border-radius: var(--border-radius);
-    padding: 40px 20px;
+    padding: 20px 10px;
     text-align: center;
     border: 1px solid #E5E7EB;
+    margin-bottom: 40px;
 }
 
 .avatar-wrapper {
@@ -100,13 +101,37 @@ body {
 }
 
 .avatar-circle2 {
-    width: 100%; height: 100%;
-    background-color: #FFEDD5; /* Màu cam nhạt */
-    color: var(--primary-color);
+    /* Kích thước & Hình dáng */
+    width: 100%; 
+    height: 100%;
+    aspect-ratio: 1 / 1; /* Đảm bảo luôn tròn tuyệt đối */
+    border-radius: 50%;
+
+    /* Màu sắc & Hiệu ứng nền */
+    background-color: #FFEDD5;
+    color: var(--primary-color, #d97706); /* Fallback color nếu biến chưa định nghĩa */
+    border: 2px solid #ffffff; /* Viền trắng tạo độ tách biệt */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Đổ bóng mềm */
+
+    /* Typography (Căn giữa chữ) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 2.5rem;
     font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
+    font-family: system-ui, -apple-system, sans-serif; /* Font chữ hiện đại */
+    text-transform: uppercase; /* Chữ cái luôn viết hoa */
+    user-select: none; /* Không cho bôi đen chữ */
+    
+    /* Hiệu ứng mượt mà */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Thêm hiệu ứng khi di chuột vào (tùy chọn) */
+.avatar-circle2:hover {
+    transform: scale(1.05); /* Phóng to nhẹ */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .btn-upload-avatar {

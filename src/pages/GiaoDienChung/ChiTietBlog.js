@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link, useParams } from 'react-router';
+import BinhLuanBlog from '../NguoiDung/BinhLuanBlog'; //Trâm import BinhLuanBlog
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
