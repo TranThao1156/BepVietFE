@@ -77,7 +77,7 @@ const ChitietBlog = () => {
                     {/* DANH SÁCH BÌNH LUẬN */}
                     {blog.BinhLuan.length === 0 && (
                         <p style={{ marginTop: '20px', color: '#777' }}>
-                            Chưa có bình luận nào
+                            Chưa có bình luận
                         </p>
                     )}
 
