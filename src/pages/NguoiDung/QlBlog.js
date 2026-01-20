@@ -38,12 +38,39 @@ const QlBlog = () => {
   if (loading) return <p style={{ textAlign: 'center' }}>Đang tải dữ liệu...</p>;
 
   // Hàm xử lý xóa bài viết
-  const handleDelete = (e, blogTitle) => {
-    // Ngăn chặn hành vi mặc định nếu nút nằm trong thẻ Link (dù ở đây là button, nhưng thói quen tốt)
-    e.preventDefault(); 
-    if (window.confirm(`Bạn có chắc muốn xóa bài viết "${blogTitle}"?`)) {
-      console.log('Đã xóa bài viết:', blogTitle);
-      // Gọi API xóa ở đây
+  const handleDelete = async (e, blogId, blogTitle) => {
+
+    e.preventDefault();
+    const confirmDelete = window.confirm(`Bạn có chắc muốn xóa bài viết "${blogTitle}"?`);
+
+    if (!confirmDelete) return;
+    try {
+
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/user/xoa-blog/${blogId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+      const result = await response.json();
+      if (response.ok && result.success) {
+        alert("Xóa blog thành công ");
+
+        //Cập nhật UI: loại blog đã xoá khỏi danh sách
+        setBlogs((prevBlogs) =>
+          prevBlogs.filter((blog) => blog.Ma_Blog !== blogId)
+        );
+      } else {
+        alert(result.message || "Xóa blog thất bại ");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa blog:", error);
+      alert("Có lỗi xảy ra khi xóa blog ");
     }
   };
 
@@ -106,7 +133,6 @@ const QlBlog = () => {
                 <span><i className="fa-regular fa-comment"></i> {blog.binh_luan_count ?? 0}</span>
               </div>
             </div>
-
             <div className="blog-actions">
               <Link
                 to={`/nguoi-dung/ql-blog/sua-blog/${blog.Ma_Blog}`}
@@ -117,7 +143,7 @@ const QlBlog = () => {
 
               <button
                 className="btn-icon btn-delete"
-                onClick={(e) => handleDelete(e, blog.TieuDe)}
+                onClick={(e) => handleDelete(e, blog.Ma_Blog, blog.TieuDe)}
               >
                 <i className="fa-regular fa-trash-can"></i>
               </button>
