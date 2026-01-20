@@ -26,7 +26,7 @@ export default function UserRoutes() {
         <Route path="lich-su-truy-cap" element={<LichSuTruyCap />} />
         <Route path="ql-cong-thuc" element={<QlCongThuc />} />
         <Route path="ql-blog" element={<QlBlog />} />
-        <Route path="ql-blog/sua-blog" element={<SuaBlog />} />
+        <Route path="ql-blog/sua-blog/:id" element={<SuaBlog />} />
         <Route path="ql-cong-thuc/sua-cong-thuc/:Ma_CT" element={<SuaCongThuc />} />
         <Route path="ql-blog/tao-blog" element={<TaoBlog />} />
         <Route path="ql-cong-thuc/tao-cong-thuc" element={<TaoCongThuc />} />

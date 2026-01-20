@@ -7,12 +7,16 @@ const TaoBlog = () => {
   // State quản lý dữ liệu form
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+
   const [coverImage, setCoverImage] = useState(null); // preview
   const [imageFile, setImageFile] = useState(null);   // file gửi BE
+
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+
   const [isDragging, setIsDragging] = useState(false);
 
+  
   // Xử lý khi chọn ảnh để hiển thị preview
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -40,41 +44,60 @@ const TaoBlog = () => {
 };
 
   // Xử lý submit form
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  // Kiểm tra dữ liệu đầu vào
-  if (!title || !content || !imageFile) {
-    alert("Vui lòng nhập đầy đủ thông tin");
-    return;
-  }
-  setLoading(true);
+    const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const formData = new FormData();
-  formData.append("TieuDe", title);
-  formData.append("NoiDung", content);
-  formData.append("HinhAnh", imageFile);
-
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/them-blog", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("Đăng bài thành công!");
-      navigate("/nguoi-dung/ql-blog");
-    } else {
-      alert(data.message || "Đăng bài thất bại");
+    if (!title || !content || !imageFile) {
+      alert("Vui lòng nhập đầy đủ thông tin");
+      return;
     }
-  } catch (error) {
-    console.error(error);
-    alert("Lỗi kết nối server");
-  } finally {
-    setLoading(false);
-  }
-};
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("TieuDe", title);
+    formData.append("ND_ChiTiet", content);
+    formData.append("HinhAnh", imageFile);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/user/them-blog", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      });
+
+      // ĐỌC TEXT TRƯỚC
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error("Server trả về HTML:", text);
+        alert("Server đang lỗi, vui lòng thử lại");
+        return;
+      }
+
+      if (!response.ok) {
+        alert(data.message || "Đăng bài thất bại");
+        return;
+      }
+
+      // Thành công
+      alert("Đăng bài thành công! Bài viết đang chờ duyệt");
+      navigate("/nguoi-dung/ql-blog");
+
+    } catch (error) {
+      console.error(error);
+      alert("Không kết nối được server");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   return (
@@ -162,7 +185,7 @@ const TaoBlog = () => {
           <div className="form-group">
             <label>Nội dung chi tiết</label>
             <div className="editor-wrapper">
-              <div className="editor-toolbar">
+              {/* <div className="editor-toolbar">
                 <button type="button" className="editor-btn" title="In đậm"><i className="fa-solid fa-bold"></i></button>
                 <button type="button" className="editor-btn" title="In nghiêng"><i className="fa-solid fa-italic"></i></button>
                 <button type="button" className="editor-btn" title="Gạch chân"><i className="fa-solid fa-underline"></i></button>
@@ -173,7 +196,7 @@ const TaoBlog = () => {
                 <button type="button" className="editor-btn" title="Danh sách"><i className="fa-solid fa-list-ul"></i></button>
                 <button type="button" className="editor-btn" title="Chèn ảnh"><i className="fa-regular fa-image"></i></button>
                 <button type="button" className="editor-btn" title="Chèn link"><i className="fa-solid fa-link"></i></button>
-              </div>
+              </div> */}
               <textarea 
                 className="editor-textarea" 
                 placeholder="Bắt đầu viết câu chuyện của bạn tại đây..."
@@ -181,6 +204,7 @@ const TaoBlog = () => {
                 onChange={(e) => setContent(e.target.value)}
                 required
               ></textarea>
+              
             </div>
           </div>
 
