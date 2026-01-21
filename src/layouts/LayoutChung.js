@@ -15,23 +15,48 @@ const LayoutChung = () => {
     const storedUser = localStorage.getItem("user");
     setUser(storedUser ? JSON.parse(storedUser) : null);
   }, [location.pathname]);
+  //Khanh - Xử lý đăng xuất
+  const handleLogout = async () => {
+    if (!window.confirm("Bạn có chắc chắn muốn đăng xuất?")) return;
 
-  // LOGOUT
-  const handleLogout = () => {
+    const token = localStorage.getItem("access_token");
+
+    // Gọi API logout trên server (nếu có)
+    try {
+      if (token) {
+        const response = await fetch("http://127.0.0.1:8000/api/user/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.warn("API logout thất bại, vẫn xóa token local");
+        }
+      }
+    } catch (error) {
+      console.error("Lỗi gọi API logout:", error);
+    }
+
+    // Xóa token và user ở localStorage
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
-    setUser(null);
-    alert("👋 Đã đăng xuất");
+    setUser(null); // Cập nhật state ngay lập tức
+
+    alert("Đã đăng xuất thành công!");
+    navigate("/");
   };
 
   // Trâm -thêm: Hàm xử lý khi bấm nút Tìm kiếm
   const handleSearch = () => {
-    
-      // Chuyển hướng sang trang công thức kèm từ khóa trên URL
-      navigate(`/cong-thuc?keyword=${encodeURIComponent(keyword)}`);
-    
+    // Chuyển hướng sang trang công thức kèm từ khóa trên URL
+    navigate(`/cong-thuc?keyword=${encodeURIComponent(keyword)}`);
   };
 
-  // Hàm kiểm tra link active (thay thế cho request()->routeIs() của Laravel)
+  // Hàm kiểm tra link active
   const isActive = (path) => {
     return location.pathname === path ? "active" : "";
   };
@@ -73,25 +98,27 @@ const LayoutChung = () => {
               </ul>
             </nav>
 
-          <div className="header-right">
-            <div className="toolbar-actions">
-              <div className="search-box">
-                <i className="fa-solid fa-magnifying-glass"></i>
-                
-                {/* Trâm -thêm: Sự kiện nhập liệu và bấm Enter */}
-                <input 
-                  type="text" 
-                  placeholder="Tìm kiếm công thức..." 
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  onFocus={(e) => e.target.select()}
-                />
-                
-                {/* Trâm -thêm: Sự kiện click nút Tìm */}
-                <button className="btn-search" onClick={handleSearch}>Tìm</button>
+            <div className="header-right">
+              <div className="toolbar-actions">
+                <div className="search-box">
+                  <i className="fa-solid fa-magnifying-glass"></i>
+
+                  {/* Trâm -thêm: Sự kiện nhập liệu và bấm Enter */}
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm công thức..."
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    onFocus={(e) => e.target.select()}
+                  />
+
+                  {/* Trâm -thêm: Sự kiện click nút Tìm */}
+                  <button className="btn-search" onClick={handleSearch}>
+                    Tìm
+                  </button>
+                </div>
               </div>
-            </div>
 
               {user ? (
                 <div className="user-dropdown">
@@ -115,23 +142,27 @@ const LayoutChung = () => {
 
                     <hr />
 
-                  {/* --- LOGIC ĐIỀU HƯỚNG THEO VAI TRÒ --- */}
-                  {user.VaiTro === 0 ? (
-                    <>
-                    <Link to="/nguoi-dung/thong-tin-ca-nhan">
-                      Hồ sơ cá nhân
-                    </Link>
+                    {/* --- LOGIC ĐIỀU HƯỚNG THEO VAI TRÒ --- */}
+                    {user.VaiTro === 0 ? (
+                      <>
+                        <Link to="/nguoi-dung/thong-tin-ca-nhan">
+                          Hồ sơ cá nhân
+                        </Link>
 
-                    <Link to="/quan-tri">Quản lý hệ thống</Link>
-                    </>
-                  ) : (
-                    // Nếu là USER (1) -> Link tới trang Thông tin cá nhân
-                    <Link to="/nguoi-dung/thong-tin-ca-nhan">
-                      Hồ sơ cá nhân
-                    </Link>
-                  )}
+                        <Link to="/quan-tri">Quản lý hệ thống</Link>
+                      </>
+                    ) : (
+                      // Nếu là USER (1) -> Link tới trang Thông tin cá nhân
+                      <Link to="/nguoi-dung/thong-tin-ca-nhan">
+                        Hồ sơ cá nhân
+                      </Link>
+                    )}
 
-                    <button onClick={handleLogout}>Đăng xuất</button>
+                    <div className="sidebar-footer">
+                      <button onClick={handleLogout} className="logout-btn">
+                        <i className="fas fa-sign-out-alt"></i> Đăng xuất
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -148,7 +179,6 @@ const LayoutChung = () => {
          Nó sẽ hiển thị nội dung của các trang con (Home, Blog, AI...) tại đây.
       */}
         <Outlet />
-   
 
         {/* ================= FOOTER ================= */}
         <footer>
@@ -191,7 +221,6 @@ const LayoutChung = () => {
           </div>
         </footer>
       </div>
-      
     </>
   );
 };
