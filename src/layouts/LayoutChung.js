@@ -92,6 +92,13 @@ const LayoutChung = () => {
                 <button className="btn-search" onClick={handleSearch}>Tìm</button>
               </div>
             </div>
+            {user && (
+                  <div className="notification-btn" title="Thông báo">
+                      <i className="fa-regular fa-bell"></i>
+                      {/* Số lượng thông báo (Ví dụ cứng là 3, sau này thay bằng biến state) */}
+                      <span className="badge-count">3</span>
+                  </div>
+              )}
 
               {user ? (
                 <div className="user-dropdown">
