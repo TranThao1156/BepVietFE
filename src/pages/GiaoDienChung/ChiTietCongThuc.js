@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import "../../assets/css/ChiTietCT.css"
+import DanhGiaSao from "../NguoiDung/DanhGiaSao";
 // import "../../assets/css/ChiTietCT.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -286,7 +288,8 @@ const ChitietCongthuc = () => {
   // 1. Load User & Token
   useEffect(() => {
     const u = localStorage.getItem("user");
-    const t = localStorage.getItem("access_token");
+    // Trâm - đã sửa: hỗ trợ cả key cũ (access_token) và key mới (token)
+    const t = localStorage.getItem("token") || localStorage.getItem("access_token") || localStorage.getItem("user_token");
     if (u) setCurrentUser(JSON.parse(u));
     if (t) setToken(t);
   }, []);
@@ -421,6 +424,17 @@ const ChitietCongthuc = () => {
   const related = recipe.mon_lien_quan || recipe.monLienQuan || [];
   const author = recipe.nguoidung || {};
 
+  // Trâm - đã thêm: chỉ cho hiển thị đánh giá khi công thức đã được duyệt (logic chuẩn kiểm duyệt)
+  const trangThaiDuyet = recipe.TrangThaiDuyet ?? recipe.trang_thai_duyet;
+  const trangThai = recipe.TrangThai ?? recipe.trang_thai;
+  const coTheHienDanhGia =
+    trangThaiDuyet === "Chấp nhận" &&
+    (trangThai === 1 || trangThai === "1" || trangThai === true);
+
+  // Trâm - đã sửa: normalize danh sách đánh giá để DanhGiaSao nhận được ở mọi dạng key
+  const reviews = recipe.danhGia || recipe.danh_gia || recipe.danhgia || [];
+  const avgRating = recipe.TrungBinhSao ?? recipe.trung_binh_sao ?? 0;
+
   return (
     <div className="recipe-page-wrapper">
       <main className="container recipe-container">
@@ -475,6 +489,19 @@ const ChitietCongthuc = () => {
               </div>
             </div>
           </div>
+
+          {/* RATING SECTION */}
+          {coTheHienDanhGia && (
+            <div style={{ marginTop: 20 }}>
+              <DanhGiaSao
+                maCongThuc={currentId}
+                currentUser={currentUser}
+                initialAvgRating={avgRating}
+                initialReviews={reviews}
+                onRatingSuccess={fetchRecipe}
+              />
+            </div>
+          )}
         </div>
 
         {/* INGREDIENTS & STEPS */}

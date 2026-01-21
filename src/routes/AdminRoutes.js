@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import AdminLayout from '../layouts/AdminLayout';
 import BangDieuKhien from '../pages/QuanTriVien/BangDieuKhien';
 import KiemDuyetNoiDung from '../pages/QuanTriVien/KiemDuyetNoiDung'; // <-- ĐƯỜNG DẪN MỚI CỦA BẠN
+import KiemDuyetCongThuc from '../pages/QuanTriVien/KiemDuyetCongThuc'; // Trâm - đã thêm: trang kiểm duyệt công thức riêng
 import QuanLyDanhMuc from '../pages/QuanTriVien/QuanLyDanhMuc';
 import TaoDanhMuc from '../pages/QuanTriVien/TaoDanhMuc';
 import SuaDanhMuc from '../pages/QuanTriVien/SuaDanhMuc';
@@ -21,6 +22,7 @@ const AdminRoutes = () => {
         
         {/* Nội dung */}
         <Route path="kiem-duyet" element={<KiemDuyetNoiDung />} /> 
+        <Route path="kiem-duyet-cong-thuc" element={<KiemDuyetCongThuc />} /> 
         {/* Người dùng */}
         <Route path="quan-ly-nguoi-dung" element={<QuanLyNguoiDung />} />
         <Route path="quan-ly-nguoi-dung/them-nguoi-dung" element={<ThemNguoiDung />} />

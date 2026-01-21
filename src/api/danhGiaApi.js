@@ -3,7 +3,8 @@
 const BASE_URL = "http://127.0.0.1:8000/api/user";
 
 const getHeaders = () => {
-    const token = localStorage.getItem("token");
+    // Trâm - đã sửa: hỗ trợ cả key cũ (access_token) và key mới (token)
+    const token = localStorage.getItem("token") || localStorage.getItem("access_token") || localStorage.getItem("user_token");
     return {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
