@@ -1,41 +1,120 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router';
+import React, { useState, useEffect,useRef } from 'react';
+import { Link, useParams,useNavigate } from 'react-router-dom';
 
 const SuaNguoiDung = () => {
-  const { id } = useParams(); // Lấy ID người dùng từ URL
 
-  // State lưu thông tin người dùng (Giả lập dữ liệu ban đầu)
-  const [userData, setUserData] = useState({
-    username: 'nguyenvana',
-    email: 'nguyenvana@gmail.com',
-    fullname: 'Nguyễn Văn A',
-    phone: '0987654321',
-    gender: 'Nam',
-    nationality: 'Việt Nam',
-    address: '18 Hoàng Hoa Thám, Ba Đình, Hà Nội',
-    role: 'user',
-    avatar: 'https://ui-avatars.com/api/?name=Nguyen+Van+A&background=random'
-  });
+    const { id } = useParams(); 
+    const navigate = useNavigate();
+    const fileInputRef = useRef(null);
 
-  // State xem trước ảnh mới (nếu có thay đổi)
-  const [avatarPreview, setAvatarPreview] = useState(null);
-
-  // Xử lý thay đổi input text
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
-  };
-
-  // Xử lý chọn ảnh mới
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setAvatarPreview(imageUrl);
+    const TOKEN = localStorage.getItem('token');
+    
+    const [loading, setLoading] = useState(true);
+     
+    const [form, setForm] = useState({
+        TenTK:"",
+        MatKhau:"",
+        HoTen:"",
+        AnhDaiDien:"",
+        Email:"",
+        Sdt:"",
+        DiaChi:"",
+        GioiTinh:"",
+        QuocTich:"",
+        VaiTro:""
+    });
+    
+    
+    const headers = {
+        Authorization: `Bearer ${TOKEN}`,
+        Accept: 'application/json'
     }
-  };
 
-  return (
+    // State xem trước ảnh mới (nếu có thay đổi)
+    const [avatarPreview, setAvatarPreview] = useState(null);
+    const [avatarUrl, setAvatarUrl] = useState(null);
+
+
+    // Xử lý thay đổi input text
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Xử lý chọn ảnh mới
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setAvatarPreview(URL.createObjectURL(file));
+            setForm(prev => ({ ...prev, AnhDaiDien: file }));
+        }
+    };
+
+   useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await fetch(
+                    `http://localhost:8000/api/admin/quan-ly-nguoi-dung/${id}`,
+                    { headers }
+                );
+                const json = await res.json();
+                setForm(json.data);
+                setAvatarUrl(json.data.AnhDaiDien);
+                setForm({
+                    ...json.data,
+                    MatKhau: ""   // LUÔN ĐỂ RỖNG
+                });
+            } catch (err) {
+                console.error('Lỗi load user', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUser();
+    }, [id]);
+    // 
+    const handleSubmit = async () => {
+        const formData = new FormData();
+
+        Object.entries(form).forEach(([key, value]) => {
+            if (key === 'AnhDaiDien') {
+                if (value instanceof File) {
+                    formData.append(key, value);
+                }
+            } else if (value !== "") {
+                formData.append(key, key ==='VaiTro' ? Number(value) : value);
+            }
+        });
+
+
+        try {
+            const res = await fetch(
+                `http://localhost:8000/api/admin/quan-ly-nguoi-dung/cap-nhat/${id}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${TOKEN}`
+                    },
+                    body: formData
+                }
+            );
+
+            const json = await res.json();
+
+            if (json.success) {
+                alert('Cập nhật thành công');
+                
+                navigate('/quan-tri/quan-ly-nguoi-dung');
+            } else {
+                alert(json.message || 'Cập nhật thất bại');
+            }
+        } catch (err) {
+            console.error('Lỗi cập nhật', err);
+        }
+    };
+        if (loading) return <p>Đang tải dữ liệu...</p>;
+    return (
     <main className="main-content">
 
         {/* --- HEADER --- */}
@@ -61,20 +140,22 @@ const SuaNguoiDung = () => {
                         <div className="avatar-preview" style={{ overflow: 'hidden' }}>
                             {/* Ưu tiên hiển thị ảnh mới chọn, nếu không thì hiện ảnh cũ */}
                             <img 
-                                src={avatarPreview || userData.avatar} 
+                                src={avatarPreview || avatarUrl} 
                                 alt="Avatar" 
+                                className="avatar-img"
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                             />
                             
                             <label htmlFor="avatarInput" className="btn-upload-icon">
                                 <i className="fa-solid fa-camera"></i>
                             </label>
-                            <input 
-                                type="file" 
-                                id="avatarInput" 
-                                hidden 
-                                accept="image/*" 
-                                onChange={handleImageChange} 
+                            <input
+                                type="file"
+                                hidden
+                                name="AnhDaiDien"
+                                ref={fileInputRef}
+                                accept="image/*"
+                                onChange={handleImageChange}
                             />
                         </div>
                     </div>
@@ -87,8 +168,8 @@ const SuaNguoiDung = () => {
                             <input 
                                 type="text" 
                                 className="form-control" 
-                                name="username"
-                                value={userData.username} 
+                                name="TenTK"
+                                value={form.TenTK} 
                                 readOnly 
                                 style={{backgroundColor: '#f9fafb', cursor: 'not-allowed'}}
                             />
@@ -99,8 +180,8 @@ const SuaNguoiDung = () => {
                             <input 
                                 type="email" 
                                 className="form-control" 
-                                name="email"
-                                value={userData.email} 
+                                name="Email"
+                                value={form.Email} 
                                 readOnly
                                 style={{backgroundColor: '#f9fafb', cursor: 'not-allowed'}}
                             />
@@ -109,18 +190,25 @@ const SuaNguoiDung = () => {
                         {/* Mật khẩu để trống, chỉ nhập khi muốn đổi */}
                         <div className="form-group">
                             <label>Mật khẩu mới</label>
-                            <input type="password" className="form-control" placeholder="Để trống nếu không muốn thay đổi..." />
+                            <input
+                            type="password"
+                            className="form-control"
+                            name="MatKhau"
+                            value={form.MatKhau}
+                            onChange={handleChange}
+                            placeholder="Để trống nếu không muốn thay đổi..."
+                            />
                         </div>
                         <div className="form-group">
                             <label>Vai trò (Phân quyền)</label>
                             <select 
                                 className="form-control" 
-                                name="role"
-                                value={userData.role}
+                                name="VaiTro"
+                                value={form.VaiTro}
                                 onChange={handleChange}
                             >
-                                <option value="user">Người dùng thành viên</option>
-                                <option value="admin">Quản trị viên (Admin)</option>
+                                <option value="1">Người dùng thành viên</option>
+                                <option value="0">Quản trị viên (Admin)</option>
                             </select>
                         </div>
                     </div>
@@ -135,8 +223,8 @@ const SuaNguoiDung = () => {
                             <input 
                                 type="text" 
                                 className="form-control" 
-                                name="fullname"
-                                value={userData.fullname}
+                                name="HoTen"
+                                value={form.HoTen}
                                 onChange={handleChange}
                             />
                         </div>
@@ -145,8 +233,8 @@ const SuaNguoiDung = () => {
                             <input 
                                 type="text" 
                                 className="form-control" 
-                                name="phone"
-                                value={userData.phone}
+                                name="Sdt"
+                                value={form.Sdt}
                                 onChange={handleChange}
                             />
                         </div>
@@ -155,8 +243,8 @@ const SuaNguoiDung = () => {
                             <label>Giới tính</label>
                             <select 
                                 className="form-control" 
-                                name="gender"
-                                value={userData.gender}
+                                name="GioiTinh"
+                                value={form.GioiTinh}
                                 onChange={handleChange}
                             >
                                 <option>Nam</option>
@@ -168,8 +256,8 @@ const SuaNguoiDung = () => {
                             <label>Quốc tịch</label>
                             <select 
                                 className="form-control"
-                                name="nationality"
-                                value={userData.nationality}
+                                name="QuocTich"
+                                value={form.QuocTich}
                                 onChange={handleChange}
                             >
                                 <option>Việt Nam</option>
@@ -184,8 +272,8 @@ const SuaNguoiDung = () => {
                             <input 
                                 type="text" 
                                 className="form-control" 
-                                name="address"
-                                value={userData.address}
+                                name="DiaChi"
+                                value={form.DiaChi}
                                 onChange={handleChange}
                             />
                         </div>
@@ -200,7 +288,7 @@ const SuaNguoiDung = () => {
 
                     <div className="action-right" style={{ display: 'flex', alignItems: 'center' }}>
                         <Link to="/quan-tri/quan-ly-nguoi-dung" className="btn-text-gray">Hủy bỏ</Link>
-                        <button type="button" className="btn btn-primary" style={{marginLeft: '15px'}}>
+                        <button type="button" className="btn btn-primary" style={{marginLeft: '15px'}} onClick={handleSubmit}>
                             <i className="fa-solid fa-save" style={{marginRight: '8px'}}></i> Lưu thay đổi
                         </button>
                     </div>
@@ -209,7 +297,7 @@ const SuaNguoiDung = () => {
         </div>
 
     </main>
-  );
+    );
 };
 
 export default SuaNguoiDung;
