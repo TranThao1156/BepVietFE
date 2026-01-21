@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import "../../assets/css/ChiTietCT.css"
+import "../../assets/css/ChiTietCT.css";
 import DanhGiaSao from "../NguoiDung/DanhGiaSao";
 // import "../../assets/css/ChiTietCT.css";
 
@@ -289,7 +289,10 @@ const ChitietCongthuc = () => {
   useEffect(() => {
     const u = localStorage.getItem("user");
     // Trâm - đã sửa: hỗ trợ cả key cũ (access_token) và key mới (token)
-    const t = localStorage.getItem("token") || localStorage.getItem("access_token") || localStorage.getItem("user_token");
+    const t =
+      localStorage.getItem("token") ||
+      localStorage.getItem("access_token") ||
+      localStorage.getItem("user_token");
     if (u) setCurrentUser(JSON.parse(u));
     if (t) setToken(t);
   }, []);
@@ -304,13 +307,46 @@ const ChitietCongthuc = () => {
 
   const fetchRecipe = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/cong-thuc/${currentId}`);
+      const res = await fetch(`${API_URL}/api/cong-thuc/${currentId}`, {
+        method: "GET",
+        headers: {
+          // Gửi kèm token nếu có để Backend nhận diện đây là tác giả
+          // Nếu không gửi token, Backend sẽ coi là khách và chặn luôn bài chưa duyệt
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+      });
+
+      // 1. NẾU SERVER TRẢ VỀ LỖI (404 Not Found hoặc 403 Forbidden)
+      if (!res.ok) {
+        const errorData = await res.json();
+        // Hiển thị thông báo từ Backend (VD: "Công thức chưa được công khai")
+        alert(
+          errorData.message || "Bạn không có quyền truy cập công thức này!",
+        );
+
+        // ĐÁ NGƯỜI DÙNG VỀ TRANG KHÁC NGAY LẬP TỨC
+        navigate("/cong-thuc"); // Hoặc navigate("/")
+        return;
+      }
+
+      // 2. NẾU THÀNH CÔNG (Là tác giả hoặc bài đã duyệt)
       const data = await res.json();
+
+      // Kiểm tra kỹ dữ liệu trả về có hợp lệ không
+      if (!data.data) {
+        navigate("/cong-thuc");
+        return;
+      }
+
       setRecipe(data.data || data);
       setLoading(false);
     } catch (e) {
       console.error(e);
       setLoading(false);
+      // Nếu lỗi mạng hoặc server sập -> cũng đẩy ra ngoài
+      alert("Có lỗi xảy ra khi tải dữ liệu.");
+      navigate("/cong-thuc");
     }
   };
 
