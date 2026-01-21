@@ -123,13 +123,13 @@
 }
 
 .comment-avatar.main {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
 }
 
 .comment-avatar.reply {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
 }
 
 /* Bong bóng nội dung (Bubble) */
@@ -147,8 +147,12 @@
   max-width: 100%;
 }
 
+.comment-bubble.primary {
+  background: var(--bg-comment);
+}
+
 .comment-bubble.reply-bg {
-  background-color: #f0f2f5;
+  background: var(--bg-reply);
 }
 
 .comment-author-name {
@@ -167,31 +171,45 @@
 
 /* Các nút hành động (Like, Reply, Time...) */
 .comment-actions {
-  display: flex;
-  gap: 15px;
+  display: flex;            /* Xếp các phần tử nằm ngang */
+  align-items: center;      /* Căn giữa theo trục dọc */
+  flex-wrap: nowrap;        /* Bắt buộc nằm trên 1 dòng, không xuống dòng */
+  gap: 0;                   /* Reset gap để dùng margin cho dấu chấm ngăn cách */
+  margin-top: 6px;
   margin-left: 12px;
-  margin-top: 5px;
-  font-size: 0.8rem;
+  font-size: 0.8rem;        /* Cỡ chữ nhỏ vừa phải (khoảng 12-13px) */
   color: #65676b;
 }
-
+.comment-actions > span,
+.comment-actions > button,
+.comment-actions > .action-btn {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;      /* Ngăn chữ bị ngắt dòng */
+  margin-right: 16px;       /* Khoảng cách giữa các mục */
+  position: relative;
+}
 .action-btn {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;         /* In đậm chữ "Trả lời" cho rõ */
+  color: #65676b;
+  border: none;
+  background: transparent;
+  padding: 0;
   transition: color 0.2s;
 }
 
 .action-btn:hover {
-  text-decoration: underline;
-  color: #ff6b6b;
+  color: var(--primary-color); /* Đổi màu khi di chuột */
+  text-decoration: none;
 }
 
-.action-btn.active {
-  color: #ff6b6b;
+.action-btn.delete:hover {
+  color: #d32f2f; /* Màu đỏ khi hover nút xóa */
 }
 
 .action-btn.delete {
-  color: #dc3545; /* Màu đỏ cho nút xóa */
+  color: var(--danger-color);
 }
 
 /* 4. Form Sửa bình luận */
@@ -230,11 +248,24 @@
 
 /* 5. Input Trả lời (Reply Input) */
 .reply-input-container {
+  margin-top: 12px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  animation: fadeIn 0.3s ease;
+  gap: 12px;
+  align-items: flex-start;
+  /* Căn trên để đẹp hơn nếu ô nhập nhiều dòng */
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .reply-input-wrapper {
@@ -242,43 +273,82 @@
   position: relative;
   display: flex;
   align-items: center;
+  background: #f0f2f5;
+  /* Màu nền xám nhạt hiện đại */
+  border-radius: 24px;
+  /* Bo tròn kiểu viên thuốc */
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+.reply-input-wrapper:focus-within {
+  background: #fff;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Bóng đổ nhẹ tạo chiều sâu */
 }
 
 .reply-input {
   width: 100%;
-  padding: 8px 45px 8px 15px; /* Chừa chỗ cho nút gửi */
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  padding: 10px 45px 10px 16px; /* Padding phải rộng để không đè lên nút gửi */
+  border: none;
+  background: transparent;
   outline: none;
-  font-size: 0.9rem;
-  transition: border-color 0.2s;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  font-family: inherit;
+  resize: none; /* Nếu dùng textarea */
+  height: 42px; /* Chiều cao cố định cho đẹp, hoặc để auto nếu là textarea auto-resize */
+  line-height: 20px;
 }
-
+.reply-input::placeholder {
+  color: #8e8e8e;
+  font-weight: 400;
+}
 .reply-input:focus {
   border-color: #ff6b6b;
 }
 
 .btn-send-reply {
   position: absolute;
-  right: 5px;
-  background: none;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
   border: none;
-  color: #ff6b6b;
-  padding: 5px 10px;
-  cursor: pointer;
-  font-size: 1.1rem;
+  background: transparent;
+  border-radius: 50%;
+  color: var(--primary-color); /* Lấy màu chủ đạo */
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
 }
-
+/* Icon mũi tên bên trong */
+.btn-send-reply i {
+  font-size: 1.1rem;
+  margin-left: 2px; /* Căn chỉnh nhẹ cho mũi tên cân giữa thị giác */
+}
 .btn-send-reply:hover {
-  transform: scale(1.1);
+  background-color: rgba(8, 102, 255, 0.1); /* Màu nền mờ dựa trên primary color */
+  transform: translateY(-50%) scale(1.1); /* Phóng to nhẹ */
 }
-
-/* 6. Phân cấp (Threading) */
+/* Active lúc bấm */
+.btn-send-reply:active {
+  transform: translateY(-50%) scale(0.95);
+}
+/* Trạng thái nút gửi khi input trống (cần JS check disabled) */
+.btn-send-reply:disabled {
+  color: #ccc;
+  cursor: default;
+  background: transparent;
+}
+.btn-send-reply:disabled:hover {
+  transform: translateY(-50%);
+}
 .reply-thread {
+  padding-left: 44px;
+  /* Align with parent content */
   margin-top: 10px;
   margin-left: 52px; /* Thụt đầu dòng so với avatar cha (40px + 12px gap) */
   border-left: 2px solid #f0f0f0; /* Đường kẻ dọc hướng dẫn */
@@ -297,8 +367,24 @@
   }
 }
 
-/* Animation nhẹ */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .recipe-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-bottom-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-right-sidebar {
+    border-left: none;
+    padding-left: 0;
+    margin-top: 40px;
+  }
+
+  .recipe-quick-info {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
 }

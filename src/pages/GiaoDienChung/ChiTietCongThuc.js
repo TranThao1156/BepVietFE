@@ -99,7 +99,6 @@ const CommentItem = ({
               </div>
             </>
           ) : (
-            // Form Sửa
             <div className="edit-form">
               <textarea
                 autoFocus
