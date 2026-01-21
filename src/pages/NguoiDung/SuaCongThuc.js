@@ -3,8 +3,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import "../../assets/css/congthuc.css";
 
 const SuaCongThuc = () => {
-  const { Ma_CT } = useParams();
+  const { idSlug } = useParams();
   const navigate = useNavigate();
+  const API_URL = "http://127.0.0.1:8000";
+
+  const Ma_CT = idSlug ? parseInt(idSlug.split("-")[0]) : null;
 
   // --- STATES ---
   const [tenMon, setTenMon] = useState("");
@@ -42,6 +45,11 @@ const SuaCongThuc = () => {
 
   // --- LOAD DATA ---
   useEffect(() => {
+    if (!Ma_CT) {
+      alert("Đường dẫn không hợp lệ!");
+      navigate("/nguoi-dung/ql-cong-thuc");
+      return;
+    }
     const fetchData = async () => {
       try {
         // Kiểm tra đăng nhập
@@ -55,40 +63,44 @@ const SuaCongThuc = () => {
         }
 
         const currentUser = JSON.parse(userStr);
-        
-        const optionsRes = await fetch("http://127.0.0.1:8000/api/tuy-chon-cong-thuc");
+
+        const optionsRes = await fetch(
+          "http://127.0.0.1:8000/api/tuy-chon-cong-thuc",
+        );
         const optionsData = await optionsRes.json();
         setDsDanhMuc(optionsData.danhmuc);
         setDsLoaiMon(optionsData.loaimon);
         setDsVungMien(optionsData.vungmien);
 
-        const detailRes = await fetch(`http://127.0.0.1:8000/api/cong-thuc/${Ma_CT}`);
+        const detailRes = await fetch(
+          `http://127.0.0.1:8000/api/cong-thuc/${Ma_CT}`,
+        );
         const detailData = await detailRes.json();
         const data = detailData.data;
 
         // Lấy ID người dùng hiện tại
         const currentUserId = currentUser.id;
-        
+
         // Lấy ID tác giả bài viết
         const authorId = data.Ma_ND;
 
         // Kiểm tra kỹ xem biến VaiTro trong localStorage viết hoa hay thường
-        const isAdmin = Number(currentUser.VaiTro) === 0 || Number(currentUser.role) === 0;
+        const isAdmin =
+          Number(currentUser.VaiTro) === 0 || Number(currentUser.role) === 0;
 
         // Kiểm tra quyền
         console.log("Check Quyền:", {
-            UserDangNhap: currentUserId,
-            TacGiaBaiViet: authorId,
-            LaAdmin: isAdmin
+          UserDangNhap: currentUserId,
+          TacGiaBaiViet: authorId,
+          LaAdmin: isAdmin,
         });
 
         // Nếu KHÔNG PHẢI tác giả VÀ KHÔNG PHẢI Admin -> Chặn
         if (Number(authorId) !== Number(currentUserId) && !isAdmin) {
-            alert("BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA CÔNG THỨC NÀY!");
-            navigate("/nguoi-dung/ql-cong-thuc"); 
-            return; 
+          alert("BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA CÔNG THỨC NÀY!");
+          navigate("/nguoi-dung/ql-cong-thuc");
+          return;
         }
-
 
         setTenMon(data.TenMon);
         setMoTa(data.MoTa || "");
@@ -159,7 +171,9 @@ const SuaCongThuc = () => {
     if (value.length > 1) {
       setActiveIngIndex(index);
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/nguyen-lieu/goi-y?q=${value}`);
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/nguyen-lieu/goi-y?q=${value}`,
+        );
         const data = await res.json();
         setSuggestedIngredients(data);
       } catch (err) {
@@ -180,8 +194,14 @@ const SuaCongThuc = () => {
   };
 
   const addIngredient = () => {
-    const newId = ingredients.length > 0 ? Math.max(...ingredients.map((i) => i.id)) + 1 : 1;
-    setIngredients([...ingredients, { id: newId, name: "", qty: "", unit: "" }]);
+    const newId =
+      ingredients.length > 0
+        ? Math.max(...ingredients.map((i) => i.id)) + 1
+        : 1;
+    setIngredients([
+      ...ingredients,
+      { id: newId, name: "", qty: "", unit: "" },
+    ]);
   };
 
   const removeIngredient = (id) => {
@@ -191,7 +211,8 @@ const SuaCongThuc = () => {
   };
 
   const addStep = () => {
-    const newId = steps.length > 0 ? Math.max(...steps.map((s) => s.id)) + 1 : 1;
+    const newId =
+      steps.length > 0 ? Math.max(...steps.map((s) => s.id)) + 1 : 1;
     const nextSTT = steps.length + 1;
     setSteps([...steps, { id: newId, STT: nextSTT, content: "", image: "" }]);
   };
@@ -216,7 +237,7 @@ const SuaCongThuc = () => {
 
     try {
       const token = localStorage.getItem("access_token");
-      
+
       const res = await fetch("http://127.0.0.1:8000/api/upload-anh-buoc", {
         method: "POST",
         headers: {
@@ -232,7 +253,9 @@ const SuaCongThuc = () => {
         setSteps((prevSteps) => {
           const newSteps = [...prevSteps];
           const currentStep = { ...newSteps[index] };
-          const currentImages = currentStep.image ? currentStep.image.split(";") : [];
+          const currentImages = currentStep.image
+            ? currentStep.image.split(";")
+            : [];
 
           if (!currentImages.includes(data.image)) {
             currentImages.push(data.image);
@@ -264,13 +287,13 @@ const SuaCongThuc = () => {
     e.preventDefault();
 
     const token = localStorage.getItem("access_token");
-        const userStr = localStorage.getItem("user"); // Giả sử bạn lưu thông tin user ở đây
-        
-        if (!token || !userStr) {
-            alert("Vui lòng đăng nhập để thực hiện chức năng này!");
-            navigate("/dang-nhap");
-            return;
-        }
+    const userStr = localStorage.getItem("user"); // Giả sử bạn lưu thông tin user ở đây
+
+    if (!token || !userStr) {
+      alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+      navigate("/dang-nhap");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("TenMon", tenMon);
@@ -308,7 +331,7 @@ const SuaCongThuc = () => {
             Authorization: `Bearer ${token}`,
           },
           body: formData,
-        }
+        },
       );
 
       const data = await res.json();

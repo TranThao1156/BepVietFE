@@ -58,6 +58,19 @@ const QlCongThuc = () => {
     }
   };
 
+  const createSlug = (str) => {
+    if (!str) return "";
+    return str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .replace(/([^0-9a-z-\s])/g, "")
+      .replace(/(\s+)/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
   // Hàm xóa
   const handleDelete = async (id, name) => {
     if (window.confirm(`Bạn có chắc chắn muốn xóa món "${name}" không?`)) {
@@ -68,7 +81,7 @@ const QlCongThuc = () => {
         const res = await fetch(
           `http://127.0.0.1:8000/api/user/cong-thuc/xoa-cong-thuc/${id}`,
           {
-            method: "POST", 
+            method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: "application/json",
@@ -173,7 +186,9 @@ const QlCongThuc = () => {
                 recipes.map((recipe) => (
                   <tr key={recipe.Ma_CT}>
                     <td>
-                      <Link to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}`}>
+                      <Link
+                        to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}-${createSlug(recipe.TenMon)}`}
+                      >
                         <img
                           // Kiểm tra nếu là link online hay link local
                           src={
@@ -192,13 +207,14 @@ const QlCongThuc = () => {
                       </Link>
                     </td>
                     <td>
-                      <Link to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}`}>
-                      
-                      <div className="table-title">{recipe.TenMon}</div>
-                      <div className="table-subtitle">
-                        {recipe.loai_mon?.TenLoaiMon} •{" "}
-                        {recipe.vung_mien?.TenVungMien}
-                      </div>
+                      <Link
+                        to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}-${createSlug(recipe.TenMon)}`}
+                      >
+                        <div className="table-title">{recipe.TenMon}</div>
+                        <div className="table-subtitle">
+                          {recipe.loai_mon?.TenLoaiMon} •{" "}
+                          {recipe.vung_mien?.TenVungMien}
+                        </div>
                       </Link>
                     </td>
                     <td className="table-date">
@@ -207,7 +223,7 @@ const QlCongThuc = () => {
                     <td>{getStatusBadge(recipe.TrangThaiDuyet)}</td>
                     <td className="text-right">
                       <Link
-                        to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}`}
+                        to={`/nguoi-dung/ql-cong-thuc/sua-cong-thuc/${recipe.Ma_CT}-${createSlug(recipe.TenMon)}`}
                         className="action-btn edit"
                         title="Sửa"
                       >
