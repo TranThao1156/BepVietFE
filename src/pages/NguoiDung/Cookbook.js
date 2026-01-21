@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+const toSlug = (str) => {
+    if (!str) return '';
+    return str.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Xóa dấu
+        .replace(/[đĐ]/g, "d")
+        .replace(/([^0-9a-z-\s])/g, "") // Xóa ký tự đặc biệt
+        .replace(/(\s+)/g, "-") // Thay khoảng trắng bằng gạch ngang
+        .replace(/-+/g, "-") // Xóa gạch ngang thừa
+        .replace(/^-+|-+$/g, ""); // Xóa gạch ngang đầu cuối
+};
 const CookBook = () => {
   const [dsCookbook, setDsCookbook] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -115,7 +125,7 @@ const CookBook = () => {
             filteredCookbooks.map((cookbook) => (
                 <div className="cb-card" key={cookbook.id}>
                     <div className="cb-img-wrapper">
-                        <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}`}>
+                        <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}-${toSlug(cookbook.TenCookBook)}`}>
                             <img 
                                 src={`http://127.0.0.1:8000/storage/img/cookbook/${cookbook.AnhBia.trim()}`} 
                                 alt={cookbook.TenCookBook}
@@ -156,7 +166,7 @@ const CookBook = () => {
                                     : <i className="fa-solid fa-globe" title="Công khai"></i>} 
                                 {' ' + cookbook.NgayTao}
                             </span>
-                            <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}`} className="cb-link">
+                            <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}-${toSlug(cookbook.TenCookBook)}`} className="cb-link">
                                 Xem chi tiết <i className="fa-solid fa-arrow-right"></i>
                             </Link>
                         </div>
