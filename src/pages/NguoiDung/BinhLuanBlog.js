@@ -93,7 +93,6 @@ const BinhLuanBlog = ({ blogId, currentUser }) => {
             // Trâm - đã sửa: chuẩn hóa lấy id người dùng (Ma_ND) và mapping quan hệ nguoi_dung từ Backend
             const currentUserId = currentUser?.Ma_ND ?? currentUser?.id;
             const isOwner = Number(currentUserId) === Number(item.Ma_ND);
-            const canDelete = !!currentUser && (isOwner || currentUser?.VaiTro === 0);
             const avatarUrl = item.nguoi_dung?.AnhDaiDien
                 ? `http://127.0.0.1:8000/storage/img/NguoiDung/${item.nguoi_dung.AnhDaiDien}`
                 : 'http://127.0.0.1:8000/storage/img/NguoiDung/default-avatar.png';
@@ -145,11 +144,6 @@ const BinhLuanBlog = ({ blogId, currentUser }) => {
                         {isOwner && (
                             <>
                                 <button onClick={() => { setEditingId(item.Ma_BL); setEditContent(item.NoiDungBL); }} style={styles.actionLink}>Sửa</button>
-                                <button onClick={() => handleDelete(item.Ma_BL)} style={{...styles.actionLink, color: '#e74c3c'}}>Xóa</button>
-                            </>
-                        )}
-                        {!isOwner && canDelete && (
-                            <>
                                 <button onClick={() => handleDelete(item.Ma_BL)} style={{...styles.actionLink, color: '#e74c3c'}}>Xóa</button>
                             </>
                         )}

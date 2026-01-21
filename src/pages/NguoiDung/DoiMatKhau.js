@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { changePassword } from '../../api/doimatkhauApi';
 
 const DoiMatKhau = () => {
+  const API_URL = 'http://127.0.0.1:8000';
+
   // State để quản lý việc ẩn/hiện cho 3 ô input
   const [showCurrentPass, setShowCurrentPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem('user');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const [form, setForm] = useState({
     currentPassword: '',
@@ -15,6 +26,57 @@ const DoiMatKhau = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const token = useMemo(() => {
+    return (
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('user_token')
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    // Load hồ sơ để có HoTen/TenTK/AnhDaiDien (tránh hiển thị tĩnh NA)
+    fetch(`${API_URL}/api/user/ho-so`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && json?.data) {
+          setCurrentUser(json.data);
+          // Đồng bộ lại localStorage để header/avatar các nơi khác cũng cập nhật
+          try {
+            localStorage.setItem('user', JSON.stringify(json.data));
+          } catch {}
+        }
+      })
+      .catch(() => {
+        // ignore
+      });
+  }, [token]);
+
+  const avatarSrc = useMemo(() => {
+    const filename = currentUser?.AnhDaiDien;
+    if (!filename) return `${API_URL}/storage/img/NguoiDung/default-avatar.png`;
+    if (typeof filename === 'string' && filename.startsWith('http')) return filename;
+    return `${API_URL}/storage/img/NguoiDung/${encodeURIComponent(filename)}`;
+  }, [currentUser]);
+
+  const joinedDate = useMemo(() => {
+    const v = currentUser?.created_at;
+    if (!v) return 'N/A';
+    try {
+      return new Date(v).toLocaleDateString('vi-VN');
+    } catch {
+      return 'N/A';
+    }
+  }, [currentUser]);
 
   const onChange = (key) => (e) => {
     setForm((p) => ({ ...p, [key]: e.target.value }));
@@ -68,15 +130,19 @@ const DoiMatKhau = () => {
       {/* Profile Card */}
       <div className="profile-card" style={{ marginBottom: '20px' }}>
         <div className="avatar-wrapper">
-          <div className="avatar-circle">NA</div>
-          <button className="btn-upload-avatar">
-            <i className="fa-solid fa-camera"></i>
-          </button>
+          <img
+            src={avatarSrc}
+            alt="Avatar"
+            className="avatar-circle2"
+            onError={(e) => {
+              e.currentTarget.src = `${API_URL}/storage/img/NguoiDung/default-avatar.png`;
+            }}
+          />
         </div>
-        <h2 className="user-fullname">Nguyễn Văn A</h2>
-        <p className="user-handle">@nguyenvana</p>
+        <h2 className="user-fullname">{currentUser?.HoTen || 'N/A'}</h2>
+        <p className="user-handle">@{currentUser?.TenTK || '...'}</p>
         <div className="member-since">
-          <i className="fa-solid fa-shield-halved"></i> Thành viên từ: 20/10/2023
+          <i className="fa-solid fa-shield-halved"></i> Thành viên từ: {joinedDate}
         </div>
       </div>
 
