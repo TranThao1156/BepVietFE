@@ -3,7 +3,8 @@ const BASE_URL_PUBLIC = "http://127.0.0.1:8000/api"; // Không có /user
 const BASE_URL = "http://127.0.0.1:8000/api/user"; // Có /user cho Thêm/Sửa/Xóa
 
 const getHeaders = () => {
-    const token = localStorage.getItem("token"); 
+    // Trâm - đã sửa: đồng bộ key token (ưu tiên access_token, fallback token)
+    const token = localStorage.getItem("access_token") || localStorage.getItem("token");
     return {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}` 

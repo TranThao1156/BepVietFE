@@ -143,7 +143,10 @@ const KiemDuyetNoiDung = () => {
                 </button>
                 <button
                     className={`btn ${contentType === 'recipes' ? 'btn-primary' : 'btn-white'}`}
-                    onClick={() => setContentType('recipes')}
+                  onClick={() => {
+                    // Trâm - đã sửa: chuyển sang trang kiểm duyệt công thức riêng
+                    window.location.assign('/quan-tri/kiem-duyet-cong-thuc');
+                  }}
                 >
                     Duyệt công thức
                 </button>

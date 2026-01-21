@@ -4,6 +4,8 @@ import { changePassword } from '../../api/doimatkhauApi';
 const DoiMatKhau = () => {
   const API_URL = 'http://127.0.0.1:8000';
 
+  // Trâm - đã thêm: load thông tin user + ảnh đại diện (tránh hiển thị NA tĩnh)
+
   // State để quản lý việc ẩn/hiện cho 3 ô input
   const [showCurrentPass, setShowCurrentPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);

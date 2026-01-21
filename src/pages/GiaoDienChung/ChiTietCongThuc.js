@@ -32,7 +32,11 @@ const CommentItem = ({
 
   const timeString = comment.created_at
     ? new Date(comment.created_at).toLocaleString("vi-VN", {
-        day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       })
     : "";
 
@@ -56,7 +60,9 @@ const CommentItem = ({
           {!isEditing ? (
             <>
               {/* Nội dung bình luận */}
-              <div className={`comment-bubble ${isReply ? "reply-bg" : "primary"}`}>
+              <div
+                className={`comment-bubble ${isReply ? "reply-bg" : "primary"}`}
+              >
                 <div className="comment-author-name">{authorName}</div>
                 <div className="comment-text">{comment.NoiDungBL}</div>
               </div>
@@ -75,11 +81,16 @@ const CommentItem = ({
                   <>
                     <span
                       className="action-btn"
-                      onClick={() => onReplyClick(comment.Ma_BL, "edit", comment.NoiDungBL)}
+                      onClick={() =>
+                        onReplyClick(comment.Ma_BL, "edit", comment.NoiDungBL)
+                      }
                     >
                       Sửa
                     </span>
-                    <span className="action-btn delete" onClick={() => onDelete(comment.Ma_BL)}>
+                    <span
+                      className="action-btn delete"
+                      onClick={() => onDelete(comment.Ma_BL)}
+                    >
                       Xóa
                     </span>
                   </>
@@ -96,7 +107,10 @@ const CommentItem = ({
                 rows={2}
               />
               <div className="edit-actions">
-                <button className="btn-save-edit" onClick={() => onUpdate(comment.Ma_BL)}>
+                <button
+                  className="btn-save-edit"
+                  onClick={() => onUpdate(comment.Ma_BL)}
+                >
                   Lưu
                 </button>
                 <button
@@ -130,9 +144,14 @@ const CommentItem = ({
                   placeholder={`Trả lời ${authorName}...`}
                   autoFocus
                   className="reply-input"
-                  onKeyDown={(e) => e.key === "Enter" && onPostReply(comment.Ma_BL)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && onPostReply(comment.Ma_BL)
+                  }
                 />
-                <button onClick={() => onPostReply(comment.Ma_BL)} className="btn-send-reply">
+                <button
+                  onClick={() => onPostReply(comment.Ma_BL)}
+                  className="btn-send-reply"
+                >
                   <i className="fa-solid fa-paper-plane"></i>
                 </button>
               </div>
@@ -156,7 +175,11 @@ const CommentThread = ({ comments = [], ...props }) => {
           {comment.replies && comment.replies.length > 0 && (
             <div className="reply-thread">
               <div className="reply-line">
-                <CommentThread comments={comment.replies} {...props} isReply={true} />
+                <CommentThread
+                  comments={comment.replies}
+                  {...props}
+                  isReply={true}
+                />
               </div>
             </div>
           )}
@@ -166,9 +189,8 @@ const CommentThread = ({ comments = [], ...props }) => {
   );
 };
 
-// =================================================================================
 // 3. COMPONENT CHÍNH
-// =================================================================================
+
 const ChitietCongthuc = () => {
   const { idSlug } = useParams();
   const navigate = useNavigate();
@@ -179,12 +201,88 @@ const ChitietCongthuc = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState(null);
 
+  const [showModalCookbook, setShowModalCookbook] = useState(false); // Ẩn/Hiện modal
+  const [myCookbooks, setMyCookbooks] = useState([]); // Danh sách cookbook tải về
+  const [selectedCookbookId, setSelectedCookbookId] = useState("");
+
   const [commentContent, setCommentContent] = useState("");
   const [replyContent, setReplyContent] = useState("");
   const [editContent, setEditContent] = useState("");
   const [replyingCommentId, setReplyingCommentId] = useState(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Khôi---------------------------------
+  const handleOpenCookbookModal = async () => {
+    // Kiểm tra đăng nhập
+    if (!currentUser) {
+      alert("Vui lòng đăng nhập để sử dụng tính năng này!");
+      return;
+    }
+    setShowModalCookbook(true);
+
+    const token = localStorage.getItem("access_token");
+
+    try {
+      const res = await fetch(`${API_URL}/api/user/cookbooks/cua-toi`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMyCookbooks(data.data);
+        // Mặc định chọn cái đầu tiên nếu có
+        if (data.data.length > 0) {
+          setSelectedCookbookId(data.data[0].Ma_CookBook);
+        }
+      }
+    } catch (error) {
+      console.error("Lỗi lấy cookbook:", error);
+    }
+  };
+  const handleSubmitAddToCookbook = async () => {
+    if (!selectedCookbookId) {
+      alert("Vui lòng chọn một Cookbook!");
+      return;
+    }
+    const token = localStorage.getItem("access_token");
+
+    try {
+      const res = await fetch(`${API_URL}/api/user/cookbooks/them-mon`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          Ma_CookBook: selectedCookbookId,
+          Ma_CT: idSlug,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        alert(data.message); // "Đã thêm thành công!"
+        setShowModalCookbook(false); // Đóng modal
+      } else {
+        alert(data.message || "Có lỗi xảy ra.");
+      }
+    } catch (error) {
+      console.error("Lỗi lưu cookbook:", error);
+      alert("Lỗi kết nối server");
+    }
+  };
+  // -------------------------
 
   // 1. Load User & Token
   useEffect(() => {
@@ -217,7 +315,9 @@ const ChitietCongthuc = () => {
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/cong-thuc/${currentId}/binh-luan`);
+      const res = await fetch(
+        `${API_URL}/api/cong-thuc/${currentId}/binh-luan`,
+      );
       const json = await res.json();
       if (json.data) setComments(json.data);
     } catch (e) {
@@ -227,7 +327,8 @@ const ChitietCongthuc = () => {
 
   const checkAuth = () => {
     if (!token) {
-      if (window.confirm("Bạn cần đăng nhập để bình luận!")) navigate("/dang-nhap");
+      if (window.confirm("Bạn cần đăng nhập để bình luận!"))
+        navigate("/dang-nhap");
       return false;
     }
     return true;
@@ -314,12 +415,21 @@ const ChitietCongthuc = () => {
   };
 
   if (loading) return <div className="loading-state">Đang tải dữ liệu...</div>;
-  if (!recipe) return <div className="error-state">Không tìm thấy công thức</div>;
+  if (!recipe)
+    return <div className="error-state">Không tìm thấy công thức</div>;
 
   const ingredients = recipe.nguyen_lieu || recipe.nguyenLieu || [];
   const steps = recipe.buoc_thuc_hien || recipe.buocThucHien || [];
   const related = recipe.mon_lien_quan || recipe.monLienQuan || [];
   const author = recipe.nguoidung || {};
+
+  // Trâm - đã thêm: chỉ cho hiển thị đánh giá khi công thức đã được duyệt (logic chuẩn kiểm duyệt)
+  const trangThaiDuyet = recipe.TrangThaiDuyet ?? recipe.trang_thai_duyet;
+  const trangThai = recipe.TrangThai ?? recipe.trang_thai;
+  const coTheHienDanhGia =
+    trangThaiDuyet === "Chấp nhận" &&
+    (trangThai === 1 || trangThai === "1" || trangThai === true);
+
   // Trâm - đã sửa: normalize danh sách đánh giá để DanhGiaSao nhận được ở mọi dạng key
   const reviews = recipe.danhGia || recipe.danh_gia || recipe.danhgia || [];
   const avgRating = recipe.TrungBinhSao ?? recipe.trung_binh_sao ?? 0;
@@ -380,15 +490,17 @@ const ChitietCongthuc = () => {
           </div>
 
           {/* RATING SECTION */}
-          <div style={{ marginTop: 20 }}>
-            <DanhGiaSao
-              maCongThuc={currentId}
-              currentUser={currentUser}
-              initialAvgRating={avgRating}
-              initialReviews={reviews}
-              onRatingSuccess={fetchRecipe}
-            />
-          </div>
+          {coTheHienDanhGia && (
+            <div style={{ marginTop: 20 }}>
+              <DanhGiaSao
+                maCongThuc={currentId}
+                currentUser={currentUser}
+                initialAvgRating={avgRating}
+                initialReviews={reviews}
+                onRatingSuccess={fetchRecipe}
+              />
+            </div>
+          )}
         </div>
 
         {/* INGREDIENTS & STEPS */}
@@ -405,7 +517,62 @@ const ChitietCongthuc = () => {
                 ))}
               </ul>
             </div>
+            {/* Khôi Lưu vào cookbookk */}
+            <button
+              className="btn-save-cookbook"
+              onClick={handleOpenCookbookModal}
+            >
+              <i className="fa-regular fa-bookmark"></i> Lưu vào Cookbook
+            </button>
           </aside>
+
+          {showModalCookbook && (
+            <div className="modal-overlay">
+              <div className="modal-box">
+                <h3 className="modal-title">Chọn Cookbook để lưu</h3>
+
+                {myCookbooks.length === 0 ? (
+                  <p style={{ textAlign: "center", color: "#666" }}>
+                    Bạn chưa có Cookbook nào. <br />
+                    Hãy tạo mới trong trang cá nhân.
+                  </p>
+                ) : (
+                  <div className="modal-body">
+                    <label className="modal-label">Chọn bộ sưu tập:</label>
+                    <select
+                      className="modal-select"
+                      value={selectedCookbookId}
+                      onChange={(e) => setSelectedCookbookId(e.target.value)}
+                    >
+                      {myCookbooks.map((cb) => (
+                        <option key={cb.Ma_CookBook} value={cb.Ma_CookBook}>
+                          {cb.TenCookBook} ({cb.congthucs_count || 0} món)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="modal-actions">
+                  <button
+                    className="modal-btn btn-cancel"
+                    onClick={() => setShowModalCookbook(false)}
+                  >
+                    Hủy
+                  </button>
+                  {myCookbooks.length > 0 && (
+                    <button
+                      className="modal-btn btn-confirm"
+                      onClick={handleSubmitAddToCookbook}
+                    >
+                      Lưu ngay
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {/* ------------------------------------------------------ */}
 
           <div className="main-instructions">
             <h2>Hướng dẫn thực hiện</h2>
@@ -426,7 +593,7 @@ const ChitietCongthuc = () => {
                                 src={`${API_URL}/storage/img/BuocThucHien/${img.trim()}`}
                                 alt=""
                               />
-                            )
+                            ),
                         )}
                       </div>
                     )}
@@ -482,7 +649,11 @@ const ChitietCongthuc = () => {
                 Vui lòng{" "}
                 <Link
                   to="/dang-nhap"
-                  style={{ color: "var(--primary-color)", fontWeight: "bold", textDecoration: "none" }}
+                  style={{
+                    color: "var(--primary-color)",
+                    fontWeight: "bold",
+                    textDecoration: "none",
+                  }}
                 >
                   đăng nhập
                 </Link>{" "}
@@ -509,7 +680,13 @@ const ChitietCongthuc = () => {
                   level={0}
                 />
               ) : (
-                <p style={{ textAlign: "center", color: "#777", padding: "40px 0" }}>
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#777",
+                    padding: "40px 0",
+                  }}
+                >
                   Chưa có bình luận nào. Hãy là người đầu tiên!
                 </p>
               )}
@@ -524,15 +701,21 @@ const ChitietCongthuc = () => {
             {related.length > 0 ? (
               related.map((item) => (
                 <article className="related-item" key={item.Ma_CT}>
-                  <Link to={`/cong-thuc/${item.Ma_CT}-${item.slug_url || "mon-an"}`}>
+                  <Link
+                    to={`/cong-thuc/${item.Ma_CT}-${item.slug_url || "mon-an"}`}
+                  >
                     <img
                       src={`${API_URL}/storage/img/CongThuc/${item.HinhAnh}`}
                       alt={item.TenMon}
-                      onError={(e) => (e.target.src = "https://placehold.co/100")}
+                      onError={(e) =>
+                        (e.target.src = "https://placehold.co/100")
+                      }
                     />
                   </Link>
                   <div className="related-info">
-                    <Link to={`/cong-thuc/${item.Ma_CT}-${item.slug_url || "mon-an"}`}>
+                    <Link
+                      to={`/cong-thuc/${item.Ma_CT}-${item.slug_url || "mon-an"}`}
+                    >
                       {item.TenMon}
                     </Link>
                     <span>

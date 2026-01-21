@@ -43,6 +43,7 @@ const AdminLayout = () => {
                                 <i className="fas fa-file-alt"></i> Kiểm duyệt nội dung
                             </NavLink>
                         </li>
+                        {/* Trâm - đã sửa: bỏ menu riêng kiểm duyệt công thức (nằm trong Kiểm duyệt nội dung) */}
                         <li>
                             <NavLink to="/quan-tri/quan-ly-danh-muc" className={({ isActive }) => isActive ? "active" : ""}>
                                 <i className="fas fa-tags"></i> Quản lý Danh mục
