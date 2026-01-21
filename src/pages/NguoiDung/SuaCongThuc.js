@@ -44,6 +44,18 @@ const SuaCongThuc = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Kiểm tra đăng nhập
+        const token = localStorage.getItem("access_token");
+        const userStr = localStorage.getItem("user");
+
+        if (!token || !userStr) {
+          alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+          navigate("/dang-nhap");
+          return;
+        }
+
+        const currentUser = JSON.parse(userStr);
+        
         const optionsRes = await fetch("http://127.0.0.1:8000/api/tuy-chon-cong-thuc");
         const optionsData = await optionsRes.json();
         setDsDanhMuc(optionsData.danhmuc);
@@ -53,6 +65,30 @@ const SuaCongThuc = () => {
         const detailRes = await fetch(`http://127.0.0.1:8000/api/cong-thuc/${Ma_CT}`);
         const detailData = await detailRes.json();
         const data = detailData.data;
+
+        // Lấy ID người dùng hiện tại
+        const currentUserId = currentUser.id;
+        
+        // Lấy ID tác giả bài viết
+        const authorId = data.Ma_ND;
+
+        // Kiểm tra kỹ xem biến VaiTro trong localStorage viết hoa hay thường
+        const isAdmin = Number(currentUser.VaiTro) === 0 || Number(currentUser.role) === 0;
+
+        // Kiểm tra quyền
+        console.log("Check Quyền:", {
+            UserDangNhap: currentUserId,
+            TacGiaBaiViet: authorId,
+            LaAdmin: isAdmin
+        });
+
+        // Nếu KHÔNG PHẢI tác giả VÀ KHÔNG PHẢI Admin -> Chặn
+        if (Number(authorId) !== Number(currentUserId) && !isAdmin) {
+            alert("BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA CÔNG THỨC NÀY!");
+            navigate("/nguoi-dung/ql-cong-thuc"); 
+            return; 
+        }
+
 
         setTenMon(data.TenMon);
         setMoTa(data.MoTa || "");
@@ -180,6 +216,7 @@ const SuaCongThuc = () => {
 
     try {
       const token = localStorage.getItem("access_token");
+      
       const res = await fetch("http://127.0.0.1:8000/api/upload-anh-buoc", {
         method: "POST",
         headers: {
@@ -225,12 +262,15 @@ const SuaCongThuc = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("access_token");
 
-    if (!token) {
-      alert("Bạn chưa đăng nhập");
-      return;
-    }
+    const token = localStorage.getItem("access_token");
+        const userStr = localStorage.getItem("user"); // Giả sử bạn lưu thông tin user ở đây
+        
+        if (!token || !userStr) {
+            alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+            navigate("/dang-nhap");
+            return;
+        }
 
     const formData = new FormData();
     formData.append("TenMon", tenMon);
