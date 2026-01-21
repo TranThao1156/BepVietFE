@@ -117,7 +117,7 @@ const CookBook = () => {
                     <div className="cb-img-wrapper">
                         <Link to={`/nguoi-dung/cookbook/chi-tiet/${cookbook.id}`}>
                             <img 
-                                src={cookbook.AnhBia} 
+                                src={`http://127.0.0.1:8000/storage/img/cookbook/${cookbook.AnhBia.trim()}`} 
                                 alt={cookbook.TenCookBook}
                                 onError={(e) => {e.target.src = 'https://placehold.co/600x400?text=No+Image'}}
                             />

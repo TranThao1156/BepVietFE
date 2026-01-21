@@ -452,7 +452,7 @@ const DsCongThuc = () => {
                 recipes.map((recipe) => (
                   <article className="card" key={recipe.Ma_CT}>
                     <div className="card-img-wrapper">
-                      <Link to={`/cong-thuc/${recipe.Ma_CT}`}>
+                      <Link to={`/cong-thuc/${recipe.Ma_CT}-${recipe.slug_url}`}>
                         <img
                           src={`http://127.0.0.1:8000/storage/img/CongThuc/${recipe.HinhAnh}`}
                           alt={recipe.TenMon}
