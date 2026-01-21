@@ -1,9 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const KiemDuyetCongThuc = () => {
   // Trâm - đã thêm: Trang kiểm duyệt công thức riêng (không chỉnh file kiểm duyệt nội dung cũ)
   // --- CẤU HÌNH API ---
   const API_URL = 'http://localhost:8000/api/admin';
+
+  // Trâm - đã thêm: slugify title fallback (phòng khi BE không trả slug_url)
+  const slugify = (text = '') =>
+    text
+      .toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
 
   // Trâm - đã thêm: Ưu tiên access_token, fallback token (tránh lệch key localStorage)
   const getAuthToken = () => localStorage.getItem('access_token') || localStorage.getItem('token');
@@ -180,16 +192,13 @@ const KiemDuyetCongThuc = () => {
                       <td>{getStatusBadge(item.status)}</td>
                       <td className="text-right">
                         <div className="action-group">
-                          <button
+                          <Link
                             className="btn-icon"
                             title="Xem chi tiết"
-                            onClick={() => {
-                            //   const slug = item.slug || 'cong-thuc'; 
-                              (window.location.href = `/cong-thuc/${item.id}`)
-                            }}
+                            to={`/cong-thuc/${item.id}-${item.slug || slugify(item.title) || 'mon-an'}`}
                           >
                             <i className="fa-regular fa-eye"></i>
-                          </button>
+                          </Link>
 
                           {item.status === 'pending' && (
                             <>
