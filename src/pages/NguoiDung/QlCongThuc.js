@@ -154,7 +154,6 @@ const QlCongThuc = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: "10%" }}>Ảnh</th>
                 <th style={{ width: "30%" }}>Tên món</th>
                 <th style={{ width: "20%" }}>Ngày tạo</th>
                 <th style={{ width: "20%" }}>Trạng thái</th>
