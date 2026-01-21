@@ -1,508 +1,304 @@
-/* =========================================
-   GLOBAL VARIABLES & RESET
-   ========================================= */
-:root {
-  --primary-color: #0866ff;
-  --text-color: #050505;
-  --text-secondary: #65676b;
-  --bg-comment: #f0f2f5;
-  --bg-reply: #f7f8fa;
-  --border-color: #e4e6eb;
-  --danger-color: #d32f2f;
-}
+/* ======================================================
+   COMMENT SECTION STYLES
+   File: assets/css/CommentSection.css
+   ====================================================== */
 
-.recipe-page-wrapper {
-  background-color: #fff;
-  min-height: 100vh;
-  padding-bottom: 50px;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
-
-/* =========================================
-   RECIPE HEADER & HERO
-   ========================================= */
-.recipe-header {
-  margin-bottom: 30px;
-}
-
-.recipe-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.recipe-desc {
-  font-size: 1.1rem;
-  color: #555;
-  margin-bottom: 20px;
-  line-height: 1.6;
-}
-
-.author-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.author-avatar-small {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.author-name {
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.view-count {
-  font-size: 0.85rem;
-  color: #888;
-}
-
-.recipe-hero-img img {
-  width: 100%;
-  max-height: 500px;
-  object-fit: cover;
+/* 1. Container Chính */
+.comments-section {
+  margin-top: 40px;
+  background-color: #ffffff;
   border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-/* Quick Info Bar */
-.recipe-quick-info {
-  display: flex;
-  justify-content: space-around;
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  border: 1px solid #eee;
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.info-item i {
-  font-size: 24px;
-  color: var(--primary-color);
-}
-
-.info-item span {
-  display: block;
-  font-size: 0.9rem;
-  color: #777;
-}
-
-.info-item strong {
-  display: block;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-/* =========================================
-   RECIPE CONTENT GRID (Ingredients & Steps)
-   ========================================= */
-.recipe-content-grid {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 40px;
-}
-
-/* Sidebar Ingredients */
-.ingredients-box {
-  background: #fdfdfd;
-  border: 1px solid #eee;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.ingredients-box h3 {
-  margin-bottom: 15px;
-  font-size: 1.2rem;
-  border-bottom: 2px solid var(--primary-color);
-  padding-bottom: 10px;
-  display: inline-block;
-}
-
-.ingredients-list {
-  list-style: none;
-  padding: 0;
-}
-
-.ingredients-list li {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  line-height: 1.5;
-}
-
-.ingredients-list li i {
-  color: var(--primary-color);
-  margin-top: 4px;
-}
-
-/* Main Instructions */
-.main-instructions h2 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.step-item {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.step-number {
-  width: 40px;
-  height: 40px;
-  background: var(--primary-color);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-.step-content p {
-  margin-top: 0;
-  line-height: 1.6;
-  font-size: 1.05rem;
-  color: #444;
-}
-
-.step-images-grid {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-  flex-wrap: wrap;
-}
-
-.step-img {
-  max-width: 200px;
-  border-radius: 8px;
-  object-fit: cover;
-  border: 1px solid #eee;
-}
-
-/* =========================================
-   COMMENTS SECTION
-   ========================================= */
-.recipe-bottom-layout {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 40px;
-  max-width: 1200px;
-  margin: 40px auto 0;
-  padding: 0 15px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
 }
 
 .section-title {
   font-size: 1.4rem;
-  margin-bottom: 20px;
+  font-weight: 700;
   color: #333;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 12px;
 }
 
-/* Comment Input Area */
+/* 2. Form nhập bình luận (Gốc) */
 .review-dashboard {
   margin-bottom: 30px;
 }
 
 .input-row {
   display: flex;
-  gap: 12px;
+  gap: 15px;
   align-items: flex-start;
 }
 
 .user-avatar-input {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid #e0e0e0;
+  flex-shrink: 0;
 }
 
 .review-textarea-clean {
   width: 100%;
-  padding: 12px;
-  border-radius: 18px;
+  min-height: 50px;
+  padding: 12px 15px;
   border: 1px solid #ddd;
-  background-color: #f0f2f5;
-  resize: none;
+  border-radius: 20px; /* Bo tròn kiểu input chat */
+  background-color: #f9f9f9;
   font-family: inherit;
-  transition: all 0.2s;
+  font-size: 0.95rem;
+  resize: none; /* Chặn kéo giãn lung tung */
+  transition: all 0.3s ease;
+  outline: none;
 }
 
 .review-textarea-clean:focus {
   background-color: #fff;
-  border-color: var(--primary-color);
-  outline: none;
+  border-color: #ff6b6b; /* Màu chủ đạo */
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
 }
 
 .btn-submit-review {
-  background: var(--primary-color);
+  background-color: #ff6b6b;
   color: white;
-  padding: 8px 20px;
   border: none;
+  padding: 8px 24px;
   border-radius: 20px;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .btn-submit-review:hover {
-  background: #0056b3;
+  background-color: #ff5252;
 }
 
 .btn-submit-review:disabled {
-  background: #ccc;
+  background-color: #ccc;
   cursor: not-allowed;
 }
 
 .login-prompt {
   text-align: center;
   padding: 20px;
-  background: #f9f9f9;
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
   border-radius: 8px;
-  margin-bottom: 20px;
-  color: #666;
 }
 
-/* Comment Items */
+/* 3. Danh sách bình luận (Comment Item) */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .comment-node {
-  margin-bottom: 16px;
+  position: relative;
 }
 
 .comment-row {
   display: flex;
   gap: 12px;
+  align-items: flex-start;
 }
 
+/* Avatar hiển thị */
 .comment-avatar {
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid var(--border-color);
+  border: 1px solid #eee;
+  transition: transform 0.2s;
+  flex-shrink: 0;
 }
 
-.comment-avatar.main { width: 44px; height: 44px; }
-.comment-avatar.reply { width: 36px; height: 36px; }
+.comment-avatar:hover {
+  transform: scale(1.05);
+}
 
+.comment-avatar.main {
+  width: 40px;
+  height: 40px;
+}
+
+.comment-avatar.reply {
+  width: 32px;
+  height: 32px;
+}
+
+/* Bong bóng nội dung (Bubble) */
 .comment-body {
   flex: 1;
+  max-width: 100%;
 }
 
 .comment-bubble {
-  border-radius: 18px;
-  padding: 8px 14px;
   display: inline-block;
-  max-width: 90%;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background-color: #f0f2f5; /* Màu xám nhạt giống FB */
+  position: relative;
+  max-width: 100%;
 }
 
-.comment-bubble.primary { background: var(--bg-comment); }
-.comment-bubble.reply-bg { background: var(--bg-reply); }
+.comment-bubble.reply-bg {
+  background-color: #f0f2f5;
+}
 
 .comment-author-name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
-  color: var(--text-color);
+  color: #050505;
   margin-bottom: 2px;
 }
 
 .comment-text {
   font-size: 0.95rem;
-  line-height: 1.45;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--text-color);
+  color: #050505;
+  line-height: 1.4;
+  word-wrap: break-word; /* Xuống dòng nếu chữ quá dài */
 }
 
+/* Các nút hành động (Like, Reply, Time...) */
 .comment-actions {
   display: flex;
-  gap: 14px;
-  margin-top: 4px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  gap: 15px;
   margin-left: 12px;
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: #65676b;
 }
 
 .action-btn {
   cursor: pointer;
   font-weight: 600;
+  transition: color 0.2s;
 }
 
-.action-btn:hover { text-decoration: underline; }
-.action-btn.active { color: var(--primary-color); }
-.action-btn.delete { color: var(--danger-color); }
+.action-btn:hover {
+  text-decoration: underline;
+  color: #ff6b6b;
+}
 
-/* Edit Form */
+.action-btn.active {
+  color: #ff6b6b;
+}
+
+.action-btn.delete {
+  color: #dc3545; /* Màu đỏ cho nút xóa */
+}
+
+/* 4. Form Sửa bình luận */
 .edit-form textarea {
   width: 100%;
   padding: 10px;
-  border-radius: 12px;
   border: 1px solid #ccc;
-  resize: none;
+  border-radius: 8px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 8px;
 }
 
 .edit-actions {
-  margin-top: 8px;
   display: flex;
   gap: 10px;
+}
+
+.btn-save-edit, .btn-cancel-edit {
+  padding: 5px 15px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
 }
 
 .btn-save-edit {
-  background: var(--primary-color);
-  color: #fff;
-  border: none;
-  padding: 5px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
+  background-color: #ff6b6b;
+  color: white;
 }
 
 .btn-cancel-edit {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  background-color: #e4e6eb;
+  color: #050505;
 }
 
-/* Reply Input Form */
+/* 5. Input Trả lời (Reply Input) */
 .reply-input-container {
-  margin-top: 10px;
   display: flex;
-  gap: 10px;
   align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
 }
 
 .reply-input-wrapper {
   flex: 1;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .reply-input {
   width: 100%;
-  padding: 8px 40px 8px 12px;
+  padding: 8px 45px 8px 15px; /* Chừa chỗ cho nút gửi */
   border-radius: 20px;
   border: 1px solid #ccc;
+  background-color: #fff;
   outline: none;
-  background: #f0f2f5;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
 }
 
 .reply-input:focus {
-  background: #fff;
-  border-color: var(--primary-color);
+  border-color: #ff6b6b;
 }
 
 .btn-send-reply {
   position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
+  right: 5px;
   background: none;
-  color: var(--primary-color);
+  border: none;
+  color: #ff6b6b;
+  padding: 5px 10px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.btn-send-reply:hover {
+  transform: scale(1.1);
+}
+
+/* 6. Phân cấp (Threading) */
 .reply-thread {
-  padding-left: 44px; /* Align with parent content */
   margin-top: 10px;
+  margin-left: 52px; /* Thụt đầu dòng so với avatar cha (40px + 12px gap) */
+  border-left: 2px solid #f0f0f0; /* Đường kẻ dọc hướng dẫn */
+  padding-left: 12px;
 }
 
-.reply-line {
-  border-left: 2px solid #f0f2f5;
-  padding-left: 10px;
-}
-
-/* =========================================
-   RIGHT SIDEBAR (Related)
-   ========================================= */
-.recipe-right-sidebar {
-  border-left: 1px solid #eee;
-  padding-left: 30px;
-}
-
-.sidebar-title {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  border-bottom: 2px solid var(--primary-color);
-  padding-bottom: 10px;
-  display: inline-block;
-}
-
-.related-item {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.related-item img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.related-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.related-info a {
-  font-weight: 600;
-  color: #333;
-  text-decoration: none;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.related-info a:hover {
-  color: var(--primary-color);
-}
-
-.related-info span {
-  font-size: 0.85rem;
-  color: #888;
-}
-
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  .recipe-content-grid {
-    grid-template-columns: 1fr;
+/* Responsive cho mobile */
+@media (max-width: 576px) {
+  .reply-thread {
+    margin-left: 30px;
+    padding-left: 8px;
   }
   
-  .recipe-bottom-layout {
-    grid-template-columns: 1fr;
+  .comment-bubble {
+    font-size: 0.9rem;
   }
-  
-  .recipe-right-sidebar {
-    border-left: none;
-    padding-left: 0;
-    margin-top: 40px;
-  }
-  
-  .recipe-quick-info {
-    flex-wrap: wrap;
-    gap: 20px;
-  }
+}
+
+/* Animation nhẹ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
