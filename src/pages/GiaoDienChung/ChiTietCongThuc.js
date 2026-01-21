@@ -142,7 +142,7 @@ const CommentItem = ({
                   type="text"
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
-                  placeholder={`Trả lời ${authorName}...`}
+                  placeholder={`Trả lời   ${authorName}...`}
                   autoFocus
                   className="reply-input"
                   onKeyDown={(e) =>
@@ -339,6 +339,23 @@ const ChitietCongthuc = () => {
         return;
       }
 
+      const recipeData = data.data || data;
+
+      //  LOGIC CHẶN Ở FRONTEND
+      // Lấy thông tin người đang xem
+      const currentUserLocal = JSON.parse(localStorage.getItem("user"));
+
+      // Kiểm tra trạng thái bài viết
+      const isApproved = recipeData.TrangThaiDuyet === "Chấp nhận"; // Bài đã duyệt
+
+      // Bài chưa duyệt) 
+      if (!isApproved) {
+        // Có thể alert nhẹ hoặc console.warn
+        alert('Không tìm thấy công thức !');
+        navigate("/"); // Chuyển hướng về trang chủ
+        return; // Dừng hàm, không setRecipe
+      }
+
       setRecipe(data.data || data);
       setLoading(false);
     } catch (e) {
@@ -525,19 +542,6 @@ const ChitietCongthuc = () => {
               </div>
             </div>
           </div>
-
-          {/* RATING SECTION */}
-          {coTheHienDanhGia && (
-            <div style={{ marginTop: 20 }}>
-              <DanhGiaSao
-                maCongThuc={currentId}
-                currentUser={currentUser}
-                initialAvgRating={avgRating}
-                initialReviews={reviews}
-                onRatingSuccess={fetchRecipe}
-              />
-            </div>
-          )}
         </div>
 
         {/* INGREDIENTS & STEPS */}
@@ -641,6 +645,22 @@ const ChitietCongthuc = () => {
           </div>
         </div>
       </main>
+      <div className="recipe-page-wrapper">
+        <main className="container recipe-container">
+          {/* RATING SECTION */}
+          {coTheHienDanhGia && (
+            <div style={{ marginTop: 20 }}>
+              <DanhGiaSao
+                maCongThuc={currentId}
+                currentUser={currentUser}
+                initialAvgRating={avgRating}
+                initialReviews={reviews}
+                onRatingSuccess={fetchRecipe}
+              />
+            </div>
+          )}
+        </main>
+      </div>
 
       {/* COMMENTS SECTION */}
       <div className="recipe-bottom-layout">

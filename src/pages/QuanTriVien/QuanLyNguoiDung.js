@@ -64,7 +64,7 @@ import { Link } from 'react-router-dom';
         // Xoá ngươi dùng
         const handleDelete = async (maND,tenND) => {
             const confirmDelete = window.confirm(
-                `Bạn có chắc chắn muốn xoá tài khoản "${tenND}" không?`
+                `Bạn có chắc chắn muốn khóa tài khoản "${tenND}" không?`
             );
 
             if (!confirmDelete) return;
@@ -180,7 +180,7 @@ import { Link } from 'react-router-dom';
                                                     className="btn-icon"
                                                     onClick={() => handleDelete(user.Ma_ND,user.HoTen)}
                                                 >
-                                                    <i className="fa-solid fa-trash-can"></i>
+                                                    <i className="fa-solid fa-user-lock"></i>
                                                 </button>
                                             </div>
                                         </td>

@@ -5,7 +5,6 @@ import "../../assets/css/congthuc.css";
 const SuaCongThuc = () => {
   const { idSlug } = useParams();
   const navigate = useNavigate();
-  const API_URL = "http://127.0.0.1:8000";
 
   const Ma_CT = idSlug ? parseInt(idSlug.split("-")[0]) : null;
 
@@ -81,7 +80,7 @@ const SuaCongThuc = () => {
         // Lấy ID người dùng hiện tại
         const currentUserId = currentUser.id;
 
-        // Lấy ID tác giả bài viết
+        // Lấy ID tác giả công thức
         const authorId = data.Ma_ND;
 
         // Kiểm tra kỹ xem biến VaiTro trong localStorage viết hoa hay thường
