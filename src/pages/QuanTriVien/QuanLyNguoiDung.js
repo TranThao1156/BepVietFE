@@ -12,7 +12,13 @@ import { Link } from 'react-router-dom';
             'Accept': 'application/json',
             'Authorization': `Bearer ${TOKEN}`
         };
-        
+        // Phân trang
+        const [meta, setMeta] = useState({
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0
+        });
 
         // API chung để lấy danh sách người dùng
         const fetchUsers = async (
@@ -36,13 +42,7 @@ import { Link } from 'react-router-dom';
                     console.error('Lỗi load users', err);
                 }
             };
-        // Phân trang
-        const [meta, setMeta] = useState({
-            current_page: 1,
-            last_page: 1,
-            per_page: 10,
-            total: 0
-        });
+
         // Hàm chuyển trang
         const changePage = (page) => {
             if (page < 1 || page > meta.last_page) return;
@@ -61,17 +61,48 @@ import { Link } from 'react-router-dom';
             setVaiTro(value);
             fetchUsers(tuKhoa, value);
         };
+        // Xoá ngươi dùng
+        const handleDelete = async (maND,tenND) => {
+            const confirmDelete = window.confirm(
+                `Bạn có chắc chắn muốn xoá tài khoản "${tenND}" không?`
+            );
+
+            if (!confirmDelete) return;
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/admin/quan-ly-nguoi-dung/xoa/${maND}`,
+                {
+                    method: "DELETE",
+                    headers
+                });
+
+                const result = await response.json();
+                // Không được xoá tài khoản của mình
+                const myId = JSON.parse(localStorage.getItem("user"))?.Ma_ND;
+                if (maND === myId) {
+                    alert("Bạn không thể xoá chính mình");
+                    return;
+                }
+
+
+                if (!response.ok) {
+                throw new Error(result.message || `Xoá người dùng "${tenND}" dùng thất bại"`);
+                }
+
+                alert("Xoá người dùng thành công");
+
+                // Load lại danh sách
+                fetchUsers(tuKhoa, vaiTro, meta.current_page);
+
+                } catch (error) {
+                    console.error(`Lỗi xoá người dùng "${tenND}":"`, error);
+                    alert(error.message);
+            }
+        };
 
         useEffect(() => {
             fetchUsers();
         }, []);
-
-        // --- HÀM XỬ LÝ XÓA ---
-        const handleDelete = (id) => {
-            if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
-                setUsers(users.filter(u => u.id !== id));
-            }
-        };
 
         return (
             <main className="main-content">
@@ -147,7 +178,7 @@ import { Link } from 'react-router-dom';
                                                 </Link>
                                                 <button
                                                     className="btn-icon"
-                                                    onClick={() => handleDelete(user.Ma_ND)}
+                                                    onClick={() => handleDelete(user.Ma_ND,user.HoTen)}
                                                 >
                                                     <i className="fa-solid fa-trash-can"></i>
                                                 </button>
