@@ -343,33 +343,41 @@
 }
 
 .comment-actions {
-  display: flex;
-  gap: 14px;
-  margin-top: 4px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  display: flex;            /* Xếp các phần tử nằm ngang */
+  align-items: center;      /* Căn giữa theo trục dọc */
+  flex-wrap: nowrap;        /* Bắt buộc nằm trên 1 dòng, không xuống dòng */
+  gap: 0;                   /* Reset gap để dùng margin cho dấu chấm ngăn cách */
+  margin-top: 6px;
   margin-left: 12px;
+  font-size: 0.8rem;        /* Cỡ chữ nhỏ vừa phải (khoảng 12-13px) */
+  color: #65676b;
 }
-
+.comment-actions > span,
+.comment-actions > button,
+.comment-actions > .action-btn {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;      /* Ngăn chữ bị ngắt dòng */
+  margin-right: 16px;       /* Khoảng cách giữa các mục */
+  position: relative;
+}
 .action-btn {
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-weight: 700;         /* In đậm chữ "Trả lời" cho rõ */
   color: #65676b;
-  position: relative;
+  border: none;
+  background: transparent;
+  padding: 0;
   transition: color 0.2s;
-  padding: 2px 4px;
-  border-radius: 4px;
 }
 
 .action-btn:hover {
-  color: var(--primary-color);
-  text-decoration: none; /* Bỏ gạch chân cũ */
-  background-color: rgba(0, 0, 0, 0.03);
+  color: var(--primary-color); /* Đổi màu khi di chuột */
+  text-decoration: none;
 }
 
-.action-btn.active {
-  color: var(--primary-color);
+.action-btn.delete:hover {
+  color: #d32f2f; /* Màu đỏ khi hover nút xóa */
 }
 
 .action-btn.delete {
