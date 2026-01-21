@@ -73,7 +73,7 @@ const SuaBlog = () => {
     }
 
     const res = await fetch(
-      `http://127.0.0.1:8000/api/user/cap-nhat-blog/${id}`,
+      `http://127.0.0.1:8000/api/user/cap-nhat-blog/${id} `,
       {
         method: "POST",
         headers: {

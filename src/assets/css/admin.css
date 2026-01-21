@@ -529,7 +529,9 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
     width: 100%; height: 100%; 
     border-radius: 50%; 
     object-fit: cover; 
-    display: none; /* Ẩn khi chưa có ảnh */
+
+    /* Bỏ display cái nì nha */
+    /* display: block; Ẩn khi chưa có ảnh */ 
 }
 
 /* Nút icon upload màu cam */
