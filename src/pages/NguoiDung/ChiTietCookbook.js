@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 
+const toSlug = (str) => {
+    if (!str) return '';
+    return str.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[đĐ]/g, "d")
+        .replace(/([^0-9a-z-\s])/g, "")
+        .replace(/(\s+)/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-+|-+$/g, "");
+};
 const ChiTietCookbook = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const navigate = useNavigate();
-
+  const realId = id ? parseInt(id.split("-")[0]) : null;
   const [cookbook, setCookbook] = useState(null); // Thông tin cookbook
   const [recipes, setRecipes] = useState([]); // Danh sách món ăn
   const [loading, setLoading] = useState(true);
@@ -19,6 +29,7 @@ const ChiTietCookbook = () => {
   // 1. Fetch dữ liệu từ API
   useEffect(() => {
     const fetchDetail = async () => {
+      if (!realId) return;
       try {
         // --- THÊM ĐOẠN NÀY ---
         const token = localStorage.getItem('access_token'); // Lấy token từ bộ nhớ
@@ -32,7 +43,7 @@ const ChiTietCookbook = () => {
         }
         // ---------------------
 
-        const response = await fetch(`http://localhost:8000/api/user/cookbook/chi-tiet/${id}`, {
+        const response = await fetch(`http://localhost:8000/api/user/cookbook/chi-tiet/${realId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -98,7 +109,7 @@ const ChiTietCookbook = () => {
     }
 
     try {
-        const response = await fetch(`http://localhost:8000/api/user/cookbook/${id}`, {
+        const response = await fetch(`http://localhost:8000/api/user/cookbook/${realId}`, {
             method: 'POST', // Gửi POST kèm _method: PUT
             headers: { 'Authorization': `Bearer ${token}` }, // Không set Content-Type!
             body: formData
@@ -138,7 +149,7 @@ const ChiTietCookbook = () => {
 
     try {
         // 👇 ĐỔI THÀNH POST (cho dễ chạy)
-        const response = await fetch(`http://localhost:8000/api/user/cookbook/${id}/xoa-mon/${recipeId}`, {
+        const response = await fetch(`http://localhost:8000/api/user/cookbook/${realId}/xoa-mon/${recipeId}`, {
             method: 'POST', // Đã đổi từ DELETE sang POST
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -299,7 +310,7 @@ const ChiTietCookbook = () => {
           filteredRecipes.map((recipe) => (
             <div className="saved-card" key={recipe.Ma_CT}>
               <div className="saved-thumb">
-                <Link to={`/cong-thuc/${recipe.Ma_CT}`}>
+                <Link to={`/cong-thuc/${recipe.Ma_CT}-${toSlug(recipe.TenMon)}`}>
                   <img
                     src={recipe.HinhAnh}
                     alt={recipe.TenMon}
@@ -323,7 +334,7 @@ const ChiTietCookbook = () => {
                   />
                   <span>{recipe.TacGia}</span>
                 </div>
-                <Link to={`/cong-thuc/${recipe.Ma_CT}`} className="saved-title">
+                <Link to={`/cong-thuc/${recipe.Ma_CT}-${toSlug(recipe.TenMon)}`} className="saved-title">
                   {recipe.TenMon}
                 </Link>
                 <div className="saved-meta-row">
