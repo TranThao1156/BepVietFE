@@ -105,16 +105,19 @@ const AdminLayout = () => {
             </li>
           </ul>
         </div>
+
+        <div className="sidebar-footer">
+          <a href="/" className="logout-btn">
+            <i className="fa-solid fa-arrow-left"></i> Trở về trang chính
+          </a>
+        </div>
+
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="logout-btn">
             <i className="fas fa-sign-out-alt"></i> Đăng xuất
           </button>
         </div>
-        <div className="sidebar-footer">
-          <a href="/" className="logout-btn">
-            <i className="fas fa-sign-out-alt"></i> Trở về trang chính
-          </a>
-        </div>
+        
       </nav>
 
       {/* --- NỘI DUNG CHÍNH (Thay thế @yield) --- */}

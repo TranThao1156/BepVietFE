@@ -1923,8 +1923,8 @@ blockquote p {
 
 .sidebar-footer {
     border-top: 1px solid #E5E7EB;
-    padding-top: 5px;
-    margin-top: 5px;
+    /* padding-top: 5px;
+    margin-top: 5px; */
 }
 
 .user-mini {

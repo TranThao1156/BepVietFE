@@ -109,8 +109,8 @@ const LayoutNguoiDung = () => {
             <i className="fa-solid fa-clock-rotate-left"></i> Lịch sử công thức
           </NavLink>
         </nav>
-        <div className="mar">
-          <Link to="/" className="btn-logout">
+        <div className="sidebar-footer">
+          <Link to="/" className="logout-btn">
             <i className="fa-solid fa-arrow-left"></i>Trang chủ
           </Link>
         </div>

@@ -62,8 +62,8 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
     margin-right: 20px;
 }
 
-.sidebar-footer { padding: 30px; border-top: 1px solid var(--border-color); }
-.logout-btn { display: flex; align-items: center; gap: 10px; color: var(--danger-text); font-weight: 500; }
+.sidebar-footer { padding: 17px; border-top: 1px solid var(--border-color); }
+.logout-btn { display: flex; font-size: 13px; margin-left: 28px; margin-top: 10px ;align-items: center; gap: 30px; color: var(--primary-color); font-weight: 1000; }
 .logout-btn:hover { opacity: 0.8; }
 
 /* --- MAIN CONTENT --- */
