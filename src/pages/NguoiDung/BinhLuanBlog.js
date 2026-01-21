@@ -89,6 +89,16 @@ const BinhLuanBlog = ({ blogId, currentUser }) => {
     };
 
     const renderComment = (item, isReply = false) => (
+        (() => {
+            // Trâm - đã sửa: chuẩn hóa lấy id người dùng (Ma_ND) và mapping quan hệ nguoi_dung từ Backend
+            const currentUserId = currentUser?.Ma_ND ?? currentUser?.id;
+            const isOwner = Number(currentUserId) === Number(item.Ma_ND);
+            const canDelete = !!currentUser && (isOwner || currentUser?.VaiTro === 0);
+            const avatarUrl = item.nguoi_dung?.AnhDaiDien
+                ? `http://127.0.0.1:8000/storage/img/NguoiDung/${item.nguoi_dung.AnhDaiDien}`
+                : 'http://127.0.0.1:8000/storage/img/NguoiDung/default-avatar.png';
+
+            return (
         <div key={item.Ma_BL} style={{ 
             ...styles.commentWrapper,
             marginLeft: isReply ? '45px' : '0',
@@ -97,7 +107,7 @@ const BinhLuanBlog = ({ blogId, currentUser }) => {
         }}>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                 <img 
-                    src={item.nguoi_dung?.AnhDaiDien || "https://via.placeholder.com/40"} 
+                    src={avatarUrl}
                     style={styles.avatar} alt="avatar"
                 />
                 <div style={{ flex: 1 }}>
@@ -132,9 +142,14 @@ const BinhLuanBlog = ({ blogId, currentUser }) => {
                                 Trả lời
                             </button>
                         )}
-                        {currentUser?.id === item.Ma_ND && (
+                        {isOwner && (
                             <>
                                 <button onClick={() => { setEditingId(item.Ma_BL); setEditContent(item.NoiDungBL); }} style={styles.actionLink}>Sửa</button>
+                                <button onClick={() => handleDelete(item.Ma_BL)} style={{...styles.actionLink, color: '#e74c3c'}}>Xóa</button>
+                            </>
+                        )}
+                        {!isOwner && canDelete && (
+                            <>
                                 <button onClick={() => handleDelete(item.Ma_BL)} style={{...styles.actionLink, color: '#e74c3c'}}>Xóa</button>
                             </>
                         )}
@@ -156,6 +171,8 @@ const BinhLuanBlog = ({ blogId, currentUser }) => {
             </div>
             {item.replies && item.replies.map(reply => renderComment(reply, true))}
         </div>
+            );
+        })()
     );
 
     return (

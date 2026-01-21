@@ -1,6 +1,8 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+// Trâm - đã sửa: dùng component bình luận Blog (load + gửi bình luận qua API)
+import BinhLuanBlog from '../NguoiDung/BinhLuanBlog';
 
 const ChitietBlog = () => {
 
@@ -8,6 +10,13 @@ const ChitietBlog = () => {
 
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        // Trâm - đã sửa: lấy currentUser từ localStorage để bật chức năng gửi/sửa/xóa bình luận
+        const u = localStorage.getItem('user');
+        setCurrentUser(u ? JSON.parse(u) : null);
+    }, []);
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/blog/${id}`)
@@ -62,54 +71,8 @@ const ChitietBlog = () => {
                     dangerouslySetInnerHTML={{ __html: blog.ND_ChiTiet }}
                 />
 
-                {/* BÌNH LUẬN */}
-                <div className="comments-section" style={{ maxWidth: '100%' }}>
-                    <h3>Bình luận ({blog.SoBinhLuan})</h3>
-
-                    <div className="comment-form">
-                        <textarea placeholder="Bạn nghĩ gì về bài viết này?"></textarea>
-                        <button className="btn btn-primary" style={{ float: 'right' }}>
-                            Gửi bình luận
-                        </button>
-                        <div style={{ clear: 'both' }}></div>
-                    </div>
-
-                    {/* DANH SÁCH BÌNH LUẬN */}
-                    {blog.BinhLuan.length === 0 && (
-                        <p style={{ marginTop: '20px', color: '#777' }}>
-                            Chưa có bình luận
-                        </p>
-                    )}
-
-                    {blog.BinhLuan.map((item) => (
-                        <div
-                            className="comment-item"
-                            key={item.Ma_BL}
-                            style={{ marginTop: '30px', display: 'flex', gap: '15px' }}
-                        >
-                            <img
-                                src={`http://127.0.0.1:8000/storage/img/NguoiDung/${item.NguoiDung.AnhDaiDien}`}
-                                alt={item.NguoiDung.HoTen}
-                                style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover'
-                                }}
-                            />
-
-                            <div>
-                                <div style={{ marginBottom: '5px' }}>
-                                    <strong>{item.NguoiDung.HoTen}</strong>
-                                </div>
-                                <p style={{ color: 'var(--text-dark)' }}>{item.NoiDungBL}</p>
-                                <div style={{color: 'var(--text-gray)',fontSize: '0.8rem',marginTop: '5px'}}>
-                                    Trả lời • Ngày {item.NgayBL}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                {/* BÌNH LUẬN (có gửi + load từ API /binh-luan-blog) */}
+                <BinhLuanBlog blogId={blog.Ma_Blog} currentUser={currentUser} />
             </article>
             {/* SIDEBAR PHẢI */}
             <aside className="sidebar-right">

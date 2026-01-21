@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import "../../assets/css/ChiTietCT.css"
+import DanhGiaSao from "../NguoiDung/DanhGiaSao";
 
 const API_URL = "http://127.0.0.1:8000";
 
@@ -188,7 +189,8 @@ const ChitietCongthuc = () => {
   // 1. Load User & Token
   useEffect(() => {
     const u = localStorage.getItem("user");
-    const t = localStorage.getItem("access_token");
+    // Trâm - đã sửa: hỗ trợ cả key cũ (access_token) và key mới (token)
+    const t = localStorage.getItem("token") || localStorage.getItem("access_token") || localStorage.getItem("user_token");
     if (u) setCurrentUser(JSON.parse(u));
     if (t) setToken(t);
   }, []);
@@ -318,6 +320,9 @@ const ChitietCongthuc = () => {
   const steps = recipe.buoc_thuc_hien || recipe.buocThucHien || [];
   const related = recipe.mon_lien_quan || recipe.monLienQuan || [];
   const author = recipe.nguoidung || {};
+  // Trâm - đã sửa: normalize danh sách đánh giá để DanhGiaSao nhận được ở mọi dạng key
+  const reviews = recipe.danhGia || recipe.danh_gia || recipe.danhgia || [];
+  const avgRating = recipe.TrungBinhSao ?? recipe.trung_binh_sao ?? 0;
 
   return (
     <div className="recipe-page-wrapper">
@@ -372,6 +377,17 @@ const ChitietCongthuc = () => {
                 <strong>{recipe.KhauPhan} người</strong>
               </div>
             </div>
+          </div>
+
+          {/* RATING SECTION */}
+          <div style={{ marginTop: 20 }}>
+            <DanhGiaSao
+              maCongThuc={currentId}
+              currentUser={currentUser}
+              initialAvgRating={avgRating}
+              initialReviews={reviews}
+              onRatingSuccess={fetchRecipe}
+            />
           </div>
         </div>
 
