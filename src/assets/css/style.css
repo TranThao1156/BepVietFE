@@ -2902,3 +2902,59 @@ blockquote p {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+.notification-btn {
+    position: relative;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s;
+    margin-right: 10px; /* Cách avatar ra một chút */
+}
+
+.notification-btn:hover {
+    background-color: #f3f4f6; /* Màu nền xám nhạt khi hover */
+}
+
+.notification-btn i {
+    font-size: 1.4rem;
+    color: #4b5563; /* Màu xám đậm */
+    transition: transform 0.2s;
+}
+
+.notification-btn:hover i {
+    color: #FF6B35; /* Đổi màu cam khi hover */
+    animation: bellShake 0.5s ease-in-out; /* Hiệu ứng rung chuông */
+}
+
+/* Số lượng thông báo (Chấm đỏ) */
+.badge-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #EF4444; /* Màu đỏ */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white; /* Viền trắng tách biệt */
+}
+
+/* Hiệu ứng rung chuông */
+@keyframes bellShake {
+  0% { transform: rotate(0); }
+  15% { transform: rotate(15deg); }
+  30% { transform: rotate(-15deg); }
+  45% { transform: rotate(10deg); }
+  60% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0); }
+}
