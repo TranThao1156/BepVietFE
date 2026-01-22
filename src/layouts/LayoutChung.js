@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"; // Trâm -thêm useNavigate
 import "../assets/css/style.css";
 
@@ -10,12 +10,18 @@ const LayoutChung = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
+  // Khanh - State cho Thông báo
+  const [notifications, setNotifications] = useState([]);
+  const [showNotif, setShowNotif] = useState(false);
+  const notifRef = useRef(null);
+
   // LOAD USER TỪ LOCALSTORAGE
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     setUser(storedUser ? JSON.parse(storedUser) : null);
   }, [location.pathname]);
-  //Khanh - Xử lý đăng xuất
+
+  // Khanh - Xử lý đăng xuất
   const handleLogout = async () => {
     if (!window.confirm("Bạn có chắc chắn muốn đăng xuất?")) return;
 
@@ -24,7 +30,7 @@ const LayoutChung = () => {
     // Gọi API logout trên server (nếu có)
     try {
       if (token) {
-        const response = await fetch("http://127.0.0.1:8000/api/user/logout", {
+        await fetch("http://127.0.0.1:8000/api/user/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -32,13 +38,9 @@ const LayoutChung = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-
-        if (!response.ok) {
-          console.warn("API logout thất bại, vẫn xóa token local");
-        }
       }
     } catch (error) {
-      console.error("Lỗi gọi API logout:", error);
+      // Xử lý lỗi logout âm thầm
     }
 
     // Xóa token và user ở localStorage
@@ -60,6 +62,120 @@ const LayoutChung = () => {
   const isActive = (path) => {
     return location.pathname === path ? "active" : "";
   };
+
+  // Khanh - Hàm lấy thông báo
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem("access_token");
+    if (user && token) {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/user/thong-bao",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            const data = result.data || [];
+            setNotifications(data);
+          }
+        }
+      } catch (error) {
+        // Xử lý lỗi fetch thầm lặng
+      }
+    }
+  };
+
+  // Gọi hàm lấy thông báo khi User thay đổi
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(() => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        fetchNotifications();
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const handleReadNotification = async (notif) => {
+    // 1. GỌI API ĐÁNH DẤU ĐÃ ĐỌC (Giữ nguyên logic cũ của bạn)
+    if (notif.TrangThai === 0) {
+      const token = localStorage.getItem("access_token");
+      try {
+        await fetch(
+          `http://127.0.0.1:8000/api/user/thong-bao/${notif.Ma_TB}/da-doc`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        // Cập nhật state local
+        setNotifications(
+          notifications.map((n) =>
+            n.Ma_TB === notif.Ma_TB ? { ...n, TrangThai: 1 } : n
+          )
+        );
+      } catch (error) {
+        // Xử lý lỗi update thầm lặng
+      }
+    }
+
+    // Đóng dropdown
+    setShowNotif(false);
+
+    // 2. XỬ LÝ CHUYỂN HƯỚNG
+    // Chuyển về chữ thường để so sánh cho chắc chắn
+    const loai = notif.LoaiThongBao ? notif.LoaiThongBao.toLowerCase() : "";
+
+    // --- TRƯỜNG HỢP ADMIN (DUYỆT BÀI) ---
+    if (
+      notif.TieuDe.includes("Yêu cầu duyệt") ||
+      notif.NoiDung.includes("chờ duyệt")
+    ) {
+      if (loai === "congthuc") {
+        // Đúng với route: path="kiem-duyet-cong-thuc"
+        navigate(`/quan-tri/kiem-duyet-cong-thuc?ma=${notif.MaLoai}`);
+      } else if (loai === "blog") {
+        // Đúng với route: path="kiem-duyet"
+        navigate(`/quan-tri/kiem-duyet?ma=${notif.MaLoai}`);
+      }
+    }
+    // --- TRƯỜNG HỢP USER (XEM CHI TIẾT) ---
+    else {
+      if (loai === "congthuc") {
+        navigate(`/cong-thuc/${notif.MaLoai}`);
+      } else if (loai === "blog") {
+        navigate(`/blog/${notif.MaLoai}`);
+      }
+    }
+  };
+
+  // Xử lý click ra ngoài để đóng dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotif(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Tính số lượng chưa đọc
+  const unreadCount = notifications.filter((n) => n.TrangThai === 0).length;
 
   return (
     <>
@@ -118,6 +234,54 @@ const LayoutChung = () => {
                     Tìm
                   </button>
                 </div>
+              </div>
+              <div className="header-right-actions">
+                {user && (
+                  <div className="notification-wrapper" ref={notifRef}>
+                    {/* NÚT CHUÔNG */}
+                    <div
+                      className="notification-btn"
+                      onClick={() => setShowNotif(!showNotif)}
+                    >
+                      <i
+                        className={`fa-regular fa-bell ${showNotif ? "active" : ""}`}
+                      ></i>
+                      {unreadCount > 0 && (
+                        <span className="badge-count">{unreadCount}</span>
+                      )}
+                    </div>
+                    {/* DROPDOWN */}
+                    {showNotif && (
+                      <div className="notification-dropdown">
+                        <div className="notif-header">
+                          <h3>Thông báo</h3>
+                        </div>
+                        <div className="notif-list">
+                          {notifications.length > 0 ? (
+                            notifications.map((item) => (
+                              <div
+                                key={item.Ma_TB}
+                                className={`notif-item ${item.TrangThai === 0 ? "unread" : ""}`}
+                                onClick={() => handleReadNotification(item)}
+                              >
+                                <div className="notif-content">
+                                  <p className="notif-text">{item.NoiDung}</p>
+                                </div>
+                                {item.TrangThai === 0 && (
+                                  <span className="dot-unread"></span>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="empty-notif">
+                              Không có thông báo mới
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {user ? (
