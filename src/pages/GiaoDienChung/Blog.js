@@ -10,12 +10,13 @@ const Blog = () => {
     last_page: 1,
   });
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [sortType, setSortType] = useState("newest"); 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
+        setLoading(true);
         const response = await fetch(
-          `http://127.0.0.1:8000/api/blog?page=${currentPage}`,
+          `http://127.0.0.1:8000/api/blog/sap-xep?type=${sortType}&page=${currentPage}`,
         );
 
         if (!response.ok) {
@@ -23,18 +24,22 @@ const Blog = () => {
         }
 
         const data = await response.json();
-        setBlogsData(data.data);
+        setBlogsData({
+          data: data.data,
+          current_page: data.meta.current_page,
+          last_page: data.meta.last_page,
+        });
         // Kiểm tra dữ liệu nhận được
-        console.log(Array.isArray(blogsData), blogsData);
+        console.log(data.data);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách blog:", error);
       } finally {
-        setLoading();
+        setLoading(false);
       }
     };
 
     fetchBlogs();
-  }, [currentPage]);
+  }, [currentPage, sortType]);
 
   if (loading) {
     return <div className="loading">Đang tải...</div>;
@@ -59,14 +64,19 @@ const Blog = () => {
 
       <div className="blog-toolbar">
         <span className="result-count">
-          Hiển thị <b>{blogsData?.data?.length}</b> bài viết mới nhất
+          Hiển thị <b>{blogsData?.data?.length}</b> bài viết{" "}
+          <b>{sortType === "newest" ? "mới nhất" : "cũ nhất"}</b>
         </span>
         <div className="sort-box">
           <i className="fa-solid fa-arrow-up-wide-short"></i>
           <span>Sắp xếp:</span>
-          <select defaultValue="newest">
+          <select value={sortType}
+            onChange={(e) => {
+              setSortType(e.target.value);
+              setCurrentPage(1); // reset trang
+            }}>
             <option value="newest">Mới nhất</option>
-            <option value="popular">Xem nhiều nhất</option>
+            <option value="oldest">Cũ nhất</option>
           </select>
         </div>
       </div>
@@ -77,7 +87,8 @@ const Blog = () => {
             <div className="card-img-wrapper">
               <Link to={`/blog/${blog.Ma_Blog}`}>
                 <img
-                  src={`http://127.0.0.1:8000/storage/img/Blog/${blog.HinhAnh}`}
+                  // src={`http://127.0.0.1:8000/storage/img/Blog/${blog.HinhAnh}`}
+                  src={blog.HinhAnh}
                   alt={blog.TieuDe}
                   className="card-img"
                 />
