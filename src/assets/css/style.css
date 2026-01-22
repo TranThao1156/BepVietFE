@@ -2902,3 +2902,62 @@ blockquote p {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+
+/* Container từng bước */
+.step-input-item {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+/* Hàng tiêu đề: Chứa Số bước và Nút xóa */
+.step-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Badge số thứ tự (Style lại cho đẹp hơn) */
+.step-num-badge {
+  background-color: #333;
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Nút xóa bước */
+.btn-delete-step {
+  background-color: transparent;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Khoảng cách giữa icon và chữ */
+}
+
+.btn-delete-step:hover {
+  background-color: #fff1f0;
+  border-color: #ff4d4f;
+}
+
+/* Điều chỉnh lại Textarea để không bị dính sát */
+.step-input-content textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  resize: vertical;
+}

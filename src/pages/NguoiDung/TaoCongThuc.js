@@ -25,7 +25,7 @@ const TaoCongThuc = () => {
     { id: 1, name: "", qty: "", unit: "" },
   ]);
 
-  // STATE MỚI CHO GỢI Ý NGUYÊN LIỆU 
+  // STATE MỚI CHO GỢI Ý NGUYÊN LIỆU
   const [suggestedIngredients, setSuggestedIngredients] = useState([]);
   const [activeIngIndex, setActiveIngIndex] = useState(null);
   const wrapperRef = useRef(null);
@@ -87,7 +87,7 @@ const TaoCongThuc = () => {
       setActiveIngIndex(index);
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/nguyen-lieu/goi-y?q=${value}`
+          `http://127.0.0.1:8000/api/nguyen-lieu/goi-y?q=${value}`,
         );
         const data = await res.json();
         setSuggestedIngredients(data);
@@ -99,7 +99,7 @@ const TaoCongThuc = () => {
     }
   };
 
-  // Chọn nguyên liệu từ gợi ý 
+  // Chọn nguyên liệu từ gợi ý
   const selectSuggestion = (index, item) => {
     const d = [...ingredients];
     d[index].name = item.TenNguyenLieu;
@@ -245,7 +245,7 @@ const TaoCongThuc = () => {
             Authorization: `Bearer ${token}`,
           },
           body: formData,
-        }
+        },
       );
 
       const data = await res.json();
@@ -515,14 +515,18 @@ const TaoCongThuc = () => {
 
                 {/* Nút Xóa */}
                 <div className="remove-btn-wrapper">
-                  {ingredients.length > 1 && (
+                  {ingredients.length > 1 ? (
                     <button
                       type="button"
-                      className="remove-img"
+                      className="btn-delete-ing" // Class mới để style
                       onClick={() => removeIngredient(ing.id)}
+                      title="Xóa dòng này"
                     >
-                      <i className="fa-solid fa-trash"></i>
+                      <i className="fa-solid fa-trash-can"></i>
                     </button>
+                  ) : (
+                    /* Giữ chỗ trống để layout không bị lệch khi chỉ có 1 dòng */
+                    <div style={{ width: "35px" }}></div>
                   )}
                 </div>
               </div>
@@ -548,6 +552,16 @@ const TaoCongThuc = () => {
             {steps.map((step, index) => (
               <div className="step-input-item" key={step.id}>
                 <div className="step-num-badge">{step.STT}</div>
+                {steps.length > 1 && (
+                  <button
+                    type="button"
+                    className="btn-delete-step"
+                    onClick={() => removeStep(step.id)}
+                    title="Xóa bước này"
+                  >
+                    <i className="fa-solid fa-trash-can"></i> Xóa bước
+                  </button>
+                )}
                 <div className="step-input-content">
                   <textarea
                     placeholder={`Mô tả chi tiết bước ${step.STT}...`}
